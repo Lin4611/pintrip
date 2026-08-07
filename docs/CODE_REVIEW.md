@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 Reviewer Sub-agent 的審查範圍、檢查方式、結果狀態與回報格式
-- 最後更新：2026-07-31
+- 最後更新：2026-08-07
 
 本文件規範 Reviewer Sub-agent。
 
@@ -25,6 +25,24 @@ Reviewer 的責任是獨立確認：
 7. 是否存在會阻擋完成、交付或後續 Git 流程的問題。
 
 Reviewer 必須檢查實際檔案、需求與 diff 證據，不能只相信 Developer Agent 的摘要。Diff 預設來自 Git；目標檔案未被追蹤或被忽略時，只能使用經使用者事前授權的 Non-Git Baseline diff。
+
+### 1.1 與 `code-review` Skill 的銜接
+
+專案 `.agents/skills/code-review/SKILL.md` 是雙軸分析工具，不是 PinTrip 的正式 Reviewer Gate：
+
+- `Standards` 軸檢查 Repository 規範與 Skill 定義的 code smell baseline。
+- `Spec` 軸檢查修改是否符合原始需求、Issue、PRD 或其他規格來源。
+- 兩軸輸出必須保持分離，不得互相掩蓋，也不得以 finding 數量直接決定正式狀態。
+- Skill 不輸出 `APPROVED`、`REQUEST_CHANGES` 或 `UNABLE_TO_VERIFY`；其結論只作為正式 Reviewer 的輸入證據。
+
+正式 Reviewer 必須讀取兩軸 findings，依本文件第 11 節判斷每項問題屬於 Blocking 或 Non-blocking，再依第 12 節輸出唯一有效的正式狀態。Skill 沒有 findings 不自動代表 `APPROVED`；Skill 有 findings 也不自動代表 `REQUEST_CHANGES`。
+
+該 Skill 以可解析的 fixed point 與 `git diff <fixed-point>...HEAD` 為輸入，主要適用於已有 committed diff 的 Branch 或 Pull Request。PinTrip 的必要 Reviewer Gate 發生在 Commit 前；working tree 修改不符合 Skill 輸入條件時：
+
+1. 不得為了執行 Skill 而要求使用者先 Commit。
+2. 不得把 Skill 無法執行本身視為 `UNABLE_TO_VERIFY`。
+3. 正式 Reviewer 仍須檢查 working tree 的實際 Git diff，或經使用者授權的 Non-Git Baseline diff。
+4. 只有缺少本文件要求的需求、diff、驗證或其他關鍵證據，導致正式 Reviewer 無法可靠判斷時，才回報 `UNABLE_TO_VERIFY`。
 
 ---
 
@@ -105,7 +123,8 @@ Reviewer 開始前至少需要取得：
 
 ### Test Seams and TDD Evidence
 - 使用者確認的 Test Seams、測試案例與通過標準
-- Red、Green、Refactor 證據或事前說明的例外理由
+- Red、Green 證據或事前說明的例外理由
+- Re-review 時附上 Reviewer 要求的 Refactor、Developer 限定修改與重新驗證證據
 
 ### Git Status
 - `git status --short`
@@ -113,6 +132,12 @@ Reviewer 開始前至少需要取得：
 ### Diff Evidence
 - Diff Source：GIT / NON_GIT_BASELINE
 - 本次相關的實際 diff
+
+### Two-axis Review Evidence
+- `code-review` Skill：RUN / NOT APPLICABLE / UNABLE TO RUN
+- Fixed Point：實際 ref，或不適用原因
+- Standards：分離報告，或不適用原因
+- Spec：分離報告、`NO SPEC AVAILABLE`，或不適用原因
 ```
 
 若缺少會影響判斷的必要資料，Reviewer 應回報 `UNABLE_TO_VERIFY`，不得猜測。
@@ -129,9 +154,11 @@ Reviewer 應依以下順序檢查：
 4. `docs/ARCHITECTURE.md` 的技術邊界。
 5. 實際修改檔案。
 6. 實際 Git diff 或經授權的 Non-Git Baseline diff。
-7. 測試與驗證結果。
-8. Developer Report。
-9. 是否具備進入 Git 流程的條件。
+7. `code-review` Skill 適用時，分別檢查 `Standards` 與 `Spec` 證據；不適用時記錄原因並繼續正式審查。
+8. 測試與驗證結果。
+9. Developer Report。
+10. 依本文件分級 findings，輸出正式 Reviewer 狀態。
+11. 是否具備進入 Git 流程的條件。
 
 不得先看 Developer 摘要就直接下結論。
 
@@ -267,7 +294,11 @@ Reviewer 必須確認：
 - 每個垂直切片都有先 Red、再 Green 的可信證據。
 - Red 的失敗確實來自缺少目標行為，不是語法、環境或錯誤設定。
 - Green 只加入通過當前測試的最小實作，沒有預作未要求功能。
-- Refactor 由 Developer 在交審前完成，且相關測試持續通過；沒有必要時已記錄 `No refactor needed`。
+- 初次交審前沒有把 Refactor 加入 Developer 的 Red → Green 迴圈。
+- Reviewer 在審查階段判斷是否存在為通過審查所必要的 Refactor；不得因個人偏好或非阻擋改善要求重構。
+- 必要的 Refactor 必須以 Blocking Issue 說明理由、影響與限定範圍，並回報 `REQUEST_CHANGES`；Reviewer 不得自行修改受審內容。
+- Re-review 時確認 Developer 只處理 Reviewer 指定的 Refactor 範圍、沒有改變公開行為，且受影響測試與必要驗證持續通過。
+- 不需要 Refactor 時直接繼續其他審查，不要求 Developer 為形式改碼或記錄 `No refactor needed`。
 - 沒有先批次寫完所有測試再批次實作的 Horizontal Slicing。
 - 沒有 Mock 內部協作者、測試私有方法或依賴非必要呼叫順序的 Implementation-coupled Tests。
 - 預期值來自規格、已確認範例或其他獨立依據，不是重算實作邏輯的 Tautological Tests。
@@ -350,6 +381,8 @@ Reviewer 不得將個人風格偏好升級為 Blocking。
 
 Reviewer 只能使用以下三種狀態：
 
+正式狀態只能由遵守本文件的 Reviewer 輸出。`code-review` Skill 的 `Standards`、`Spec`、finding 數量或摘要都不是正式狀態，也不得直接轉換成下列任一結果。
+
 ### 12.1 `APPROVED`
 
 代表：
@@ -422,8 +455,15 @@ Reviewer 必須使用以下格式：
 ### TDD Assessment
 - Test Seams 已確認：YES / NO / NOT APPLICABLE
 - Red → Green 證據：SUFFICIENT / INSUFFICIENT / NOT APPLICABLE
-- Refactor：VERIFIED / NO REFACTOR NEEDED / INSUFFICIENT / NOT APPLICABLE
+- Review-stage Refactor：NOT REQUIRED / REQUESTED / VERIFIED / INSUFFICIENT / NOT APPLICABLE
 - 測試反模式：NONE / FOUND / UNABLE TO VERIFY
+
+### Two-axis Review Assessment
+- `code-review` Skill：RUN / NOT APPLICABLE / UNABLE TO RUN
+- Fixed Point：實際 ref，或不適用原因
+- Standards Findings：數量、分級與最嚴重問題，或 None
+- Spec Findings：數量、分級與最嚴重問題、`NO SPEC AVAILABLE`，或 None
+- Skill Evidence Limitation：限制，若無則填寫 None
 
 ### Requirement Coverage
 - 已符合：
@@ -456,8 +496,9 @@ Developer 修正 Blocking 問題後：
 1. 提供更新版 Developer Report。
 2. 重新執行失敗項目與受修正影響的驗證。
 3. 提供更新後的 Git diff 或經授權的 Non-Git Baseline diff。
-4. Reviewer 重新檢查修正內容。
-5. 必要時確認修正沒有引入新問題。
+4. 若 Blocking Issue 要求 Refactor，確認修改沒有超出指定範圍、沒有改變公開行為，且相關測試持續通過。
+5. Reviewer 重新檢查修正內容。
+6. 必要時確認修正沒有引入新問題。
 
 Re-review 不得只檢查 Developer 聲稱修正的那一行。
 
@@ -511,6 +552,7 @@ Reviewer 不負責：
 6. 驗證結果足以支持完成聲明。
 7. Developer Report 與實際內容一致。
 8. 沒有未知或未說明的修改。
+9. `code-review` Skill 適用時，`Standards` 與 `Spec` findings 已保持分離並完成正式分級；不適用時已記錄原因，且正式 Reviewer 已直接檢查必要證據。
 
 Reviewer 回報 `APPROVED` 後，流程回到使用者。
 

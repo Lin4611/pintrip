@@ -40,5 +40,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 不得把敏感資訊寫入程式碼。
 - 不得虛構測試或完成結果。
 - 發現需求、文件、程式碼或使用者要求互相衝突時，停止相關工作並回報。
+- 使用 Skill 時仍以使用者明確指示與本專案規則優先；涉及使用者偏好、Agent 權限或流程決策時，一次只提出一個需要決定的問題。
 - Git 寫入與發布由使用者處理；Agent 不得執行建立或切換分支、`git add`、Commit、Push、建立或合併 Pull Request。
 - 任何實際檔案修改都必須交由 Reviewer 審查；未取得 `APPROVED` 前，不得宣稱可交付或完成，也不得進入 Git 寫入或發布流程。

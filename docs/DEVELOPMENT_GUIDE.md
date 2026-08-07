@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 Developer Agent 執行程式與文件修改時的工作方式、實作原則、驗證要求與完成回報
-- 最後更新：2026-07-31
+- 最後更新：2026-08-07
 
 本文件只規範開發與驗證流程。
 
@@ -51,11 +51,11 @@ Developer Agent 必須使用符合事實的狀態，不得將流程中的中間�
 任務確認
   → 限定範圍與驗收條件
   → 使用者確認 Test Seams、測試案例與通過標準
-  → Developer 逐切片執行 Red → Green → Refactor
+  → Developer 逐切片執行 Red → Green
   → lint → targeted tests → full tests → build → diff check → manual verification
   → Developer Report（READY FOR REVIEW）
-  → Reviewer
-      ├─ REQUEST_CHANGES → Developer 修正、重新驗證、更新 Report、重新 Review
+  → Reviewer（必要且可執行時，先取得 code-review Skill 的 Standards／Spec 證據）
+      ├─ REQUEST_CHANGES（含必要 Refactor）→ Developer 依阻擋問題修改、重新驗證、更新 Report、重新 Review
       ├─ UNABLE_TO_VERIFY → 補充證據或由使用者決定下一步
       └─ APPROVED → Final Report（COMPLETE）
   → 使用者確認
@@ -360,7 +360,7 @@ Developer Agent 必須先判斷程式的責任，再選擇位置。
 
 ## 10. 測試與驗證
 
-### 10.1 TDD：Red → Green → Refactor
+### 10.1 TDD：Red → Green
 
 新增功能與錯誤修正預設必須採用專案 `.agents/skills/tdd/SKILL.md`。純重構也必須先以既有或新增測試鎖定公開行為。
 
@@ -368,10 +368,11 @@ Developer Agent 必須先判斷程式的責任，再選擇位置。
 
 1. **Red**：新增一個因缺少目標行為而失敗的測試，執行並確認失敗原因正確。
 2. **Green**：只加入使該測試通過的最小實作，不預作尚未被下一個測試要求的功能。
-3. **Refactor**：由 Developer Agent 在相關測試持續通過下改善結構、命名或重複邏輯，不改變公開行為。
-4. 完成一個切片後，再依前一輪學到的資訊進入下一個 Red。
+3. 完成一個切片後，再依前一輪學到的資訊進入下一個 Red。
 
-PinTrip 在此明確將 Refactor 放在 Developer 階段。Reviewer 維持審查角色，只核對 Refactor 是否改變公開行為、是否引入未要求內容，以及相關測試是否持續通過。沒有值得進行的 Refactor 時，Developer Report 記錄 `No refactor needed`，不得為了形式刻意改碼。
+Refactor 不屬於 Developer 初次交審前的 Red → Green 迴圈。Developer 完成 Green 與正式驗證後先提交 Developer Report，由 Reviewer 在審查階段判斷是否存在需要處理的結構、命名或重複邏輯問題。
+
+Reviewer 不得自行修改受審內容。若 Refactor 為通過審查所必要，Reviewer 必須將理由、影響與限定範圍列為 Blocking Issue，回報 `REQUEST_CHANGES`。Developer 只依該阻擋問題執行 Refactor，不改變公開行為，並重新執行受影響測試與必要驗證後提交更新版 Developer Report，再交由 Reviewer 完整複審。若 Reviewer 判斷不需要 Refactor，直接繼續其他審查，不要求 Developer 為形式進行改碼或記錄 `No refactor needed`。
 
 純文件、無行為的設定修改，或客觀上無法先建立有效測試的任務可以例外。Developer Agent 必須在修改前說明例外原因、替代驗證方式與風險，不得默默略過 TDD，也不得為了形式上的 Red 建立沒有行為價值的測試。
 
@@ -539,6 +540,8 @@ Reviewer 的 `APPROVED` 是交付門檻，不是 Git 操作授權。Developer Ag
 
 任何實際檔案修改都必須 Review。Developer Agent 完成限定範圍的修改與所有必要驗證後，停止新增變更，將狀態設為 `READY FOR REVIEW`，並先輸出 Developer Report：
 
+專案 `.agents/skills/code-review/SKILL.md` 是 Reviewer 可使用的雙軸分析工具，只產生彼此分離的 `Standards` 與 `Spec` 證據，不產生 PinTrip 的正式 Reviewer 狀態。該 Skill 需要可解析的 fixed point 與非空 committed diff；Commit 前 working tree 尚不符合其輸入條件時，Reviewer 不得為了執行 Skill 而要求先 Commit，也不得因此略過正式審查。正式 Reviewer 仍須依 `docs/CODE_REVIEW.md` 檢查實際 working tree diff 或經授權的 Non-Git Baseline diff。
+
 ````md
 ## Developer Report
 
@@ -562,7 +565,7 @@ Reviewer 的 `APPROVED` 是交付門檻，不是 Git 操作授權。Developer Ag
 ### TDD Evidence
 - Red：失敗測試與正確失敗原因
 - Green：最小實作與通過結果
-- Refactor：重構內容與持續通過結果，或 No refactor needed
+- Review-stage Refactor：初次交審填寫 `NOT YET ASSESSED`；若 Reviewer 曾要求 Refactor，更新版報告列出 Blocking Issue、限定修改與重新驗證結果
 - 不適用時：修改前說明的例外理由、替代驗證與風險
 
 ### Validation
@@ -589,7 +592,9 @@ Reviewer 的 `APPROVED` 是交付門檻，不是 Git 操作授權。Developer Ag
 
 Reviewer 依 `docs/CODE_REVIEW.md` 檢查實際檔案、需求、驗收條件、TDD 證據、驗證結果與 diff：
 
-- 有 Blocking 問題時回報 `REQUEST_CHANGES`。Developer Agent 只修正指出的範圍，重新執行受影響驗證，輸出更新版 Developer Report，再交完整複審。
+- `code-review` Skill 能依其規則執行時，Reviewer 將 `Standards` 與 `Spec` 報告保留為分離證據，再依正式分級規則逐項判斷是否 Blocking；Skill 的摘要或 finding 數量不得直接等同 `APPROVED`。
+- `code-review` Skill 因缺少 committed fixed point 而不適用時，Reviewer 直接使用本次實際 diff 完成正式審查；只有缺少正式判斷所需的需求、diff、驗證或其他必要證據時，才回報 `UNABLE_TO_VERIFY`。
+- 有 Blocking 問題時回報 `REQUEST_CHANGES`。若 Blocking Issue 要求 Refactor，Reviewer 必須說明理由、影響與限定範圍；Developer Agent 只處理指出的範圍，重新執行受影響驗證，輸出更新版 Developer Report，再交完整複審。
 - 沒有 Blocking 問題時，由 Reviewer 回報 `APPROVED`。
 - 缺少可靠判斷所需的證據時，由 Reviewer 回報 `UNABLE_TO_VERIFY`，不得視為通過。
 - Developer Agent 不得自行輸出 `APPROVED`。
@@ -623,7 +628,7 @@ Reviewer 依 `docs/CODE_REVIEW.md` 檢查實際檔案、需求、驗收條件、
 ### TDD Evidence
 - Red
 - Green
-- Refactor
+- Review-stage Refactor：Reviewer 是否要求；若要求，列出 Blocking Issue、Developer 修改、重新驗證與複審結果
 - 不適用時說明原因、替代驗證與風險
 
 ### Validation
