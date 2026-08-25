@@ -1,0 +1,40 @@
+:root{
+  --font-display:"Playfair Display",'Times New Roman',serif;   /* wordmark, trip titles */
+  --font-ui:"Quicksand",-apple-system,"Segoe UI",sans-serif;    /* buttons, labels, titles */
+  --font-script:"Caveat",cursive;                               /* taglines, margin notes */
+  --font-kr:"Noto Sans KR","Apple SD Gothic Neo",sans-serif;    /* Korean copy */
+
+  /* Display (Playfair) */
+  --type-wordmark:44px;
+  --type-display-lg:30px;   /* trip title: "Tokyo" */
+  --type-display-md:22px;   /* panel heading: "Start New Trip" */
+  --type-display-sm:20px;   /* section heading: "My Trip Collections" */
+
+  /* UI (Quicksand) */
+  --type-screen-title:26px; /* "Import Link" */
+  --type-ui-lg:19px;        /* place name: "Bomnal Cafe" */
+  --type-ui-md:16px;        /* button label */
+  --type-ui-sm:14px;        /* meta, place count, nav label */
+  --type-ui-xs:12px;        /* tags, badge */
+
+  /* Body */
+  --type-body:14px;
+  --type-body-sm:13px;
+  --type-caption:12px;
+  --type-script:19px;
+
+  --lh-tight:1.15; /* @kind font */
+  --lh-snug:1.35; /* @kind font */
+  --lh-body:1.55; /* @kind font */
+  --lh-kr:1.6; /* @kind font */
+
+  --w-regular:400; /* @kind font */
+  --w-medium:500; /* @kind font */
+  --w-semibold:600; /* @kind font */
+  --w-bold:700; /* @kind font */
+
+  --ls-tight:-0.01em; /* @kind font */
+  --ls-normal:0; /* @kind font */
+  --ls-wide:0.02em; /* @kind font */
+  --ls-caps:0.08em; /* @kind font */
+}

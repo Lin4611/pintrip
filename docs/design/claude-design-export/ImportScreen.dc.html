@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./ds-base.js"></script>
+<style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
+/* FAB lift override: DS BottomNav hard-codes the FAB at top:-26px; PinTrip lowers it to -14px (same as Home) */
+[data-fab-lift] nav > span:last-of-type{top:-14px !important}</style>
+</helmet>
+<div style="display:flex;gap:64px;justify-content:center;align-items:flex-start;padding:56px 56px 72px">
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:baseline;gap:10px;padding-left:6px">
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">02</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">Import Link + Analyze Result</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:#A9A6A0">390 × 844</span>
+    </div>
+
+    <div data-screen-label="02 Import result" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18)">
+      <img src="assets/icons/status-bar.png" alt="" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+
+      <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding:8px 20px 72px">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.IconButton" icon-src="./assets/icons/arrow-back.png" size="{{ 40 }}" variant="paper" label="返回" hint-size="40px,40px"></x-import>
+          <div style="display:flex;align-items:center;gap:6px">
+            <img src="assets/stickers/wordmark-script.png" alt="PinTrip" style="height:40px;display:block">
+            <img src="assets/stickers/sticker-envelope.png" alt="" style="width:52px;display:block;transform:rotate(4deg)">
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <h1 style="margin:0;font-family:Quicksand,sans-serif;font-size:26px;font-weight:700;color:#3B3B3D;letter-spacing:-0.01em">匯入連結</h1>
+          <p style="margin:8px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:400;line-height:1.6;color:#81817D">貼上 Instagram、Google 地圖或網頁連結，PinTrip 會幫你整理成可收藏的旅遊地點。</p>
+        </div>
+
+        <div style="margin-top:18px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.LinkInput" value="https://www.instagram.com/p/Cu123abcDEF/" icon-src="./assets/stickers/icon-instagram.png" hint-size="100%,52px"></x-import>
+        </div>
+        <div style="margin-top:12px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="primary" size="lg" full-width="{{ true }}" icon-src="./assets/icons/sparkle.png" hint-size="100%,50px">分析連結</x-import>
+        </div>
+
+        <div style="margin-top:20px;position:relative">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.AnalyzeStatus" icon-src="./assets/icons/check-circle.png" text="分析完成！" emphasis="找到 3 個地點。" hint-size="100%,44px"></x-import>
+          <img src="assets/stickers/arrow-curve.png" alt="" style="position:absolute;right:2px;top:-4px;width:36px;opacity:0.9">
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:-7px;left:26px;width:64px;height:17px;background:repeating-linear-gradient(90deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px),repeating-linear-gradient(0deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px);opacity:0.92;border-radius:2px;transform:rotate(-8deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-cafe-jeju.png" category="cafe" category-label="咖啡" name="春日咖啡" description="面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。" address="濟州市涯月邑涯月路1街24" tags="{{ tags1 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/heart-outline.png" hint-size="100%,214px"></x-import>
+          </div>
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:-7px;left:30px;width:60px;height:17px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(6deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-food-jeju.png" category="food" category-label="美食" name="溫谷鮭魚" description="鮭魚丼與生魚片都很新鮮，需要排隊但很值得。" address="濟州市蓮洞 261-27" tags="{{ tags2 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/star-outline.png" hint-size="100%,214px"></x-import>
+          </div>
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:-7px;left:24px;width:62px;height:17px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-5deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-nature-jeju.png" category="attraction" category-label="景點" name="城山日出峰" description="濟州最具代表性的自然景觀，趕上日出時分最動人。" address="西歸浦市城山邑城山里 1" tags="{{ tags3 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/flower.png" hint-size="100%,214px"></x-import>
+          </div>
+
+        </div>
+
+        <div style="margin-top:20px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BatchAddPanel" title="要加入這 3 個地點嗎？" subtitle="儲存到我的旅程收藏，之後也能在行程中查看。" luggage-src="./assets/stickers/sticker-luggage.png" sparkle-src="./assets/stickers/sticker-sparkles.png" hint-size="100%,96px"></x-import>
+        </div>
+        <div style="margin-top:12px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="action" size="lg" full-width="{{ true }}" hint-size="100%,50px">加入 3 個地點</x-import>
+        </div>
+      </div>
+
+      <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
+        <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+  <div style="width:400px;display:flex;flex-direction:column;gap:26px;padding-top:38px;font-family:Quicksand,sans-serif;color:#3B3B3D">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">COMPONENT TREE</div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px">
+        <div style="font-size:13.5px;font-weight:700">ImportScreen</div>
+        <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;border-left:1px dashed #E6DFCF">
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">ImportHeader</span><span style="color:#777">IconButton · Wordmark · 信封貼紙</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">ScreenTitle</span><span style="color:#777">「匯入連結」+ 說明文字</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">LinkInput</span><span style="color:#777">來源 icon · input · clear 按鈕</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">Button primary</span><span style="color:#777">「分析連結」full-width, sparkle</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">AnalyzeStatus</span><span style="color:#777">完成狀態 + 手繪箭頭貼紙</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">PlaceResultCard ×n</span><span style="color:#777">map(results) · Sticker 包裹層</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">BatchAddPanel</span><span style="color:#777">dashed 邊框，確認語氣</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">Button action</span><span style="color:#777">珊瑚色，全頁唯一 commit</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">與 Home 同一元件，active=imports</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">└ FabButton</span><span style="color:#777">60px 圓形，中央 top:-14px</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">LAYOUT / 間距</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12.5px">
+        <span style="color:#777">Frame / gutter</span><span style="font-weight:700">390 × 844 / 20px</span>
+        <span style="color:#777">Header → 標題</span><span style="font-weight:700">14px</span>
+        <span style="color:#777">標題 → LinkInput</span><span style="font-weight:700">18px</span>
+        <span style="color:#777">LinkInput → CTA</span><span style="font-weight:700">12px</span>
+        <span style="color:#777">CTA → 狀態列</span><span style="font-weight:700">20px</span>
+        <span style="color:#777">狀態列 → 卡片群</span><span style="font-weight:700">16px</span>
+        <span style="color:#777">結果卡片間距</span><span style="font-weight:700">gap 16px</span>
+        <span style="color:#777">LinkInput 高度 / 圓角</span><span style="font-weight:700">52px / 14px</span>
+        <span style="color:#777">CTA 高度</span><span style="font-weight:700">50px</span>
+        <span style="color:#777">結果卡片 padding / 圓角</span><span style="font-weight:700">12px / 20px</span>
+        <span style="color:#777">卡片照片</span><span style="font-weight:700">120 × 136 + 5px 白框</span>
+        <span style="color:#777">內容區底部留白</span><span style="font-weight:700">72px（FAB 安全距離）</span>
+        <span style="color:#777">BottomNav / FAB</span><span style="font-weight:700">72px / 60px, 上凸 14px</span>
+        <span style="color:#777">最小點擊區</span><span style="font-weight:700">44px</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">React / NEXT.JS 實作建議</div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">
+        <div>與 Home 共用同一個 AppShell：status bar 與 BottomNav 放 layout，畫面內容放 page，兩頁的固定層完全不重繪，切頁時 nav 不跳動。</div>
+        <div>三段狀態（idle / analyzing / done）只切換 AnalyzeStatus 與結果區塊，LinkInput 與 CTA 位置不動；analyzing 用 <span style="font-family:Quicksand,sans-serif;font-weight:700">opacity</span> 淡入，不要位移或骨架跳動。</div>
+        <div>結果卡片的「編輯 / 加入旅程」是卡片內操作，加入後只換標籤為「已加入 ✓」，按鈕不消失、卡片高度不變。</div>
+        <div>底部珊瑚色 CTA 是全頁唯一 commit 動作，與卡片內的藍色按鈕不可同色，也不要在同一畫面出現第二顆珊瑚色按鈕。</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">ASSETS 使用說明</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">icon-instagram</span><span style="color:#777">LinkInput 來源徽章，24×24，依連結來源替換</span>
+        <span style="font-weight:700;color:#4C76C2">sparkle</span><span style="color:#777">分析 CTA 內圖示，僅此一處</span>
+        <span style="font-weight:700;color:#4C76C2">check-circle</span><span style="color:#777">分析完成狀態列</span>
+        <span style="font-weight:700;color:#4C76C2">pin-blue</span><span style="color:#777">地點門牌地址（Home 的國家用 pin-coral）</span>
+        <span style="font-weight:700;color:#4C76C2">pencil</span><span style="color:#777">編輯動作</span>
+        <span style="font-weight:700;color:#4C76C2">arrow-curve</span><span style="color:#777">狀態列旁手繪箭頭，decorative</span>
+        <span style="font-weight:700;color:#4C76C2">sticker-envelope</span><span style="color:#777">Header 右側，每頁僅一枚</span>
+        <span style="font-weight:700;color:#4C76C2">luggage / sparkles</span><span style="color:#777">BatchAddPanel 兩側，sparkles 為 multiply</span>
+        <span style="font-weight:700;color:#4C76C2">heart / star / flower</span><span style="color:#777">卡片右緣小記號，一卡一枚、依序輪替</span>
+        <span style="font-weight:700;color:#4C76C2">washi tape</span><span style="color:#777">CSS 漸層產生（實色 / 格紋 / 點點），非圖檔</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">切版注意事項</div>
+      <div style="display:flex;flex-direction:column;gap:11px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#5A5A5C">
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">圖片裁切比例</span><br>結果卡片照片固定 120×136（約 0.88:1），一律 <span style="font-family:Quicksand,sans-serif;font-weight:700">object-fit:cover</span> + <span style="font-family:Quicksand,sans-serif;font-weight:700">object-position:center</span>；白色相框是外層 padding，不要用 border 疊圓角，否則不同 DPR 下會露出邊。來源圖多為橫幅，交付時請提供中心可裁切的版本。</div>
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Sticker / Tape 定位</span><br>裝飾一律是卡片外層 <span style="font-family:Quicksand,sans-serif;font-weight:700">position:relative</span> 容器內的 absolute 圖層，用 top/left 加上 rotate(−8°~+7°)，並跨過卡片邊界才有壓住紙張的感覺。全部 <span style="font-family:Quicksand,sans-serif;font-weight:700">aria-hidden</span> 且 <span style="font-family:Quicksand,sans-serif;font-weight:700">pointer-events:none</span>，不可放進卡片元件內部，否則卡片無法重用。</div>
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Card 高度自適應</span><br>卡片不設固定高度：描述最多 2 行、地址 1 行，超出用 <span style="font-family:Quicksand,sans-serif;font-weight:700">line-clamp</span>；標籤列用 flex-wrap 並允許換行到第二行。中／韓文較長時左右欄高度差異大，改動時請以照片高度為最小高度基準。</div>
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav 與 FAB 層級</span><br>nav 容器 z-index 5、FAB 上凸 14px 且帶 5px 米色描邊；捲動內容不可高於 nav。內容區底部保留 72px 留白，避免最後一顆 CTA 被 FAB 蓋住。</div>
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Mobile safe area</span><br>nav 高度用 <span style="font-family:Quicksand,sans-serif;font-weight:700">72px + env(safe-area-inset-bottom)</span>，底部 padding 同步加上 inset；iOS 鍵盤升起時 LinkInput 需 scroll into view，但 nav 應維持在版面底部而非跟著鍵盤。</div>
+        <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Overflow scroll</span><br>只有內容區可捲動（<span style="font-family:Quicksand,sans-serif;font-weight:700">flex:1; overflow-y:auto; overscroll-behavior:contain</span>），frame 本身 overflow:hidden；捲軸隱藏但需保留鍵盤與 tab focus 的可捲動性。裝飾貼紙不可造成水平捲動，必要時外層 <span style="font-family:Quicksand,sans-serif;font-weight:700">overflow-x:clip</span>。</div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:1010},&quot;showSpec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'imports' };
+  renderVals(){
+    const I='./assets/icons/';
+    return {
+      showSpec: this.props.showSpec ?? true,
+      showDecor: this.props.showDecor ?? true,
+      activeTab: this.state.tab,
+      onSelect: (id) => this.setState({ tab: id }),
+      navItems:[{id:'trips',label:'旅程',iconSrc:I+'nav-trips.png'},{id:'imports',label:'匯入',iconSrc:I+'nav-imports.png'}],
+      tags1:['#海景','#風格咖啡','#涯月咖啡'],
+      tags2:['#鮭魚丼','#濟州美食','#蓮洞'],
+      tags3:['#日出景點','#濟州必訪','#自然風景']
+    };
+  }
+}
+
+</script>
+</body>
+</html>

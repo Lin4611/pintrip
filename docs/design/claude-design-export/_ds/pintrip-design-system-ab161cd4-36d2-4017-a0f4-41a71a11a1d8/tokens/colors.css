@@ -1,0 +1,65 @@
+:root{
+  /* ---- Warm neutrals: paper, cream, ink. Sampled from the reference mockups. ---- */
+  --cream-50:#FDFBF6;
+  --cream-100:#F9F5ED;   /* app background */
+  --cream-200:#F4EFE4;
+  --cream-300:#EAE5DB;   /* hairline borders on cream */
+  --paper:#FFFDFA;       /* card surface */
+  --paper-nav:#FCFBF7;   /* bottom bar / elevated bar */
+
+  --ink-900:#0B1B33;     /* serif display headings */
+  --ink-700:#3B3B3D;     /* rounded-sans headings, place names */
+  --ink-500:#777777;     /* body copy, descriptions */
+  --ink-400:#81817D;     /* Korean secondary copy */
+  --ink-300:#A9A6A0;     /* placeholder, disabled */
+
+  /* ---- Soft blue: the primary accent ---- */
+  --blue-700:#3C5FA0;
+  --blue-600:#4C76C2;
+  --blue-500:#5B87D0;    /* primary button fill */
+  --blue-400:#7B9EDC;
+  --blue-200:#B2C6DD;    /* dashed borders */
+  --blue-100:#E9EEF8;    /* tag chip fill */
+  --blue-050:#ECF2F6;    /* tinted panel fill */
+
+  /* ---- Small category accents ---- */
+  --coral-600:#E8604F;
+  --coral-500:#F0796C;   /* batch CTA */
+  --coral-400:#F5726A;   /* Cafe badge, map pins */
+  --coral-100:#FBEAE6;
+
+  --butter-500:#E0B34E;
+  --butter-400:#F4CE6D;  /* Food badge */
+  --butter-100:#FAF3E0;
+  --butter-ink:#B79E68;
+
+  --lavender-500:#9E91C0;
+  --lavender-400:#B79ED9; /* Attraction badge */
+  --lavender-100:#F1EDF7;
+  --lavender-ink:#9E91C0;
+
+  --tape-butter:#F3E3B8;
+  --tape-blush:#F7D9CE;
+  --tape-lavender:#D8CBEC;
+  --tape-blue:#C4D8EF;
+
+  /* ---- Semantic aliases ---- */
+  --bg-app:var(--cream-100);
+  --surface-card:var(--paper);
+  --surface-nav:var(--paper-nav);
+  --surface-panel:var(--blue-050);
+  --text-display:var(--ink-900);
+  --text-heading:var(--ink-700);
+  --text-body:var(--ink-500);
+  --text-body-kr:var(--ink-400);
+  --text-muted:var(--ink-300);
+  --text-accent:var(--blue-600);
+  --text-on-accent:#FFFFFF;
+  --accent:var(--blue-500);
+  --accent-strong:var(--blue-600);
+  --accent-action:var(--coral-500);
+  --border-hairline:var(--cream-300);
+  --border-dashed:var(--blue-200);
+  --border-field:var(--cream-300);
+  --focus-ring:var(--blue-400);
+}

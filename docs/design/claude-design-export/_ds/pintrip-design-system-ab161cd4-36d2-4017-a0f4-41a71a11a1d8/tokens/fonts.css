@@ -1,0 +1,7 @@
+/* PinTrip webfonts. No binaries were supplied with the reference mockups, so these are
+   the nearest Google Fonts matches, loaded from the Google Fonts CDN.
+   Playfair Display  → the high-contrast serif of the PinTrip wordmark and trip titles
+   Quicksand         → the rounded UI sans of buttons, labels and screen titles
+   Caveat            → the handwritten taglines and margin notes
+   Noto Sans KR      → Korean body copy */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..700&family=Quicksand:wght@400..700&family=Caveat:wght@400..700&family=Noto+Sans+KR:wght@300..700&display=swap");

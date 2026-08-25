@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./ds-base.js"></script>
+<style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
+/* FAB lift override: DS BottomNav hard-codes the FAB at top:-26px; PinTrip Home lowers it to -14px */
+[data-fab-lift] nav > span:last-of-type{top:-14px !important}</style>
+</helmet>
+<div style="display:flex;gap:64px;justify-content:center;align-items:flex-start;padding:56px 56px 72px">
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:baseline;gap:10px;padding-left:6px">
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">01</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">Home / Trip Collections</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:600;color:#A9A6A0">390 × 844</span>
+    </div>
+
+    <div data-screen-label="01 Home" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18)">
+      <img src="assets/icons/status-bar.png" alt="" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+
+      <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding:12px 20px 72px">
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div>
+            <img src="assets/stickers/wordmark-serif.png" alt="PinTrip" style="height:58px;display:block">
+            <img src="assets/stickers/tagline-script.png" alt="Pin your best trips. Cherish every place." style="width:152px;display:block;margin-top:10px">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;padding-top:6px">
+            <img src="assets/photos/avatar-user.png" alt="" style="width:52px;height:52px;border-radius:999px;border:2.5px solid #FFFDFA;box-shadow:0 4px 14px rgba(122,96,58,0.07);display:block">
+            <img src="assets/stickers/note-paper.png" alt="Collect moments, not things." style="width:100px;display:block;transform:rotate(-3deg)">
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
+          <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅程收藏</h2>
+          <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
+        </div>
+        <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前收藏 2 個旅程 · 64 個地點</p>
+
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo.png" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+          </div>
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;bottom:-6px;right:22px;width:54px;height:16px;background:repeating-linear-gradient(90deg,#D8CBEC 0 3px,transparent 3px 7px),#EFE4FA;opacity:0.92;border-radius:2px;transform:rotate(7deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="京都" location="日本" note="慢慢散步，感受京都的四季與街景。" place-count="36" count-label="個地點" photo-src="./assets/photos/trip-kyoto.png" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
+          </div>
+
+          <div style="position:relative">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:-9px;left:50%;margin-left:-31px;width:62px;height:18px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-2deg);z-index:2"></div></sc-if>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.StartTripCard" title="開始新的旅程" description="收藏地點，記錄回憶，開始屬於你的旅行故事。" map-src="./assets/stickers/worldmap.png" hint-size="100%,104px"></x-import>
+          </div>
+
+        </div>
+      </div>
+
+      <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
+        <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+  <div style="width:380px;display:flex;flex-direction:column;gap:26px;padding-top:38px;font-family:Quicksand,sans-serif;color:#3B3B3D">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">COMPONENT TREE</div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px">
+        <div style="font-size:13.5px;font-weight:700">HomeScreen</div>
+        <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;border-left:1px dashed #E6DFCF">
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">BrandLockup</span><span style="color:#777">Wordmark · Tagline · Avatar · NoteCard</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">SectionHeader</span><span style="color:#777">title / action「查看全部」</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">CollectionSummary</span><span style="color:#777">tripCount · placeTotal</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">TripCard ×n</span><span style="color:#777">map(trips) · Sticker 包裹層</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">StartTripCard</span><span style="color:#777">dashed 邊框，非實體項目</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">Trips · Add · Imports，固定層 z-index 5</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="font-weight:700;color:#4C76C2">└ FabButton</span><span style="color:#777">60px 圓形，中央 top:-14px</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">LAYOUT / 間距</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12.5px">
+        <span style="color:#777">Frame</span><span style="font-weight:700">390 × 844</span>
+        <span style="color:#777">左右 gutter</span><span style="font-weight:700">20px</span>
+        <span style="color:#777">卡片垂直間距</span><span style="font-weight:700">gap 16px</span>
+        <span style="color:#777">品牌區 → 區塊標題</span><span style="font-weight:700">26px</span>
+        <span style="color:#777">TripCard 高度 / 圓角</span><span style="font-weight:700">184px / 20px</span>
+        <span style="color:#777">TripCard 照片</span><span style="font-weight:700">172 × 172</span>
+        <span style="color:#777">內容區底部留白</span><span style="font-weight:700">72px（FAB 安全距離）</span>
+        <span style="color:#777">BottomNav</span><span style="font-weight:700">72px, 上圓角 26px</span>
+        <span style="color:#777">FabButton</span><span style="font-weight:700">60px 圓形 + 5px 米色描邊</span>
+        <span style="color:#777">FAB 上凸高度</span><span style="font-weight:700">14px（原 26px）</span>
+        <span style="color:#777">FAB 中心 → 卡片底</span><span style="font-weight:700">≥ 26px 淨空</span>
+        <span style="color:#777">最小點擊區</span><span style="font-weight:700">44px</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">React / NEXT.JS 實作建議</div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">
+        <div>捲動層與固定層分離：status bar 與 BottomNav 為 fixed 層，內容區 <span style="font-family:Quicksand,sans-serif;font-weight:700">flex:1; overflow-y:auto</span>，可直接對應 App Router 的 layout / page 拆分。</div>
+        <div>TripCard 只吃資料 props（title, location, note, placeCount, photoSrc, icons），裝飾膠帶由外層 Sticker 包裹層負責，因此 map 出來的卡片彼此無耦合。</div>
+        <div>裝飾元素（膠帶、貼紙、郵票）皆為 <span style="font-family:Quicksand,sans-serif;font-weight:700">aria-hidden</span> 的絕對定位圖層，不影響版位計算，可依 index 給定不同角度。</div>
+        <div>FAB 上凸由 26px 降為 14px，內容區底部留白 72px：卡片內的操作（•••、Edit）與全域「新增旅程」在視覺層級上分開，兩者不再重疊。實作時建議把 lift 值做成 BottomNav 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">fabOffset</span> prop。</div>
+        <div>間距全部走 4px 基準（12 / 16 / 20 / 26 / 72），色彩與陰影使用 design token CSS 變數，不寫死 hex。</div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:1010},&quot;showSpec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'trips' };
+  renderVals(){
+    const S='./assets/stickers/', I='./assets/icons/';
+    return {
+      showSpec: this.props.showSpec ?? true,
+      showDecor: this.props.showDecor ?? true,
+      activeTab: this.state.tab,
+      onSelect: (id) => this.setState({ tab: id }),
+      tokyoIcons:[{src:S+'icon-torii.png',alt:'Shrines'},{src:S+'icon-food.png',alt:'Food'},{src:S+'icon-train.png',alt:'Rail'}],
+      kyotoIcons:[{src:S+'icon-pagoda.png',alt:'Temples'},{src:S+'icon-maple.png',alt:'Autumn'},{src:S+'icon-matcha.png',alt:'Tea'}],
+      navItems:[{id:'trips',label:'旅程',iconSrc:I+'nav-trips.png'},{id:'imports',label:'匯入',iconSrc:I+'nav-imports.png'}]
+    };
+  }
+}
+
+</script>
+</body>
+</html>
