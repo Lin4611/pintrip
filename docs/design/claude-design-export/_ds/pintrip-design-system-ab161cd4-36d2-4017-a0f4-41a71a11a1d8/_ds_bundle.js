@@ -12,7 +12,7 @@ const __ds_scope = {};
 try { (() => {
 const SIZES = {
   sm: {
-    h: 40,
+    h: 44,
     fs: 13,
     px: 10,
     r: 'var(--r-sm)',
@@ -73,6 +73,8 @@ function Button({
   icon,
   disabled = false,
   onClick,
+  ariaLabel,
+  ariaDescribedby,
   children,
   style
 }) {
@@ -82,6 +84,8 @@ function Button({
   return /*#__PURE__*/React.createElement("button", {
     type: "button",
     disabled: disabled,
+    "aria-label": ariaLabel,
+    "aria-describedby": ariaDescribedby,
     onClick: onClick,
     onPointerDown: () => setPressed(true),
     onPointerUp: () => setPressed(false),
@@ -456,6 +460,8 @@ function AnalyzeStatus({
   style
 }) {
   return /*#__PURE__*/React.createElement("div", {
+    role: "status",
+    "aria-live": "polite",
     style: {
       display: 'flex',
       alignItems: 'center',
@@ -1059,20 +1065,247 @@ function PlaceResultCard({
   editLabel = 'Edit',
   addLabel = 'Add to Trip',
   addedLabel = 'Added',
+  showReject = false,
+  rejected = false,
+  onReject,
+  rejectLabel = 'Reject',
+  rejectedLabel = 'Rejected',
+  matchState = 'matched',
+  candidates = [],
+  candidatesExpanded = false,
+  onToggleCandidates,
+  onPickCandidate,
+  onResearch,
+  chooseLabel,
+  unmatchedLabel,
+  researchLabel = '重新搜尋',
+  confirming = false,
+  onConfirmReject,
+  onCancelReject,
+  confirmLine1,
+  confirmLine2,
+  confirmCancelLabel = '取消',
+  confirmRejectLabel = '拒絕',
+  readOnly = false,
+  dispositionLabel,
+  failed = false,
+  failureText,
+  failureId,
+  failureLabel = '加入失敗',
+  adding = false,
+  editAriaLabel,
+  rejectAriaLabel,
+  addAriaLabel,
+  onRetry,
+  editIconOnly = false,
   tape,
   stamp,
   style
 }) {
+  const confirmRow = /*#__PURE__*/React.createElement("div", {
+    role: "group",
+    style: {
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      font: '13px/1.55 var(--font-kr)',
+      color: 'var(--ink-400)'
+    }
+  }, confirmLine1), /*#__PURE__*/React.createElement("div", {
+    style: {
+      font: '12px/1.55 var(--font-kr)',
+      color: 'var(--ink-400)',
+      marginTop: 2
+    }
+  }, confirmLine2), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement(__ds_scope.Button, {
+    variant: "solid",
+    size: "sm",
+    onClick: onCancelReject,
+    style: {
+      flex: 1.35
+    }
+  }, confirmCancelLabel), /*#__PURE__*/React.createElement(__ds_scope.Button, {
+    variant: "outline",
+    size: "sm",
+    onClick: onConfirmReject,
+    style: {
+      flex: 1
+    }
+  }, confirmRejectLabel)));
+  const dispositionRow = /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 7,
+      minHeight: 44,
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": "true",
+    style: {
+      fontFamily: 'var(--font-ui)',
+      fontSize: 15,
+      fontWeight: 600,
+      lineHeight: 1,
+      color: added ? 'var(--blue-500)' : 'var(--ink-400)'
+    }
+  }, added ? '\u2713' : '\u2715'), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: 'var(--font-ui)',
+      fontSize: 13.5,
+      fontWeight: 'var(--w-bold)',
+      color: added ? 'var(--blue-500)' : 'var(--ink-400)'
+    }
+  }, dispositionLabel));
+  const failureBlock = failed ? /*#__PURE__*/React.createElement("div", {
+    id: failureId,
+    role: "status",
+    "aria-live": "polite",
+    style: {
+      marginTop: 12,
+      padding: '10px 12px',
+      borderRadius: 12,
+      background: 'var(--coral-100)',
+      font: '12.5px/1.55 var(--font-kr)',
+      color: 'var(--ink-500)'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: 'var(--font-ui)',
+      fontWeight: 'var(--w-bold)',
+      color: 'var(--coral-600)'
+    }
+  }, failureLabel), '\u3000', failureText) : null;
+  const matchText = matchState === 'matched' ? address : matchState === 'choosing' ? chooseLabel : unmatchedLabel;
+  const matchSlot = /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 9
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    role: candidates.length ? 'button' : undefined,
+    tabIndex: candidates.length ? 0 : undefined,
+    "aria-expanded": candidates.length ? !!candidatesExpanded : undefined,
+    onClick: candidates.length ? onToggleCandidates : undefined,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 6,
+      minHeight: candidates.length ? 44 : 0,
+    }
+  }, /*#__PURE__*/React.createElement(__ds_scope.LocationLine, {
+    text: matchText,
+    iconSrc: pinSrc,
+    tone: "blue",
+    size: 12.5,
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }), candidates.length ? /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": "true",
+    style: {
+      fontFamily: 'var(--font-ui)',
+      fontSize: 16,
+      color: 'var(--ink-400)',
+      flexShrink: 0,
+      transform: candidatesExpanded ? 'rotate(90deg)' : 'none'
+    }
+  }, '\u203a') : null));
+  const matchExpansion = candidatesExpanded ? /*#__PURE__*/React.createElement("div", {
+    role: "radiogroup",
+    style: {
+      marginTop: 10,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6
+    }
+  }, candidates.slice(0, 3).map((c, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    role: "radio",
+    "aria-checked": !!c.selected,
+    tabIndex: 0,
+    onClick: onPickCandidate ? () => onPickCandidate(c, i) : undefined,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      minHeight: 44,
+      padding: '6px 10px',
+      borderRadius: 12,
+      cursor: 'pointer',
+      background: c.selected ? 'var(--blue-050)' : 'transparent',
+      border: c.selected ? '1.5px solid var(--blue-400)' : '1.5px solid var(--cream-300)'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": "true",
+    style: {
+      width: 14,
+      height: 14,
+      borderRadius: '50%',
+      flexShrink: 0,
+      boxSizing: 'border-box',
+      border: c.selected ? '4px solid var(--blue-500)' : '1.5px solid var(--cream-300)'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: 'block',
+      fontFamily: 'var(--font-ui)',
+      fontSize: 13,
+      fontWeight: 'var(--w-bold)',
+      color: 'var(--ink-700)',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }
+  }, c.name), /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: 'block',
+      font: '12px/1.5 var(--font-kr)',
+      color: 'var(--ink-400)'
+    }
+  }, c.address)))), /*#__PURE__*/React.createElement(__ds_scope.Button, {
+    variant: "outline",
+    size: "sm",
+    onClick: onResearch,
+    style: {
+      width: '100%'
+    }
+  }, researchLabel)) : matchState === 'unmatched' ? /*#__PURE__*/React.createElement(__ds_scope.Button, {
+    variant: "outline",
+    size: "sm",
+    onClick: onResearch,
+    style: {
+      width: '100%',
+      marginTop: 10
+    }
+  }, researchLabel) : null;
   return /*#__PURE__*/React.createElement("article", {
     style: {
       position: 'relative',
       display: 'flex',
-      gap: 12,
+      flexDirection: 'column',
       padding: 12,
       background: 'var(--surface-card)',
       borderRadius: 'var(--r-lg)',
       boxShadow: 'var(--shadow-card)',
       ...style
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 12
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1134,15 +1367,7 @@ function PlaceResultCard({
       lineHeight: 'var(--lh-kr)',
       paddingRight: 16
     }
-  }, description), address && /*#__PURE__*/React.createElement(__ds_scope.LocationLine, {
-    text: address,
-    iconSrc: pinSrc,
-    tone: "blue",
-    size: 12.5,
-    style: {
-      marginTop: 9
-    }
-  }), /*#__PURE__*/React.createElement("div", {
+  }, description), matchSlot, /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: 'var(--divider-dash)',
       margin: '11px 0 10px'
@@ -1156,7 +1381,7 @@ function PlaceResultCard({
   }, tags.map((t, i) => /*#__PURE__*/React.createElement(__ds_scope.Tag, {
     key: i,
     tone: TAG_TONE[category] || 'blue'
-  }, t))), /*#__PURE__*/React.createElement("div", {
+  }, t))))), matchExpansion, failureBlock, confirming ? confirmRow : readOnly ? dispositionRow : /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 8,
@@ -1167,13 +1392,32 @@ function PlaceResultCard({
     size: "sm",
     iconSrc: editIconSrc,
     onClick: onEdit,
+    ariaLabel: editAriaLabel,
+    disabled: added || rejected,
     style: {
       flex: 1
     }
-  }, editLabel), /*#__PURE__*/React.createElement(__ds_scope.Button, {
+  }, editLabel), showReject && /*#__PURE__*/React.createElement(__ds_scope.Button, {
+    variant: "outline",
+    size: "sm",
+    onClick: onReject,
+    ariaLabel: rejectAriaLabel,
+    disabled: added || rejected,
+    style: rejected ? {
+      flex: 1,
+      background: 'var(--cream-200)',
+      color: 'var(--ink-400)',
+      border: '1.5px solid var(--cream-300)'
+    } : {
+      flex: 1
+    }
+  }, rejected ? rejectedLabel : rejectLabel), /*#__PURE__*/React.createElement(__ds_scope.Button, {
     variant: "solid",
     size: "sm",
-    onClick: onAdd,
+    onClick: failed && onRetry ? onRetry : onAdd,
+    ariaLabel: addAriaLabel,
+    ariaDescribedby: failed ? failureId : undefined,
+    disabled: added || rejected || adding || matchState !== 'matched',
     icon: /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 17,
@@ -1181,10 +1425,13 @@ function PlaceResultCard({
         lineHeight: 1
       }
     }, added ? '✓' : '+'),
-    style: {
+    style: adding ? {
+      flex: 1.35,
+      opacity: 0.4
+    } : {
       flex: 1.35
     }
-  }, added ? addedLabel : addLabel))), markSrc && /*#__PURE__*/React.createElement("img", {
+  }, added ? addedLabel : addLabel)), markSrc && /*#__PURE__*/React.createElement("img", {
     src: markSrc,
     alt: "",
     style: {

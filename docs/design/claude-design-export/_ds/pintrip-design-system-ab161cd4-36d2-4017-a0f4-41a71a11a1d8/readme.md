@@ -1,5 +1,17 @@
 # PinTrip Design System
 
+> **本專案內實際提供的內容（2026-08-27 校正）**
+>
+> 這份 `_ds/` 資料夾只包含 `_ds_bundle.js`、`styles.css`、`tokens/`、`_ds_manifest.json`、
+> `_adherence.oxlintrc.json` 與本檔。下面 *Sources* 與 *Index* 兩節描述的是**原始 design system 資源**，
+> 其中 `uploads/01_pintrip_home_master.png`、`uploads/02_pintrip_import_result_master.png`、
+> `components/`、`ui_kits/`、`guidelines/`、`assets/`、`thumbnail.html`、`SKILL.md`
+> **未包含在本專案**，不可直接引用或當成可讀取的路徑。元件請透過 bundle 掛載
+> （`PinTripDesignSystem_ab161c.<Component>`），素材請使用專案根目錄的 `assets/`。
+>
+> 規格衝突時的優先順序：`HomeScreen.dc.html` → `ImportScreen.dc.html` → `CLAUDE.md` →
+> 本 design system → `MvpMockups.dc.html`（僅早期 visual reference）。
+
 PinTrip is a mobile-first travel place collection app. A user pastes or imports an Instagram
 post link; PinTrip extracts the places mentioned in it and turns them into collectible travel
 results the user can review, edit, and file into trip collections to explore later.
@@ -8,7 +20,7 @@ The product feeling is **warm, clean, collectible, and slightly cute** — a Kor
 with light sticker, postcard, and travel-journal detailing. Not childish, not a heavy collage,
 not generic SaaS.
 
-## Sources
+## Sources（原始 DS 資源；下列 master mockups 未包含在本專案）
 
 Everything in this system is derived from two uploaded master mockups. No codebase, Figma file,
 or brand kit was provided.
@@ -25,7 +37,7 @@ redrawn, so the system carries the original artwork rather than an approximation
 **Product scope is deliberately narrow.** Trips, Add, Imports. There is no Explore, Journal,
 Saves, Route, XP, Levels, Quests, Achievements, budgeting, or social feed — do not add them.
 
-## Index
+## Index（原始 DS 樹狀結構；本專案只含 styles.css、tokens/ 與 bundle）
 
 - `styles.css` — the single entry point consumers link. `@import`s only.
 - `tokens/` — `fonts.css`, `colors.css`, `typography.css`, `spacing.css`, `effects.css`
@@ -56,30 +68,44 @@ every surface), `CategoryIcon` (a wrapper for the die-cut sticker glyphs on trip
 
 ## Content fundamentals
 
-PinTrip is **bilingual by role, not by translation**. English carries the structure; Korean carries
-the feeling.
+**All product UI copy is Traditional Chinese (繁體中文).** PinTrip is not bilingual by role: structure
+and feeling are both carried in Chinese. The earlier "English carries the structure" model no longer
+holds — the shipped screens set navigation, actions, and object names in Chinese too.
 
-- **English** for navigation, actions, and object names: "My Trip Collections", "Start New Trip",
-  "Import Link", "Analyze Link", "Add to Trip", "Edit", "View all", "Trips", "Imports",
-  "28 places", "Tokyo", "Bomnal Cafe". Title Case for headings and buttons. No trailing periods.
-- **Korean** for anything that describes, reassures, or confirms: trip notes
-  ("도쿄의 오래된 감성과 새로운 일상 사이에서."), place descriptions
-  ("푸른 바다를 바라보며 즐기는 제주 감성 카페."), helper lines
-  ("링크를 붙여넣으면 여행지를 자동으로 정리해드려요 ✨"), status
-  ("링크 분석 완료! 3개의 장소를 찾았어요."), and the batch CTA ("3개 장소 추가하기").
-- Korean voice is polite-friendly **-해요체**, never formal -습니다. The app addresses the user
-  as a companion, and speaks about "내 여행 컬렉션" (my collection) — possession sits with the user.
-- **Numbers are stated, never celebrated.** "28 places", "3개의 장소를 찾았어요." There are no
+The shipped screens (`HomeScreen.dc.html`, `ImportScreen.dc.html`) are the source of truth for copy;
+the examples below are taken from them.
+
+- **Traditional Chinese** for navigation, actions, and object names:「我的旅行收藏」「建立旅行收藏」
+  「匯入連結」「分析連結」「編輯」「查看全部」「旅行收藏」「匯入」「28 個地點」「東京」「春日咖啡」.
+  Title Case does not apply to Chinese — the equivalent rule is that headings and buttons carry no
+  trailing punctuation at all（no 。and no ！）, and stay as short as the action allows.
+- **The only English in the product is artwork, never UI copy**: the wordmark (PinTrip), the
+  handwritten tagline ("Pin your best trips. Cherish every place."), and the paper note
+  ("Collect moments, not things."). These three keep their English exactly as drawn, keep their
+  original Title Case and sentence periods, and are never treated as strings to translate,
+  reuse, or extend. Nothing else in the interface is set in English.
+- **Traditional Chinese** for anything that describes, reassures, or confirms: trip notes
+  (「東京的老派風景與新的日常交會。」), place descriptions
+  (「面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。」), helper lines
+  (「貼上 Instagram 貼文連結，PinTrip 會整理出貼文裡提到的地點 ✨」), status
+  (「分析完成！找到 3 個地點。」), and the batch CTA (「加入 3 個地點」).
+- Chinese voice is plain, warm, and spoken — short sentences, no formal 公文 register and no
+  exhortation. The app addresses the user as a companion and speaks about「我的旅行收藏」
+  (my collection) — possession sits with the user.
+- **Numbers are stated, never celebrated.** 「28 個地點」,「找到 3 個地點。」There are no
   streaks, scores, or progress bars, and no growth-flavoured copy.
 - One exclamation mark per screen at most, and only on a genuinely good outcome
-  ("링크 분석 완료!"). Questions are used for confirmation: "3개의 장소를 추가할까요?"
-- **Emoji: exactly one sparkle, and only in Korean helper text** (✨ at the end of a helper line).
+  (「分析完成！」). Questions are used for confirmation: 「要加入這 3 個地點嗎？」
+- **Emoji: exactly one sparkle, and only in Chinese helper text** (✨ at the end of a helper line).
   Emotion elsewhere comes from stickers and photography, not glyphs. Never put emoji in a button,
-  a heading, or English copy.
+  a heading, or the English artwork copy.
+- Full-width Chinese punctuation（，。！？「」）— never ASCII commas or periods in Chinese copy.
 - Marketing voice appears once, on Home, as a handwritten tagline
   ("Pin your best trips. Cherish every place.") and one paper note
-  ("Collect moments, not things."). Both are artwork, not UI copy — brand asides, used once each.
-- Hashtags are Korean, un-spaced, 2–3 per place: `#오션뷰 #감성카페 #애월카페`.
+  ("Collect moments, not things."). Both are artwork, not UI copy — brand asides, used once each,
+  and the reason English survives on the screen at all.
+- Hashtags are Traditional Chinese, un-spaced, 2–3 per place: `#海景 #風格咖啡 #涯月咖啡`.
+- Never set Chinese copy in the handwriting script face.
 
 ## Visual foundations
 
@@ -170,6 +196,17 @@ Emoji is not used as iconography anywhere. The one ✨ in Korean helper copy is 
 
 ## Substitutions and gaps — please review
 
+- **`--font-kr` is a Korean face being used to set Traditional Chinese — UNDECIDED.** The shipped
+  screens (`HomeScreen.dc.html`, `ImportScreen.dc.html`) set all Chinese copy in `--font-kr`, whose
+  value is Noto Sans KR. Two real consequences: (1) **coverage gaps** — characters outside the
+  Korean face's Han subset silently fall back to the platform `sans-serif`, so a single line can mix
+  two faces; (2) **wrong glyph forms** — shared Han characters render in Korean regional forms
+  rather than Traditional Chinese forms. The shipped Chinese copy is therefore not correctly
+  typeset today. Fixing this means replacing an external webfont dependency, which also forces a
+  re-check of every type size and line-height in `tokens/typography.css` — out of scope here, and
+  no replacement face has been chosen. The token name `--font-kr` is also semantically wrong now
+  and needs renaming as part of the same decision. Nothing in `tokens/` or the screens was changed
+  for this entry — it is a recorded gap awaiting a product/type decision.
 - **Fonts are Google Fonts stand-ins.** No font binaries were supplied, so `tokens/fonts.css`
   loads Playfair Display, Quicksand, Caveat, and Noto Sans KR from the Google Fonts CDN as the
   nearest matches to the masters. If PinTrip owns licensed faces (a Korean display face in
@@ -178,7 +215,7 @@ Emoji is not used as iconography anywhere. The one ✨ in Korean helper copy is 
   which is the real artwork but at mockup resolution. `Wordmark` also has a type-only fallback
   (Playfair + a coral pin dot) for cases where the PNG can't load. A vector wordmark would replace
   both.
-- **Some cropped photos have stickers baked in** (the Tokyo stamp, the Kyoto lavender sprig, the
+- **Some cropped photos have stickers baked in** — 本專案已改用 clean plates + 分層裝飾（見 `CLAUDE.md`）。原始說明保留為背景： (the Tokyo stamp, the Kyoto lavender sprig, the
   Jeju stamps and heart) because they were composited into the source imagery. Clean plates would
   let the sticker layer be composed properly per card.
 - **Type sizes are readable-first, not literal.** Measured against a 390pt frame, the masters'

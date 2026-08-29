@@ -12,7 +12,16 @@
 <script src="./ds-base.js"></script>
 <style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}</style>
 </helmet>
-<div style="display:flex;gap:72px;justify-content:center;align-items:flex-start;padding:56px 56px 64px">
+<div style="display:flex;flex-direction:column;gap:28px;padding:48px 56px 64px">
+
+  <div style="max-width:900px;background:#FBF3EE;border:1.5px dashed #E6BFAE;border-radius:20px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-family:Quicksand,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:0.1em;color:#B5745A">EARLIER VISUAL REFERENCE — 不是 SOURCE OF TRUTH</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46">這份是較早期的共用 mockup，只作視覺參考。照片、裝飾、間距與狀態都可能落後於正式 handoff（例如仍使用裝飾已合成的舊 place 照片、依畫面順序放置的膠帶）。任何規格衝突一律以正式 handoff 為準，不要從這裡取值。</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46">優先順序：1. <strong style="color:#3B3B3D">HomeScreen.dc.html</strong> → 2. <strong style="color:#3B3B3D">ImportScreen.dc.html</strong> → 3. <strong style="color:#3B3B3D">CLAUDE.md</strong> → 4. <strong style="color:#3B3B3D">_ds</strong> → 5. 本檔（僅 visual reference）。</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46;border-top:1px dashed #E6BFAE;padding-top:6px"><strong>適用範圍</strong>：上述優先順序<strong style="color:#3B3B3D">僅適用於 claude-design-export 內部的視覺與 handoff 敘述</strong>。產品範圍與產品規則以 <strong style="color:#3B3B3D">docs/MVP.md</strong> 為準，技術決策與資料邊界以 <strong style="color:#3B3B3D">docs/ARCHITECTURE.md</strong> 為準；設計檔不得凌駕這兩份文件。</div>
+  </div>
+
+<div style="display:flex;gap:72px;justify-content:center;align-items:flex-start">
 
   <div style="display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;align-items:baseline;gap:10px;padding-left:6px">
@@ -108,6 +117,8 @@
       <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="imports" hint-size="100%,72px"></x-import>
     </div>
   </div>
+
+</div>
 
 </div>
 
