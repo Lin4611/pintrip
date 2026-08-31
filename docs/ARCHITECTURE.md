@@ -47,7 +47,14 @@
 
 「Google 登入已決定」只代表使用者登入方式；具體 Auth 套件、Session 儲存與 OAuth 設定仍未決定。
 
-設計交付使用的 Design System 以編譯後的 `docs/design/claude-design-export/_ds/<design-system>/_ds_bundle.js` 形式存在，原始 `components/` 未包含在本專案。目前該 bundle 已有一項修改（`Button` 的 `sm` 高度由 40 調整為 44，以符合 44px 最小點擊區）。若日後改為由原始碼重新編譯 Design System，必須先確認此類修改不會遺失。
+設計交付使用的 Design System 以編譯後的 `docs/design/claude-design-export/_ds/<design-system>/_ds_bundle.js` 形式存在，原始 `components/` 未包含在本專案。目前該 bundle 帶有以下本地修改，屬元件責任而非頁面覆寫：
+
+- `Button`：`sm` 高度由 40 調整為 44，以符合 44px 最小點擊區；並新增 `ariaLabel` 與 `ariaDescribedby` 透傳。
+- `BottomNav`：新增 `showFab`（預設 `true`；PinTrip 三張設計稿皆傳 `false`）。
+- `PlaceResultCard`：新增 `readOnly`、`dispositionLabel`、`failed`、`failureText`、`failureId`、`failureLabel`、`adding`、`editAriaLabel`、`rejectAriaLabel`、`addAriaLabel` 與 `onRetry`。
+- `CategoryBadge` 與 `PlaceResultCard`：`KINDS` 與 `TAG_TONE` 對齊 §5.9 固定五分類——`shop` 更名為 `shopping`、移除 `stay`、新增 `other`。同批更新 `_adherence.oxlintrc.json`，使不在五類內的 `kind` 或 `category` 在 lint 階段被擋下，而非靜默 fallback。
+
+若日後改為由原始碼重新編譯 Design System，必須先確認這些修改不會遺失。設計交付端的對應紀錄見 `docs/design/claude-design-export/CLAUDE.md`。
 
 本段只描述設計交付所使用的 Design System，不構成應用端 UI 元件庫的決定；應用端 UI 元件庫仍列於 §2.2 尚未決定。
 
@@ -183,7 +190,7 @@ Import 1 ── * TripPlaceSource
 ### 5.2 實體責任
 
 - `User`：應用程式使用者身分，對應已驗證的 Google 帳號。
-- `Trip`：使用者擁有的旅行收藏容器。
+- `Trip`：使用者擁有的旅行收藏容器，保存建立時指派、之後不再變更的視覺樣式標記。
 - `Import`：一次單篇來源匯入及其整體處理狀態。
 - `ImportItem`：單一候選地點及其確認結果。
 - `Place`：外部地點服務中的實際地點；不直接表示收藏所有權。
