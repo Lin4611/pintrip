@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 MVP 的系統邊界、元件責任、資料關係、處理流程與技術決策狀態
-- 最後更新：2026-07-30
+- 最後更新：2026-08-28
 
 本文件是架構與實作邊界的規範來源。產品目標、功能範圍與驗收條件以 `docs/MVP.md` 為準。
 
@@ -41,8 +41,22 @@
 | 登入方式 | Google 是唯一的 MVP 身分提供者 | MVP 登入範圍 |
 | 正式收藏門檻 | 必須由使用者確認，且匹配外部 Place | 核心產品規則 |
 | 去重範圍 | 同一 Trip 與 Place 的組合唯一 | 核心產品規則 |
+| Instagram 匯入網址 | 支援單篇一般貼文（`/p/`）與 Reel（`/reel/`）網址 | MVP 匯入範圍 |
+| Import 來源識別 | Import 建立後，其原始來源網址不因畫面輸入變更而改寫；不同網址建立另一筆 Import | 避免處理來源與顯示來源不一致 |
+| 批次確認失敗語意 | 允許部分成功；成功項目保留，失敗項目維持尚未處置並可重試，不回滾整批 | ImportItem 獨立處置與使用者體驗決定 |
 
 「Google 登入已決定」只代表使用者登入方式；具體 Auth 套件、Session 儲存與 OAuth 設定仍未決定。
+
+設計交付使用的 Design System 以編譯後的 `docs/design/claude-design-export/_ds/<design-system>/_ds_bundle.js` 形式存在，原始 `components/` 未包含在本專案。目前該 bundle 帶有以下本地修改，屬元件責任而非頁面覆寫：
+
+- `Button`：`sm` 高度由 40 調整為 44，以符合 44px 最小點擊區；並新增 `ariaLabel` 與 `ariaDescribedby` 透傳。
+- `BottomNav`：新增 `showFab`（預設 `true`；PinTrip 三張設計稿皆傳 `false`）。
+- `PlaceResultCard`：新增 `readOnly`、`dispositionLabel`、`failed`、`failureText`、`failureId`、`failureLabel`、`adding`、`editAriaLabel`、`rejectAriaLabel`、`addAriaLabel` 與 `onRetry`。
+- `CategoryBadge` 與 `PlaceResultCard`：`KINDS` 與 `TAG_TONE` 對齊 §5.9 固定五分類——`shop` 更名為 `shopping`、移除 `stay`、新增 `other`。同批更新 `_adherence.oxlintrc.json`，使不在五類內的 `kind` 或 `category` 在 lint 階段被擋下，而非靜默 fallback。
+
+若日後改為由原始碼重新編譯 Design System，必須先確認這些修改不會遺失。設計交付端的對應紀錄見 `docs/design/claude-design-export/CLAUDE.md`。
+
+本段只描述設計交付所使用的 Design System，不構成應用端 UI 元件庫的決定；應用端 UI 元件庫仍列於 §2.2 尚未決定。
 
 ### 2.2 尚未決定
 
@@ -92,18 +106,21 @@ UI 隱藏不是授權控制。任何讀取、修改、重新處理或刪除動�
 
 負責：
 
-- 驗證手動輸入或 Share Target payload。
+- 驗證手動輸入或 Share Target payload，並區分「不支援的來源網址」與「有效網址但內容無法取得」。
 - 將匯入綁定目前使用者與目標 Trip。
 - 保存原始網址、可取得文字與必要來源快照。
 - 建立 `received` 狀態的 Import。
 
 不得假設分享資料一定包含完整貼文內容或圖片。
 
+一般貼文（`/p/`）與 Reel（`/reel/`）網址通過來源格式驗證後才可建立 Import。Import 建立後，原始來源網址是該筆任務的來源識別；`received`、`processing` 與後續回訪畫面不得以可編輯輸入取代它。使用者改用其他網址時必須建立另一筆 Import，不得改寫正在處理或既有 Import 的來源。
+
 ### 3.4 來源取得與地點解析
 
 負責：
 
 - 嘗試取得允許讀取的來源內容。
+- 對 Reel 優先使用可取得的 caption、Share Target 文字或其他文字內容，不要求必須取得影片內容。
 - 結合使用者補充文字、截圖或位置提示。
 - 將一次 Import 解析為零筆或多筆 ImportItem。
 - 保存結構化候選資料與信心資訊。
@@ -124,10 +141,12 @@ UI 隱藏不是授權控制。任何讀取、修改、重新處理或刪除動�
 
 負責：
 
-- 讓使用者修改候選內容、確認或拒絕 ImportItem。
+- 在 Import 處於 `review_required` 時，讓使用者修改候選內容、確認或拒絕 ImportItem。
 - 確認時以 Trip 與 Place 檢查是否已有 TripPlace。
 - 新地點建立 TripPlace；重複地點只建立新的 TripPlaceSource。
-- 對既有內容顯示差異，但不自動覆蓋分類、說明、推薦品項或備註。
+- 對既有內容顯示差異，但不自動覆蓋分類、說明、推薦品項、標籤或備註。
+
+Import 進入 `completed` 後，ImportItem 只作為唯讀處置紀錄。後續若要修改已加入的正式收藏內容，寫入目標必須是 TripPlace，不得透過 ImportItem 編輯流程間接改寫；已拒絕的 ImportItem 不再提供編輯入口。
 
 ### 3.7 查詢與呈現
 
@@ -171,7 +190,7 @@ Import 1 ── * TripPlaceSource
 ### 5.2 實體責任
 
 - `User`：應用程式使用者身分，對應已驗證的 Google 帳號。
-- `Trip`：使用者擁有的旅行收藏容器。
+- `Trip`：使用者擁有的旅行收藏容器，保存建立時指派、之後不再變更的視覺樣式標記。
 - `Import`：一次單篇來源匯入及其整體處理狀態。
 - `ImportItem`：單一候選地點及其確認結果。
 - `Place`：外部地點服務中的實際地點；不直接表示收藏所有權。
@@ -213,14 +232,21 @@ needs_input ──使用者結束零候選匯入──▶ completed
 
 `completed` 是 Import 的處理終態，不代表每個 ImportItem 都已成為正式收藏。
 
+`completed` 不得轉回 `processing` 或其他非終態，也不得變更其目標 Trip。再次分析相同或不同來源網址時，匯入接收邊界必須建立新的 Import。
+
 ### 6.2 ImportItem 處置
 
 - 每筆候選項目獨立保持待確認、被確認或被拒絕。
 - 使用者確認時必須選定外部 Place。
 - 只要仍有一筆候選未處置，Import 就維持 `review_required`。
+- 批次確認只能接收屬於同一 Import、已匹配 Place 且尚未處置的 ImportItem；Server 必須逐筆驗證所有權、Import 歸屬、匹配狀態與處置狀態，不得信任 Client 計算的批次數量。
+- 已確認、已拒絕或尚未匹配 Place 的 ImportItem 不得進入批次確認集合。
+- 批次確認必須逐項產生成功或失敗結果。成功項目的 ImportItem、TripPlace 與 TripPlaceSource 寫入完成後不得因同批其他項目失敗而回滾；失敗項目不得標示為已確認，並維持可重試狀態。
+- 批次回應必須讓 Client 能將成功項目更新為已加入，並對每個失敗項目呈現可理解的原因。只要仍有尚未處置項目，Import 就維持 `review_required`。
 - 重新處理不得未經使用者同意覆蓋已確認的正式收藏內容。
+- Import 進入 `completed` 後，不得再修改、重新匹配、確認、拒絕或重新處理其 ImportItem。已確認項目的正式收藏內容只能透過 TripPlace 的編輯邊界修改；該修改不改變原 ImportItem 的處置紀錄。
 
-具體狀態欄位、交易邊界、併發控制與重試冪等策略仍待資料庫及背景任務方案決定。
+具體狀態欄位、單一 ImportItem 的原子寫入邊界、批次協調方式、併發控制與重試冪等策略仍待資料庫及背景任務方案決定；無論採用何種實作，都必須維持上述部分成功的對外語意。
 
 ---
 
@@ -282,16 +308,20 @@ Place 代表外部實際地點，可能被其他 Trip 參照，不隨單一 Trip
 /trips/:tripId/map
 /imports
 /imports/:importId/review
+/imports/:importId/items/:itemId/edit
 /share
 ```
 
 路由可以在實作規劃時調整，但不得刪除對應的登入、旅行收藏、匯入、確認、卡片、地圖與分享能力。
+
+`/imports/:importId/items/:itemId/edit` 只服務尚在 `review_required` 的候選編輯。Import 進入 `completed` 後不得再進入此路由；已加入地點的後續修改必須使用 TripPlace 的正式收藏編輯邊界，其路由與畫面不在本次 Import Screen 設計範圍，尚未於本文件定案。
 
 ---
 
 ## 11. 錯誤與可觀察狀態
 
 - 外部來源、AI、Places 與儲存操作失敗時，不得回報成功。
+- 非 Instagram 網址或不支援的 Instagram 路徑屬於來源格式錯誤，不建立 Import；已通過格式驗證但無法取得內容時，Import 進入 `needs_input` 並提供手動補充流程，不得回報為格式錯誤。
 - 使用者可看到 Import 目前狀態、可理解的失敗原因及下一步。
 - 可重試錯誤與不可繼續錯誤的技術分類，待整合方案確定後補充。
 - Log 與錯誤資訊不得包含 OAuth secret、API key、Session token 或不必要的私人來源內容。

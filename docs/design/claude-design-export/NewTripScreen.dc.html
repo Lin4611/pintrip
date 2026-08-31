@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/tokens/colors.css">
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/tokens/typography.css">
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/tokens/effects.css">
+<link rel="stylesheet" href="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/styles.css">
+<script src="_ds/pintrip-design-system-ab161cd4-36d2-4017-a0f4-41a71a11a1d8/_ds_bundle.js"></script>
+<style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
+/* Screen gutter — the only spacing that changes with viewport (same rule as Home / Import) */
+[data-w="360"] [data-pad]{padding-left:16px !important;padding-right:16px !important}
+[data-w="430"] [data-pad]{padding-left:24px !important;padding-right:24px !important}
+a{color:#4C76C2}a:hover{color:#3B62A8}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#EFE9DE;padding:40px 44px 64px;font-family:Quicksand,sans-serif;color:#3B3B3D;display:flex;flex-direction:column;gap:30px">
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#A9A6A0">PINTRIP MVP · DESIGN HANDOFF</div>
+    <h1 style="margin:0;font-family:'Playfair Display',serif;font-size:38px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">Create / Edit Trip Collection</h1>
+    <p style="margin:0;max-width:760px;font-family:'Noto Sans KR',sans-serif;font-size:13.5px;line-height:1.7;color:#81817D">路由 <strong style="color:#3B3B3D">/trips/new</strong>。欄位依 <strong style="color:#3B3B3D">docs/MVP.md §5.2</strong>：收藏名稱（必填）、目的地名稱（選填）、收藏說明（選填）。同一個表單版式同時服務「建立」與「重新命名／編輯收藏」，只換標題、CTA 文案與帶入的既有值。App Shell（兩格 BottomNav、無 FAB、safe area、捲動規則）沿用 HomeScreen handoff。</p>
+    <div style="max-width:760px;background:#FFFDFA;border-radius:16px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:14px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C"><strong style="color:#B5745A">不在此畫面的東西</strong>：日期、行程、封面照片選擇、裝飾挑選 — MVP §5.2 沒有這些欄位，視覺樣式在建立當下自動指派（HomeScreen 的 PRESET ASSIGNMENT），使用者不挑選。字數上限尚未決定，因此<strong style="color:#3B3B3D">不顯示字數計數器</strong>，也不以版面反推上限。</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-wrap:wrap;gap:7px;max-width:470px">
+        <sc-for list="{{ widthChips }}" as="chip" hint-placeholder-count="3">
+          <button type="button" onClick="{{ chip.onClick }}" style="font-family:Quicksand,sans-serif;font-size:12px;font-weight:700;padding:7px 12px;border-radius:999px;border:1.5px solid #C4D8EF;cursor:pointer;background:{{ chip.bg }};color:{{ chip.fg }}">{{ chip.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;max-width:470px">
+        <sc-for list="{{ stateChips }}" as="chip" hint-placeholder-count="5">
+          <button type="button" onClick="{{ chip.onClick }}" style="font-family:Quicksand,sans-serif;font-size:12px;font-weight:700;padding:7px 12px;border-radius:999px;border:1.5px solid #E3D9C6;cursor:pointer;background:{{ chip.bg }};color:{{ chip.fg }}">{{ chip.label }}</button>
+        </sc-for>
+      </div>
+
+      <div data-w="{{ w }}" data-screen-label="{{ screenLabel }}" style="width:{{ frameWidth }};height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18);position:relative">
+        <img src="assets/icons/status-bar.png" alt="" aria-hidden="true" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+
+        <div data-pad="true" style="flex:1;min-height:0;overflow-y:auto;overflow-x:clip;overscroll-behavior:contain;scrollbar-width:none;padding:8px 20px 32px">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.IconButton" icon-src="./assets/icons/arrow-back.png" size="{{ 44 }}" variant="paper" label="返回" hint-size="44px,44px"></x-import>
+            <div style="display:flex;align-items:center;gap:6px">
+              <img src="assets/stickers/wordmark-script.png" alt="PinTrip" style="height:40px;display:block">
+              <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><img src="assets/stickers/sticker-envelope.png" alt="" aria-hidden="true" style="width:52px;display:block;transform:rotate(4deg);pointer-events:none"></sc-if>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <h1 style="margin:0;font-family:Quicksand,sans-serif;font-size:26px;font-weight:700;color:#3B3B3D;letter-spacing:-0.01em">{{ screenTitle }}</h1>
+            <p style="margin:8px 0 0;max-width:304px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#81817D">{{ screenHelper }}</p>
+          </div>
+
+          <div style="position:relative;margin-top:18px">
+            <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" style="position:absolute;top:-8px;left:28px;width:58px;height:16px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-6deg);z-index:2;pointer-events:none"></div></sc-if>
+            <div style="background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px;display:flex;flex-direction:column;gap:16px">
+
+              <div>
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+                  <label for="trip-name" style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">收藏名稱</label>
+                  <span style="padding:2px 7px;border-radius:999px;background:#FBEAE6;font-family:Quicksand,sans-serif;font-size:10.5px;font-weight:700;color:#3B3B3D">必填</span>
+                </div>
+                <input id="trip-name" type="text" value="{{ nameVal }}" onChange="{{ onName }}" placeholder="例如：京都的秋天" aria-required="true" aria-describedby="{{ nameDescribedby }}" style="width:100%;height:48px;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;padding:0 12px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:#3B3B3D;outline-offset:2px">
+                <sc-if value="{{ showNameHint }}" hint-placeholder-val="{{ false }}">
+                  <p id="trip-name-hint" role="status" style="margin:7px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.55;color:#3B3B3D">先填收藏名稱，才能{{ verbNoun }}。</p>
+                </sc-if>
+              </div>
+
+              <div>
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+                  <label for="trip-dest" style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">目的地名稱</label>
+                  <span style="padding:2px 7px;border-radius:999px;background:#F4EFE4;font-family:Quicksand,sans-serif;font-size:10.5px;font-weight:700;color:#3B3B3D">選填</span>
+                </div>
+                <input id="trip-dest" type="text" value="{{ destVal }}" onChange="{{ onDest }}" placeholder="例如：日本 京都" style="width:100%;height:48px;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;padding:0 12px;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:#3B3B3D;outline-offset:2px">
+              </div>
+
+              <div>
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+                  <label for="trip-note" style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">收藏說明</label>
+                  <span style="padding:2px 7px;border-radius:999px;background:#F4EFE4;font-family:Quicksand,sans-serif;font-size:10.5px;font-weight:700;color:#3B3B3D">選填</span>
+                </div>
+                <textarea id="trip-note" value="{{ noteVal }}" onChange="{{ onNote }}" placeholder="這趟旅行想留下什麼？主題或感受都可以。" style="width:100%;min-height:82px;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;padding:11px 12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D;resize:none;outline-offset:2px"></textarea>
+                <p style="margin:7px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.55;color:#A9A6A0">用來描述旅行的主題或感受；不影響分類、篩選或地圖。</p>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="margin-top:16px">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="solid" size="md" full-width="{{ true }}" disabled="{{ submitDisabled }}" hint-size="100%,48px">{{ ctaLabel }}</x-import>
+          </div>
+
+        </div>
+
+        <div style="position:relative;z-index:5;flex-shrink:0">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="trips" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+    <div style="width:420px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">目前預覽的規格重點</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">模式</span><span style="color:#777">{{ specMode }}</span>
+        <span style="font-weight:700;color:#4C76C2">CTA</span><span style="color:#777">{{ specCta }}</span>
+        <span style="font-weight:700;color:#4C76C2">名稱欄</span><span style="color:#777">{{ specName }}</span>
+        <span style="font-weight:700;color:#4C76C2">Gutter</span><span style="color:#777">{{ specGutter }}</span>
+      </div>
+      <div style="background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">上方兩排 chip 只是這份設計稿的預覽切換，不是產品 UI。五個狀態共用同一份版面骨架：標題、三個欄位、CTA 的位置在所有狀態都不移動。</div>
+    </div>
+    </sc-if>
+
+  </div>
+
+  <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">FORM RULES</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">欄位</span><span style="color:#777">依 MVP §5.2 只有三個：收藏名稱（必填）、目的地名稱（選填）、收藏說明（選填）。順序固定，不可增刪</span>
+        <span style="font-weight:700;color:#4C76C2">必填／選填</span><span style="color:#777">以標籤右側 chip 明示（必填＝<code>--coral-100</code> #FBEAE6 底、選填＝<code>--cream-200</code> #F4EFE4 底，兩者文字都用 <code>--ink-700</code> #3B3B3D — 底色分辨語意，文字色負責對比，實測皆 ≥ 10:1），不用星號，也不只靠顏色</span>
+        <span style="font-weight:700;color:#4C76C2">送出條件</span><span style="color:#777">名稱去除前後空白後非空才可送出。<strong>只用原生 <code>disabled</code></strong>（45% 不變色、不改尺寸、不移位），不用 pointer-events 或半透明假 disabled</span>
+        <span style="font-weight:700;color:#4C76C2">disabled 說明</span><span style="color:#777">CTA disabled 時，名稱欄下方出現一句 <code>role="status"</code> 提示並由 CTA 的 <code>aria-describedby</code> 指向；提示佔位出現不推走 CTA 之外的任何元素</span>
+        <span style="font-weight:700;color:#4C76C2">收藏說明</span><span style="color:#777">textarea 最小 82px、<code>resize:none</code>、可捲動；下方一句灰字說明它不影響分類／篩選／地圖（MVP §5.2 原文語意）</span>
+        <span style="font-weight:700;color:#4C76C2">字數上限</span><span style="color:#777"><strong style="color:#B5745A">尚未決定（MVP §5.2）</strong>：不設 <code>maxlength</code>、不顯示計數器、不擋輸入。版面必須能承受任意長度，<strong>不得以版面限制反推產品規則</strong></span>
+        <span style="font-weight:700;color:#4C76C2">過長名稱｜輸入中</span><span style="color:#777">input 內<strong>水平捲動</strong>，不 ellipsis、不縮字、不換行 — 使用者必須看得到自己正在打的字（與 ImportScreen 長 URL 同一條規則）</span>
+        <span style="font-weight:700;color:#4C76C2">過長名稱｜顯示面</span><span style="color:#777">截字是<strong>顯示面</strong>的責任，不是這張表單的：TripCard 標題 line-clamp 2、目標收藏列單行 ellipsis。本畫面只負責讓過長名稱不破版</span>
+        <span style="font-weight:700;color:#4C76C2">不在此畫面</span><span style="color:#777">日期、行程、封面照片、裝飾挑選一律不加。視覺樣式在建立當下自動指派（等機率抽 preset A／B／C／D），使用者無挑選入口</span>
+      </div>
+    </div>
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">CREATE / EDIT 共用版式</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">共用</span><span style="color:#777">同一份表單同時服務 <code>/trips/new</code> 與「重新命名／編輯收藏」；欄位、順序、間距、驗證與 disabled 規則完全一致</span>
+        <span style="font-weight:700;color:#4C76C2">差異｜只有三處</span><span style="color:#777">① 畫面標題（建立旅行收藏／編輯旅行收藏）② CTA 文案（建立收藏／儲存變更）③ 初始值（建立為空／編輯帶入既有值）</span>
+        <span style="font-weight:700;color:#4C76C2">實作形式</span><span style="color:#777">一個元件 + <code>mode: 'create' | 'edit'</code> 與 <code>initialValues</code>；<strong>不要複製成兩支表單</strong>，否則兩邊驗證會漂移</span>
+        <span style="font-weight:700;color:#4C76C2">編輯的初始狀態</span><span style="color:#777">帶入既有值後 CTA <strong>可按</strong>（名稱已有值）；是否要「未變更時 disabled」<strong style="color:#B5745A">尚未定案</strong>，本稿不假設</span>
+        <span style="font-weight:700;color:#4C76C2">編輯不含刪除</span><span style="color:#777">刪除收藏是破壞性動作，入口在 Home 的 ••• → 畫面層級 sheet（見 HomeScreen 的 DELETE TRIP CONFIRM），<strong>不放進這張表單</strong></span>
+        <span style="font-weight:700;color:#4C76C2">送出後導向</span><span style="color:#777"><strong style="color:#B5745A">OPEN</strong>：建立成功後是回 Home、進入該收藏，或直接接續匯入流程，尚未定案；本稿只定義表單本身與 <code>onSubmit</code> 邊界</span>
+        <span style="font-weight:700;color:#4C76C2">視覺樣式指派</span><span style="color:#777">建立成功的那一刻抽 preset 並持久化（HomeScreen PRESET ASSIGNMENT）；編輯既有收藏<strong>不重抽</strong></span>
+      </div>
+    </div>
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">LAYOUT / SPACING</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="color:#777">Frame</span><span style="font-weight:700">390 × 844（基準）</span>
+        <span style="color:#777">Gutter</span><span style="font-weight:700">16 / 20 / 24</span>
+        <span style="color:#777">Header</span><span style="font-weight:700">Back 44 · wordmark-script 40 · 信封 52 rotate(4°)</span>
+        <span style="color:#777">Header → 標題</span><span style="font-weight:700">14px</span>
+        <span style="color:#777">標題 / 說明</span><span style="font-weight:700">26px Quicksand 700 / 13px KR 1.6，max-width 304</span>
+        <span style="color:#777">標題 → 表單卡</span><span style="font-weight:700">18px</span>
+        <span style="color:#777">表單卡</span><span style="font-weight:700">滿寬 · r20 · padding 18 · 陰影 0 4 14 rgba(122,96,58,.07)</span>
+        <span style="color:#777">欄位間距</span><span style="font-weight:700">16px（卡內 flex column gap）</span>
+        <span style="color:#777">標籤 → 欄位</span><span style="font-weight:700">6px；標籤 11px Quicksand 700 .1em</span>
+        <span style="color:#777">單行欄位</span><span style="font-weight:700">高 48 · r12 · padding 0 12 · 1.5px #E3D9C6 · 底 #F9F5ED</span>
+        <span style="color:#777">說明欄</span><span style="font-weight:700">min-height 82 · padding 11 / 12 · resize:none</span>
+        <span style="color:#777">表單卡 → CTA</span><span style="font-weight:700">16px</span>
+        <span style="color:#777">CTA</span><span style="font-weight:700">滿寬 · 48px · solid 藍（單一 commit 動作）</span>
+        <span style="color:#777">內容底部留白</span><span style="font-weight:700">32px（+ safe-area inset，與 ImportScreen 同）</span>
+        <span style="color:#777">BottomNav</span><span style="font-weight:700">72px · 兩格 · 無 FAB</span>
+      </div>
+    </div>
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">STATE RULES</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">空白</span><span style="color:#777">三欄皆空、placeholder 可見、CTA 原生 disabled、名稱下方提示出現；不預先標紅、不顯示錯誤</span>
+        <span style="font-weight:700;color:#4C76C2">已填</span><span style="color:#777">三欄有值、CTA enabled、提示消失；欄位位置與空白狀態完全一致</span>
+        <span style="font-weight:700;color:#4C76C2">名稱未填</span><span style="color:#777">目的地與說明有值但名稱空 → CTA 仍 disabled + 提示；<strong>只擋送出，不清空其他欄位</strong></span>
+        <span style="font-weight:700;color:#4C76C2">編輯｜帶入既有值</span><span style="color:#777">標題與 CTA 換字、三欄帶入既有值、CTA 可按；版面與建立模式逐 px 相同</span>
+        <span style="font-weight:700;color:#4C76C2">編輯｜過長名稱</span><span style="color:#777">名稱 input 水平捲動、卡片不變高、無水平溢出；證明版面能承受未定上限的名稱</span>
+        <span style="font-weight:700;color:#4C76C2">共通</span><span style="color:#777">狀態切換只換值與 CTA 可用性，不換版面骨架；BottomNav 在所有狀態都存在（表單畫面不隱藏 nav）</span>
+        <span style="font-weight:700;color:#4C76C2">鍵盤開啟</span><span style="color:#777">沿用 ImportScreen 的規則：nav 隱藏、聚焦欄位與 CTA 保持可見；本稿未畫鍵盤狀態</span>
+      </div>
+    </div>
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">ACCESSIBILITY</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">語言</span><span style="color:#777">所有 <code>aria-label</code> 一律繁體中文；涉及特定收藏的動作要帶收藏名稱（編輯模式的返回鍵可用「返回」，不需帶名稱）</span>
+        <span style="font-weight:700;color:#4C76C2">標籤關聯</span><span style="color:#777">三個欄位都是真 <code>&lt;label for&gt;</code> + <code>id</code>，不用 placeholder 當標籤；必填欄帶 <code>aria-required="true"</code></span>
+        <span style="font-weight:700;color:#4C76C2">disabled 原因</span><span style="color:#777">名稱提示有 id，CTA 以 <code>aria-describedby</code> 指向它 — 讀螢幕的人知道為什麼不能送出，不是只看到灰掉的按鈕</span>
+        <span style="font-weight:700;color:#4C76C2">提示播報</span><span style="color:#777">提示是 <code>role="status"</code>（polite）；不用 <code>alert</code>，因為這不是送出後的錯誤，而是尚未滿足的條件</span>
+        <span style="font-weight:700;color:#4C76C2">點擊區</span><span style="color:#777">一律 ≥ 44 × 44：Back 44、CTA 48、nav 兩格 ≥ 44；欄位本身 48 高</span>
+        <span style="font-weight:700;color:#4C76C2">對比</span><span style="color:#777">必填 chip、選填 chip 與 disabled 提示的文字一律 <code>--ink-700</code> #3B3B3D（≥ 10:1，達 WCAG AA）。<strong>珊瑚色不用於小字</strong>：#B5745A 於 #FBEAE6 僅 3.13:1、<code>--coral-600</code> 於紙色 3.36:1，皆不足；語意靠底色 + 文字，不靠色相</span>
+        <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset（欄位已留 <code>outline-offset:2px</code>），圓角跟隨元件</span>
+        <span style="font-weight:700;color:#4C76C2">裝飾</span><span style="color:#777">膠帶、信封、狀態列圖一律 <code>aria-hidden</code> + <code>pointer-events:none</code></span>
+        <span style="font-weight:700;color:#4C76C2">目前 mock 未實作</span><span style="color:#777">本卡是契約：mock 的 nav 仍缺 <code>aria-label</code> 與 <code>aria-current</code>（與 Home／Import 同一筆待補），表單未包在 <code>&lt;form&gt;</code> 內、未接 Enter 送出；CTA 的 <code>aria-describedby</code> 目前由頁面層寫入（DS Button 以 <code>ariaDescribedby</code> prop 承接即可）</span>
+      </div>
+    </div>
+
+    <div style="width:470px;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">COMPONENT TREE</div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px">
+        <div style="font-size:13.5px;font-weight:700">TripFormScreen（create ／ edit 共用）</div>
+        <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;border-left:1px dashed #E6DFCF;font-size:12px">
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">InnerHeader</span><span style="color:#777">IconButton 返回 · wordmark-script · 信封</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">ScreenTitle</span><span style="color:#777">標題 + 一句說明，依 mode 換字</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">TripFormCard</span><span style="color:#777">三個 Field，卡片 r20 + 一條膠帶</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">Field ×3</span><span style="color:#777">label + 必填／選填 chip + input／textarea（<strong>DS 尚無 TextField 元件</strong>，沿用 LinkInput 的幾何：r12／1.5px #E3D9C6／底 #F9F5ED）</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">NameHint</span><span style="color:#777">CTA disabled 時出現，role=status</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">Button solid</span><span style="color:#777">全頁唯一 commit 動作，滿寬 48</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">AppShell（共用）</span><span style="color:#777">BottomNav（兩格，無 FAB），與 Home／Import 同一元件</span></div>
+        </div>
+        <div style="margin-top:2px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">建議把三個 Field 收成 DS 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">TextField</span> 元件（label／chip／hint／invalid 一次到位），Import 的補充資料欄位也能改用同一個。</div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;previewState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;create-empty&quot;,&quot;options&quot;:[&quot;create-empty&quot;,&quot;create-filled&quot;,&quot;create-noname&quot;,&quot;edit-prefilled&quot;,&quot;edit-long&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;previewWidth&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;390&quot;,&quot;options&quot;:[&quot;360&quot;,&quot;390&quot;,&quot;430&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;showSpec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+const NAV = [
+  { id: 'trips', label: '旅行收藏', iconSrc: './assets/icons/nav-trips.png' },
+  { id: 'imports', label: '匯入', iconSrc: './assets/icons/nav-imports.png' }
+];
+const LONG_NAME = '京都的秋天與東京的清晨，慢慢走完的那十四天旅行收藏';
+const SEED = {
+  'create-empty':   { mode: 'create', label: 'Create · 空白',        name: '', dest: '', note: '' },
+  'create-filled':  { mode: 'create', label: 'Create · 已填',        name: '京都的秋天', dest: '日本 京都', note: '想沿著鴨川慢慢走，找幾間老咖啡館坐一整個下午。' },
+  'create-noname':  { mode: 'create', label: 'Create · 名稱未填',    name: '', dest: '日本 京都', note: '想沿著鴨川慢慢走。' },
+  'edit-prefilled': { mode: 'edit',   label: 'Edit · 帶入既有值',    name: '東京', dest: '日本', note: '東京的老派風景與新的日常交會。' },
+  'edit-long':      { mode: 'edit',   label: 'Edit · 過長名稱',      name: LONG_NAME, dest: '日本 京都・東京', note: '兩個城市、十四天，把老街與清晨的市場都收進來。' }
+};
+const ORDER = ['create-empty', 'create-filled', 'create-noname', 'edit-prefilled', 'edit-long'];
+const WIDTHS = [['360', '360'], ['390', '390 · 基準'], ['430', '430']];
+const LABELS = {
+  'create-empty': 'New trip · empty',
+  'create-filled': 'New trip · filled',
+  'create-noname': 'New trip · name missing',
+  'edit-prefilled': 'Edit trip · prefilled',
+  'edit-long': 'Edit trip · long name'
+};
+
+class Component extends DCLogic {
+  state = { st: null, w: null, vals: null };
+  get st() { return this.state.st || this.props.previewState || 'create-empty'; }
+  get w() { return this.state.w || String(this.props.previewWidth || 390); }
+  get vals() {
+    if (this.state.vals && this.state.vals.for === this.st) return this.state.vals;
+    const s = SEED[this.st] || SEED['create-empty'];
+    return { for: this.st, name: s.name, dest: s.dest, note: s.note };
+  }
+  set(k, v) { const cur = this.vals; this.setState({ vals: { ...cur, [k]: v } }); }
+  componentDidMount() { this.syncCta(); }
+  componentDidUpdate() { this.syncCta(); }
+  /* DS Button reads ariaDescribedby as a prop; the mount can't hand it a live value here,
+     so the page wires it after render. → 收回元件時由 Button 的 ariaDescribedby prop 承接。 */
+  syncCta() {
+    const cta = [...document.querySelectorAll('button')].find(b => /建立收藏|儲存變更/.test(b.textContent));
+    if (!cta) return;
+    if (document.getElementById('trip-name-hint')) cta.setAttribute('aria-describedby', 'trip-name-hint');
+    else cta.removeAttribute('aria-describedby');
+  }
+
+  renderVals() {
+    const st = this.st, w = this.w, seed = SEED[st] || SEED['create-empty'], v = this.vals;
+    const isEdit = seed.mode === 'edit';
+    const disabled = v.name.trim() === '';
+    const verbNoun = isEdit ? '儲存' : '建立';
+    const chip = (on) => on
+      ? { bg: '#4C76C2', fg: '#FFFDFA' }
+      : { bg: '#FFFDFA', fg: '#4C76C2' };
+    return {
+      showSpec: this.props.showSpec ?? true,
+      showDecor: this.props.showDecor ?? true,
+      w, frameWidth: w + 'px', screenLabel: LABELS[st],
+      navItems: NAV,
+
+      screenTitle: isEdit ? '編輯旅行收藏' : '建立旅行收藏',
+      screenHelper: isEdit
+        ? '名稱、目的地與說明都可以隨時修改，收藏裡的地點不受影響。'
+        : '先取個名字就能開始收集地點，其他欄位之後都能補。',
+      ctaLabel: isEdit ? '儲存變更' : '建立收藏',
+      submitDisabled: disabled,
+      showNameHint: disabled,
+      verbNoun,
+      nameDescribedby: disabled ? 'trip-name-hint' : undefined,
+      ctaProps: disabled ? { ariaDescribedby: 'trip-name-hint' } : {},
+
+      nameVal: v.name, destVal: v.dest, noteVal: v.note,
+      onName: e => this.set('name', e.target.value),
+      onDest: e => this.set('dest', e.target.value),
+      onNote: e => this.set('note', e.target.value),
+
+      widthChips: WIDTHS.map(([id, label]) => ({
+        label, onClick: () => this.setState({ w: id }), ...chip(w === id)
+      })),
+      stateChips: ORDER.map(id => ({
+        label: SEED[id].label, onClick: () => this.setState({ st: id, vals: null }),
+        bg: st === id ? '#3B3B3D' : '#FFFDFA', fg: st === id ? '#FFFDFA' : '#8E8B85'
+      })),
+
+      specMode: isEdit ? 'edit — 標題「編輯旅行收藏」、CTA「儲存變更」、帶入既有值' : 'create — 標題「建立旅行收藏」、CTA「建立收藏」、欄位為空',
+      specCta: disabled ? '原生 disabled（45%，不變色不移位）＋ 名稱欄下方 role=status 提示' : 'enabled，solid 藍，滿寬 48px',
+      specName: st === 'edit-long'
+        ? '過長名稱：input 內水平捲動、不 ellipsis、卡片高度不變、無水平溢出'
+        : (v.name.trim() === '' ? '空值 → 擋送出，但不清空其他欄位、不預先標紅' : '有值 → 可送出；未設 maxlength、無計數器'),
+      specGutter: w === '360' ? '16px（窄版）' : (w === '430' ? '24px（寬版）' : '20px（基準）')
+    };
+  }
+}
+
+</script>
+</body>
+</html>

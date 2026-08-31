@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<script src="./ds-base.js"></script>
+<style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
+/* ---- Handoff overrides. Each one belongs inside the DS component; here for demonstration. ---- */
+/* Screen gutter — the only spacing that changes with viewport */
+[data-w="360"] [data-pad]{padding-left:16px !important;padding-right:16px !important}
+[data-w="430"] [data-pad]{padding-left:24px !important;padding-right:24px !important}
+/* PlaceResultCard photo column steps per breakpoint, ratio held at 0.88 (→ photoWidth prop) */
+[data-w="360"] [data-card="place"] article > div:first-of-type > div:first-of-type{width:108px !important}
+[data-w="360"] [data-card="place"] article > div:first-of-type > div:first-of-type img{height:122px !important}
+[data-w="430"] [data-card="place"] article > div:first-of-type > div:first-of-type{width:132px !important}
+[data-w="430"] [data-card="place"] article > div:first-of-type > div:first-of-type img{height:150px !important}
+/* PlaceCardMark — the one shared mark slot (PlaceResultCard markSrc). The DS img already owns size + position;
+   these two belong in that same slot (→ decorative mark props), not in a per-variant rule. */
+[data-card="place"] article > img{pointer-events:none;user-select:none}
+/* Long-text rules PlaceResultCard should own: description clamp 2, address clamp 2 */
+[data-card="place"] article{overflow:hidden}
+[data-card="place"] article p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+[data-card="place"] article > div:first-of-type > div:last-of-type > div:nth-of-type(2) span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+/* Field states */
+[data-field="invalid"] > div{border-color:#E0A38F !important;box-shadow:0 0 0 3px rgba(224,163,143,0.16) !important}
+[data-field="focus"] > div{border-color:#8FB0DE !important;box-shadow:0 0 0 3px rgba(143,176,222,0.20) !important}
+[data-analyzing="true"] img{animation:pt-pulse 1400ms ease-in-out infinite}
+/* Completed: 「更換」stays in place and uses native disabled (MVP §5.5 / ARCH §6.1) */
+[data-change-target]{cursor:pointer}
+[data-change-target]:disabled{opacity:0.45;cursor:default}
+@media (prefers-reduced-motion:reduce){[data-analyzing="true"] img{animation:none}}
+@keyframes pt-pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
+</helmet>
+
+<div style="display:flex;flex-direction:column;gap:64px;padding:56px 56px 96px;font-family:Quicksand,sans-serif">
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#A9A6A0">PINTRIP MVP · DESIGN HANDOFF</div>
+    <h1 style="margin:0;font-family:'Playfair Display',serif;font-size:38px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">Import Link + Analyze Result</h1>
+    <p style="margin:0;max-width:760px;font-family:'Noto Sans KR',sans-serif;font-size:13.5px;line-height:1.7;color:#81817D">單一畫面、單一套元件：下方所有 viewport 與 UI state 都由同一份 markup 依 preview controls 切換，不是各自獨立的靜態畫面。390px 為視覺基準；App Shell（BottomNav、safe area、捲動規則）沿用最新 Home Screen handoff。畫面最上方的時間、訊號、Wi-Fi、電量與 Dynamic Island 僅屬 mockup，不是產品 UI。</p>
+    <div style="max-width:760px;background:#FFFDFA;border-radius:16px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:14px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:11.5px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">SOURCE OF TRUTH — 敘述衝突時的優先順序</div>
+      <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C"><strong style="color:#3B3B3D">依問題類型判斷來源，不用單一全域順序。</strong>　<strong style="color:#3B3B3D">產品行為與驗收條件</strong>：docs/MVP.md → docs/ARCHITECTURE.md。　<strong style="color:#3B3B3D">Import 畫面與互動</strong>：本輪明確標示為已確認的決定 → 本檔 ImportScreen.dc.html → Design System 中確實適用的共用元件與 token。　<strong style="color:#3B3B3D">共用視覺與 App Shell</strong>：HomeScreen.dc.html 的 App Shell／BottomNav／safe area／響應式框架 → Design System。</div>
+      <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C;border-top:1px dashed #EDE4D2;padding-top:6px">HomeScreen 只作為共用 App Shell 與視覺基準，<strong style="color:#3B3B3D">不得用 Home 專屬畫面規則覆蓋 Import</strong>。<strong style="color:#3B3B3D">MvpMockups.dc.html</strong> 僅早期 visual reference，不得用來推導或覆蓋正式規則。既有 ImportScreen 若與 MVP 或 ARCHITECTURE 衝突，<strong style="color:#3B3B3D">修改的是 ImportScreen</strong>。</div>
+      <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C;border-top:1px dashed #EDE4D2;padding-top:6px"><strong style="color:#B5745A">適用範圍</strong>：上述優先順序<strong style="color:#3B3B3D">僅適用於 claude-design-export 內部的視覺與 handoff 敘述</strong>。產品範圍與產品規則以 <strong style="color:#3B3B3D">docs/MVP.md</strong> 為準，技術決策與資料邊界以 <strong style="color:#3B3B3D">docs/ARCHITECTURE.md</strong> 為準；設計檔不得凌駕這兩份文件。</div>
+    </div>
+  </div>
+
+  <section id="preview" style="display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap">
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">VIEWPORT</div>
+        <div style="display:flex;gap:6px">
+          <button type="button" onClick="{{ setW360 }}" style="font-family:Quicksand,sans-serif;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1.5px solid #E3D9C6;cursor:pointer;background:{{ w360Bg }};color:{{ w360Fg }}">360</button>
+          <button type="button" onClick="{{ setW390 }}" style="font-family:Quicksand,sans-serif;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1.5px solid #E3D9C6;cursor:pointer;background:{{ w390Bg }};color:{{ w390Fg }}">390 · 基準</button>
+          <button type="button" onClick="{{ setW430 }}" style="font-family:Quicksand,sans-serif;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1.5px solid #E3D9C6;cursor:pointer;background:{{ w430Bg }};color:{{ w430Fg }}">430</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">STATE</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-width:430px">
+          <sc-for list="{{ stateChips }}" as="chip" hint-placeholder-count="9">
+            <button type="button" onClick="{{ chip.onClick }}" style="font-family:Quicksand,sans-serif;font-size:12px;font-weight:700;padding:7px 12px;border-radius:999px;border:1.5px solid #E3D9C6;cursor:pointer;background:{{ chip.bg }};color:{{ chip.fg }}">{{ chip.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div data-w="{{ w }}" data-screen-label="{{ screenLabel }}" style="width:{{ frameWidth }};height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18);position:relative">
+        <img src="assets/icons/status-bar.png" alt="" aria-hidden="true" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+
+        <div ref="{{ scrollRef }}" data-pad="true" style="flex:1;min-height:0;overflow-y:auto;overflow-x:clip;overscroll-behavior:contain;scrollbar-width:none;padding:8px 20px 32px">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.IconButton" icon-src="./assets/icons/arrow-back.png" size="{{ 44 }}" variant="paper" label="返回" hint-size="44px,44px"></x-import>
+            <div style="display:flex;align-items:center;gap:6px">
+              <img src="assets/stickers/wordmark-script.png" alt="PinTrip" style="height:40px;display:block">
+              <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><img src="assets/stickers/sticker-envelope.png" alt="" aria-hidden="true" style="width:52px;display:block;transform:rotate(4deg);pointer-events:none"></sc-if>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <h1 style="margin:0;font-family:Quicksand,sans-serif;font-size:26px;font-weight:700;color:#3B3B3D;letter-spacing:-0.01em">匯入連結</h1>
+            <p style="margin:8px 0 0;max-width:304px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:400;line-height:1.6;color:#81817D">貼上 Instagram 貼文或 Reel 連結，PinTrip 會整理出裡面提到的地點 ✨</p>
+          </div>
+
+          <sc-if value="{{ hasTarget }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;background:#FFFDFA;border-radius:14px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:10px 10px 10px 14px">
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <span style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">目標旅行收藏</span>
+              <span style="display:flex;align-items:center;gap:5px;min-width:0">
+                <img src="assets/icons/pin-coral.png" alt="" aria-hidden="true" style="width:13px;flex-shrink:0;display:block">
+                <span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:#0B1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ targetName }}</span>
+              </span>
+            </div>
+            <button type="button" disabled="{{ changeTargetDisabled }}" data-change-target="true" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 8px;background:none;border:0;font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">更換</button>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ noTarget }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;margin-top:16px;background:#FFFDFA;border:1.5px dashed #E3D9C6;border-radius:20px;padding:20px 18px">
+              <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" style="position:absolute;top:-8px;left:26px;width:54px;height:16px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-9deg);pointer-events:none"></div></sc-if>
+              <div style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">還沒有旅行收藏</div>
+              <p style="margin:7px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#81817D">每筆匯入都要放進一個旅行收藏。先建立一個，回到這裡時剛才的連結會留著。</p>
+              <div style="display:flex;margin-top:14px">
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="outline" size="md" hint-size="auto,40px">建立旅行收藏</x-import>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showSourceRow }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+              <div role="group" aria-label="這筆匯入的來源貼文（唯讀）" style="display:flex;align-items:center;gap:10px;background:#FFFDFA;border-radius:14px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:10px 10px 10px 14px">
+                <img src="assets/stickers/icon-instagram.png" alt="" aria-hidden="true" style="width:24px;height:24px;flex-shrink:0">
+                <div style="flex:1;min-width:0">
+                  <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">{{ sourceKindLabel }}</div>
+                  <div style="margin-top:2px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;color:#3B3B3D;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">{{ sourceUrl }}</div>
+                </div>
+                <button type="button" style="flex-shrink:0;min-height:44px;min-width:44px;padding:0 8px;background:none;border:0;font-family:Quicksand,sans-serif;font-size:13.5px;font-weight:700;color:#4C76C2;cursor:pointer">開啟</button>
+              </div>
+              <sc-if value="{{ showResumeSummary }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:9px;background:#FFFDFA;border-radius:14px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:11px 14px">
+                  <span style="flex-shrink:0;padding:4px 9px;border-radius:999px;background:#ECF2F6;font-family:Quicksand,sans-serif;font-size:11.5px;font-weight:700;color:#4C76C2">{{ resumeStatus }}</span>
+                  <span style="font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.5;color:#81817D">{{ resumeMeta }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showComposer }}" hint-placeholder-val="{{ true }}">
+          <div ref="{{ fieldRef }}" data-field="{{ fieldState }}" style="margin-top:14px">
+            <label for="import-link-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0">Instagram 貼文連結</label>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.LinkInput" value="{{ inputValue }}" placeholder="instagram.com/p/… 或 /reel/…" icon-src="./assets/stickers/icon-instagram.png" hint-size="100%,52px"></x-import>
+          </div>
+
+          <sc-if value="{{ isInvalid }}" hint-placeholder-val="{{ false }}">
+            <p id="import-link-error" role="alert" aria-live="assertive" style="margin:8px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.55;color:#C77A62">目前只支援 Instagram 貼文（instagram.com/p/…）與 Reel（instagram.com/reel/…）連結，請確認網址後再試一次。</p>
+          </sc-if>
+
+          <div data-analyzing="{{ isAnalyzing }}" style="margin-top:12px">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="primary" size="lg" full-width="{{ true }}" disabled="{{ ctaDisabled }}" icon-src="./assets/icons/sparkle.png" hint-size="100%,50px">{{ ctaLabel }}</x-import>
+          </div>
+          </sc-if>
+
+          <div data-analyzing="{{ isAnalyzing }}" style="min-height:24px;margin-top:20px;position:relative">
+            <sc-if value="{{ statusVisible }}" hint-placeholder-val="{{ true }}">
+              <x-import component-from-global-scope="PinTripDesignSystem_ab161c.AnalyzeStatus" icon-src="{{ statusIcon }}" text="{{ statusText }}" emphasis="{{ statusEmphasis }}" hint-size="100%,24px"></x-import>
+            </sc-if>
+            <sc-if value="{{ showArrow }}" hint-placeholder-val="{{ true }}">
+              <img src="assets/stickers/arrow-curve-3x.png" alt="" aria-hidden="true" style="position:absolute;right:2px;top:-8px;width:36px;opacity:0.9;pointer-events:none">
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ showNotice }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;margin-top:14px;background:#FFFDFA;border:1.5px dashed #E3D9C6;border-radius:20px;padding:20px 18px">
+              <sc-if value="{{ showNoticeTape }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" style="position:absolute;top:-8px;left:26px;width:54px;height:16px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-9deg);pointer-events:none"></div></sc-if>
+              <div style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">{{ noticeTitle }}</div>
+              <p style="margin:7px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#81817D">{{ noticeBody }}</p>
+              <sc-if value="{{ noticeExitsVisible }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:15px">
+                  <sc-for list="{{ exits }}" as="e" hint-placeholder-count="2">
+                    <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="{{ e.variant }}" size="md" full-width="{{ true }}" hint-size="100%,48px">{{ e.label }}</x-import>
+                  </sc-for>
+                  <button type="button" style="align-self:center;min-height:44px;padding:0 12px;background:none;border:0;font-family:Quicksand,sans-serif;font-size:13.5px;font-weight:700;color:#8E8B85;cursor:pointer">{{ textExit }}</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ endConfirming }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:15px;padding-top:14px;border-top:1px dashed #EDE4D2">
+                  <div style="font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D">這筆匯入會就此結束，不再等待補充資料。</div>
+                  <div style="margin-top:3px;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.6;color:#81817D">之後仍可重新貼上同一連結，建立一筆新的匯入。</div>
+                  <div style="display:flex;gap:8px;margin-top:13px">
+                    <div style="flex:1.35;display:flex"><x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="solid" size="sm" full-width="{{ true }}" hint-size="100%,44px">取消</x-import></div>
+                    <div style="flex:1;display:flex"><x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="outline" size="sm" full-width="{{ true }}" hint-size="100%,44px">結束處理</x-import></div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ supplementOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:15px;padding-top:14px;border-top:1px dashed #EDE4D2;display:flex;flex-direction:column;gap:14px">
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D">補充資料</div>
+                    <p style="margin:5px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.65;color:#81817D">填其中任一項就能重新分析，資料越多越容易對到地點。</p>
+                  </div>
+
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0;margin-bottom:6px">貼文文字</div>
+                    <textarea value="{{ suppText }}" onChange="{{ onSuppText }}" placeholder="把貼文內容貼進來" style="width:100%;box-sizing:border-box;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D;min-height:78px;padding:11px 12px;resize:none"></textarea>
+                  </div>
+
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0;margin-bottom:6px">貼文截圖</div>
+                    <div style="display:flex;gap:8px;align-items:flex-start">
+                      <sc-for list="{{ shots }}" as="s" hint-placeholder-count="0">
+                        <div style="position:relative;width:76px;height:76px;border-radius:12px;background:#EFE8DA;border:1px solid #E3D9C6;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                          <span style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;color:#A9A6A0">{{ s.n }}</span>
+                          <button type="button" onClick="{{ s.onRemove }}" aria-label="刪除這張截圖" style="position:absolute;top:-6px;right:-6px;width:44px;height:44px;display:flex;align-items:flex-start;justify-content:flex-end;background:none;border:0;padding:0;cursor:pointer">
+                            <span style="width:22px;height:22px;border-radius:999px;background:#FFFDFA;border:1.5px solid #E3D9C6;box-shadow:0 1px 3px rgba(122,96,58,0.12);display:flex;align-items:center;justify-content:center;font-family:Quicksand,sans-serif;font-size:12px;font-weight:700;color:#8E8B85">✕</span>
+                          </button>
+                        </div>
+                      </sc-for>
+                      <sc-if value="{{ showAddShot }}" hint-placeholder-val="{{ true }}">
+                        <button type="button" onClick="{{ onAddShot }}" style="width:76px;height:76px;flex-shrink:0;border-radius:12px;background:#FFFDFA;border:1.5px dashed #C4D8EF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:0">
+                          <span style="font-family:Quicksand,sans-serif;font-size:19px;font-weight:700;color:#4C76C2;line-height:1">＋</span>
+                          <span style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;color:#4C76C2">新增</span>
+                        </button>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ atShotLimit }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:7px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">已選滿 3 張，刪掉一張才能再新增。</div>
+                    </sc-if>
+                  </div>
+
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0;margin-bottom:6px">店名或景點名稱</div>
+                    <input value="{{ suppName }}" onChange="{{ onSuppName }}" placeholder="例：봄날카페" style="width:100%;box-sizing:border-box;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D;height:46px;padding:0 12px">
+                  </div>
+
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0;margin-bottom:6px">地址或區域</div>
+                    <input value="{{ suppArea }}" onChange="{{ onSuppArea }}" placeholder="例：제주 애월읍" style="width:100%;box-sizing:border-box;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D;height:46px;padding:0 12px">
+                  </div>
+
+                  <div>
+                    <div style="font-family:Quicksand,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0;margin-bottom:6px">其他有助於辨識的資訊</div>
+                    <textarea value="{{ suppExtra }}" onChange="{{ onSuppExtra }}" placeholder="營業時間、附近地標、貼文提到的線索…" style="width:100%;box-sizing:border-box;background:#F9F5ED;border:1.5px solid #E3D9C6;border-radius:12px;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;color:#3B3B3D;min-height:62px;padding:11px 12px;resize:none"></textarea>
+                  </div>
+
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="primary" size="md" full-width="{{ true }}" disabled="{{ submitDisabled }}" hint-size="100%,48px">用補充資料重新分析</x-import>
+                    <button type="button" style="align-self:center;min-height:44px;padding:0 12px;background:none;border:0;font-family:Quicksand,sans-serif;font-size:13.5px;font-weight:700;color:#8E8B85;cursor:pointer">取消補充</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showIdleHint }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:34px;padding:0 24px;text-align:center">
+              <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><img src="assets/stickers/sticker-sparkles-transparent.png" alt="" aria-hidden="true" style="width:34px;display:block;opacity:0.45;transform:rotate(-6deg);margin-bottom:2px;pointer-events:none"></sc-if>
+              <div style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#9C9891">還沒有分析結果</div>
+              <p style="margin:0;max-width:236px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.65;color:#B0ADA6">貼上 Instagram 貼文或 Reel 連結，PinTrip 會幫你找出其中的地點。</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+                <div data-card="place" style="position:relative">
+                  <sc-if value="{{ r.tapeA }}" hint-placeholder-val="{{ false }}"><div aria-hidden="true" style="position:absolute;top:-7px;left:26px;width:64px;height:17px;background:repeating-linear-gradient(90deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px),repeating-linear-gradient(0deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px);opacity:0.92;border-radius:2px;transform:rotate(-8deg);z-index:2;pointer-events:none"></div></sc-if>
+                  <sc-if value="{{ r.tapeB }}" hint-placeholder-val="{{ false }}"><div aria-hidden="true" style="position:absolute;top:-7px;left:30px;width:60px;height:17px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(6deg);z-index:2;pointer-events:none"></div></sc-if>
+                  <sc-if value="{{ r.tapeC }}" hint-placeholder-val="{{ false }}"><div aria-hidden="true" style="position:absolute;top:-7px;left:24px;width:62px;height:17px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-5deg);z-index:2;pointer-events:none"></div></sc-if>
+                  <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="{{ r.photo }}" category="{{ r.category }}" category-label="{{ r.categoryLabel }}" name="{{ r.name }}" description="{{ r.desc }}" address="{{ r.address }}" tags="{{ r.tags }}" added="{{ r.added }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入" added-label="已加入" show-reject="{{ true }}" rejected="{{ r.rejected }}" reject-label="拒絕" rejected-label="已拒絕" match-state="{{ r.matchState }}" candidates="{{ r.candidates }}" candidates-expanded="{{ r.expanded }}" choose-label="{{ r.chooseLabel }}" unmatched-label="找不到對應的實際地點" research-label="重新搜尋" confirming="{{ r.confirming }}" confirm-line1="{{ r.confirmLine1 }}" confirm-line2="拒絕不能復原。" confirm-cancel-label="取消" confirm-reject-label="拒絕" mark-src="{{ r.mark }}" read-only="{{ r.readOnly }}" disposition-label="{{ r.dispositionLabel }}" failed="{{ r.failed }}" failure-text="{{ r.failureText }}" failure-id="{{ r.failureId }}" failure-label="{{ r.failureLabel }}" adding="{{ r.adding }}" edit-aria-label="{{ r.editAria }}" reject-aria-label="{{ r.rejectAria }}" add-aria-label="{{ r.addAria }}" hint-size="100%,214px"></x-import>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ showBatch }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:20px">
+              <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BatchAddPanel" title="{{ batchTitle }}" subtitle="{{ batchSubtitle }}" luggage-src="./assets/stickers/sticker-luggage.png" sparkle-src="{{ batchSparkle }}" hint-size="100%,96px"></x-import>
+            </div>
+            <sc-if value="{{ showBatchCta }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:12px">
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="action" size="lg" full-width="{{ true }}" disabled="{{ batchCtaDisabled }}" hint-size="100%,50px">{{ batchCtaLabel }}</x-import>
+              </div>
+            </sc-if>
+            </sc-if>
+
+            <sc-if value="{{ showCompletedSummary }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:20px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 18px 19px">
+                <div style="font-family:Quicksand,sans-serif;font-size:15.5px;font-weight:700;color:#3B3B3D">{{ completedTitle }}</div>
+                <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#81817D">{{ completedBody }}</p>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ keyboardOpen }}" hint-placeholder-val="{{ false }}">
+          <div aria-hidden="true" style="flex-shrink:0;background:#D9D4CC;padding:8px 5px 26px;display:flex;flex-direction:column;gap:7px;box-shadow:0 -1px 0 rgba(0,0,0,0.08)">
+            <div style="display:flex;gap:5px;justify-content:center"><sc-for list="{{ kbRow1 }}" as="k" hint-placeholder-count="10"><span style="flex:1;height:38px;background:#FBFAF8;border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;color:#3B3B3D">{{ k }}</span></sc-for></div>
+            <div style="display:flex;gap:5px;justify-content:center;padding:0 14px"><sc-for list="{{ kbRow2 }}" as="k" hint-placeholder-count="9"><span style="flex:1;height:38px;background:#FBFAF8;border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;color:#3B3B3D">{{ k }}</span></sc-for></div>
+            <div style="display:flex;gap:5px;justify-content:center;padding:0 34px"><sc-for list="{{ kbRow3 }}" as="k" hint-placeholder-count="7"><span style="flex:1;height:38px;background:#FBFAF8;border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;color:#3B3B3D">{{ k }}</span></sc-for></div>
+            <div style="display:flex;gap:5px;align-items:center">
+              <span style="width:78px;height:38px;background:#C6C1B9;border-radius:5px"></span>
+              <span style="flex:1;height:38px;background:#FBFAF8;border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,0.18)"></span>
+              <span style="width:78px;height:38px;background:#4C76C2;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff">前往</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ navVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="imports" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;align-items:baseline;gap:10px;padding-left:4px">
+        <span style="font-size:13.5px;font-weight:700;color:#3B3B3D">{{ screenLabel }}</span>
+        <span style="font-size:12.5px;font-weight:600;color:#A9A6A0">{{ frameMeta }}</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+    <div style="width:420px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">目前預覽的規格重點</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+        <span style="font-weight:700;color:#4C76C2">Gutter</span><span style="color:#777">{{ specGutter }}</span>
+        <span style="font-weight:700;color:#4C76C2">照片欄</span><span style="color:#777">{{ specPhoto }}</span>
+        <span style="font-weight:700;color:#4C76C2">狀態說明</span><span style="color:#777">{{ specState }}</span>
+        <span style="font-weight:700;color:#4C76C2">CTA</span><span style="color:#777">{{ specCta }}</span>
+        <span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">{{ specNav }}</span>
+      </div>
+      <div style="background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">上方的 viewport 與 state 控制項、以及 Tweaks 面板的 previewWidth / previewState / showSpec / showDecor，切換的是同一份 markup 與同一組正式元件；沒有任何狀態被複製成獨立畫面。</div>
+    </div>
+    </sc-if>
+
+  </section>
+
+  <sc-if value="{{ showSpec }}" hint-placeholder-val="{{ true }}">
+  <section id="spec" style="display:flex;flex-direction:column;gap:26px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">SPEC</span>
+      <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:#0B1B33">Import Screen Design Handoff</h2>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">STATE MAPPING TABLE</div>
+      <div style="max-width:1312px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Noto Sans KR',sans-serif;font-size:12px;line-height:1.65;color:#5A5A5C">左欄全部是 <strong style="color:#3B3B3D">UI preview variant</strong>，不是資料狀態。正式 Import lifecycle 只有 <strong style="color:#3B3B3D">received · processing · needs_input · review_required · completed · failed</strong>（docs/MVP.md §5.5 · ARCHITECTURE §6.1）。本表與畫面行為由<strong style="color:#3B3B3D">同一份 STATES 資料</strong>產生，因此不可能出現表與行為互相矛盾。</div>
+        <div style="display:grid;grid-template-columns:168px 116px 86px 66px 68px 190px 132px 1fr 1fr;gap:7px 10px;font-size:11px;align-items:start">
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">STATE</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">LIFECYCLE</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">IMPORT</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">ENTRY</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">URL</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">來源元件</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">顯示</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">允許的主要動作</span>
+          <span style="font-weight:700;color:#A9A6A0;letter-spacing:0.06em">禁止</span>
+          <sc-for list="{{ stateMap }}" as="row" hint-placeholder-count="10">
+            <span style="font-weight:700;color:#3B3B3D;background:{{ row.rowBg }};border-radius:5px;padding:2px 4px;margin:-2px -4px">{{ row.name }}</span>
+            <span style="font-weight:700;color:#4C76C2">{{ row.life }}</span>
+            <span style="color:#777">{{ row.created }}</span>
+            <span style="color:#777">{{ row.entry }}</span>
+            <span style="color:#777">{{ row.url }}</span>
+            <span style="color:#777">{{ row.src }}</span>
+            <span style="color:#777">{{ row.show }}</span>
+            <span style="color:#777;line-height:1.55">{{ row.can }}</span>
+            <span style="color:#B5745A;line-height:1.55">{{ row.no }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,420px);gap:26px;align-items:start">
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">COMPONENT TREE</div>
+        <div style="display:flex;flex-direction:column;gap:8px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px">
+          <div style="font-size:13.5px;font-weight:700">ImportScreen</div>
+          <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;border-left:1px dashed #E6DFCF;font-size:12px">
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">ImportHeader</span><span style="color:#777">IconButton 44 · Wordmark script 40 · 信封貼紙</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">ScreenIntro</span><span style="color:#777">「匯入連結」+ 說明（Instagram 貼文與 Reel 兩種來源）</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">TargetCollectionRow</span><span style="color:#777">目標旅行收藏（分析前即已選定）+「更換」入口</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">LinkInputSection</span><span style="color:#777"><strong>只用於尚未建立 Import 的 composer</strong>：LinkInput + inline validation + Analyze CTA。Import 建立後整段不再掛載</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">LinkInput</span><span style="color:#777">IG icon · input · clear 按鈕</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">FieldError</span><span style="color:#777">invalid 時才佔位</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">Button primary</span><span style="color:#777">分析連結 / 分析中…</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">AnalyzeStatus</span><span style="color:#777">固定 24px 佔位；idle 空白不塌陷</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">arrow-curve</span><span style="color:#777">success 時一枚手繪箭頭</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">NoticeCard</span><span style="color:#777">empty（MVP §5.5 needs_input）／error（failed）共用 dashed 卡：標題 + 說明 + 出口列</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">ExitStack</span><span style="color:#777">flex column gap 10：補充資料後重試（primary 48）· 重新分析（outline，僅 error）· 沒有可用地點，結束處理（outline，僅 empty）· 換一個連結（文字鍵 44）</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">EndImportConfirm</span><span style="color:#777">卡內就地確認列：兩行影響說明 + 取消（solid，flex 1.35）／結束處理（outline，flex 1），sm 44</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">SupplementPanel</span><span style="color:#777">卡內展開（不開 sheet、不新增路由）：1px dashed 分隔 + 五個欄位 + 提交 + 取消補充</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:24px"><span style="font-weight:700;color:#4C76C2">SupplementField ×4</span><span style="color:#777">貼文文字（textarea 78）· 店名或景點名稱（46）· 地址或區域（46）· 其他有助於辨識的資訊（textarea 66）</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:24px"><span style="font-weight:700;color:#4C76C2">ShotSlots</span><span style="color:#777">貼文截圖：76×76 槽 ×n + dashed「＋新增」槽（gap 8，同一列）；每槽右上 ✕ 44 點擊區</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">SourceRow（persisted Import）</span><span style="color:#777">Import 一旦建立就取代 LinkInputSection（<strong>不分 entry=new 或 resume</strong>）：IG 24 + 小標「來源貼文（唯讀）」+ 單行截斷 URL +「開啟」44。<strong>唯讀且無 Clear</strong>——改連結等於另一筆 Import（§5.3 · ARCH §3.3）。所有持久狀態共用這一個元件，不為各狀態複製 markup</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">ResumeSummaryRow</span><span style="color:#777">狀態 chip（排隊中／待處理／已完成）+ 匯入時間（相對時間）。review_required 再加候選數 · 未處置數；completed 只加已加入數 · 已拒絕數（候選數可推導，不重複）。失敗原因與待補充資訊仍走 NoticeCard，不重複</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">CompletedSummaryCard</span><span style="color:#777">completed 的唯讀摘要（entry=new 與 resume 都用），取代 BatchAddPanel + commit CTA 的位置；有加入／全拒絕兩套文案</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">ResultList</span><span style="color:#777">flex column gap 16</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">ResultCardSlot ×n</span><span style="color:#777">裝飾 wrapper（relative）</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:24px"><span style="font-weight:700;color:#4C76C2">Tape</span><span style="color:#777">absolute · aria-hidden · z-index 2</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:24px"><span style="font-weight:700;color:#4C76C2">PlaceResultCard</span><span style="color:#777">review_required 的逐項處置狀態（Edit／拒絕／加入，added 只換標籤）；completed 時 readOnly 換成處置標示列</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:36px"><span style="font-weight:700;color:#4C76C2">photo frame（非獨立元件）</span><span style="color:#777">PlaceResultCard 內建的 photo treatment：5px 白框 + r6 + sticker shadow，不是可獨立引用的 PhotoFrame</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:36px"><span style="font-weight:700;color:#4C76C2">PlaceCardMark</span><span style="color:#777">卡內唯一 mark slot（markSrc）；variant 由 category 決定</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:36px"><span style="font-weight:700;color:#4C76C2">AddFailureNotice</span><span style="color:#777">批次部分失敗時的卡內單一責任區塊（role="status"），Tags 下、動作列上；不是另一種卡片版型</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:36px"><span style="font-weight:700;color:#4C76C2">DispositionRow（completed）</span><span style="color:#777">取代動作列的靜態處置標示，無按鈕；min-height 44 使卡高不變</span></div></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">BatchAddPanel</span><span style="color:#777"><strong>只存在於 review_required</strong>，數量由「已匹配且尚未處置」推導；全數處置完即 completed，改由 CompletedSummaryCard 承接</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">Button action</span><span style="color:#777">全頁唯一 commit；只在有「已匹配且尚未處置」項目時存在，completed 不出現，重試中原生 disabled</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">AppShell（共用）</span><span style="color:#777">BottomNav（兩格，無 FAB），與 Home 同一元件</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">SoftKeyboard</span><span style="color:#777">mockup-only，系統鍵盤佔位</span></div>
+          </div>
+          <div style="margin-top:2px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">mockup-only：狀態列（時間／訊號／Wi-Fi／電量／Dynamic Island）與軟鍵盤都不進產品程式。</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">LAYOUT / SPACING</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="color:#777">Frame</span><span style="font-weight:700">390 × 844（基準）</span>
+          <span style="color:#777">Gutter</span><span style="font-weight:700">16 / 20 / 24</span>
+          <span style="color:#777">內容區上緣</span><span style="font-weight:700">8px + header 6px</span>
+          <span style="color:#777">Back button</span><span style="font-weight:700">44 × 44（點擊區下限）</span>
+          <span style="color:#777">Wordmark</span><span style="font-weight:700">高 40px，靠右</span>
+          <span style="color:#777">信封貼紙</span><span style="font-weight:700">52px, rotate(4°), 貼 wordmark 右側 gap 6</span>
+          <span style="color:#777">Header → 標題</span><span style="font-weight:700">14px</span>
+          <span style="color:#777">標題字級</span><span style="font-weight:700">26px Quicksand 700</span>
+          <span style="color:#777">說明文字</span><span style="font-weight:700">13px / 1.6，max-width 304px</span>
+          <span style="color:#777">標題 → 目標收藏列</span><span style="font-weight:700">16px</span>
+          <span style="color:#777">TargetCollectionRow</span><span style="font-weight:700">滿寬 · 高 64（實測）· r14 · padding 10 / 10 / 10 / 14 · 陰影 0 4 14 rgba(122,96,58,.07)</span>
+          <span style="color:#777">　小標 / 名稱</span><span style="font-weight:700">11px Quicksand 700 .1em / 17px Playfair 500；pin 13px、gap 5</span>
+          <span style="color:#777">　名稱長度｜實測回報</span><span style="font-weight:700">名稱列為 <strong>white-space:nowrap + overflow:hidden + text-overflow:ellipsis + min-width:0</strong>（min-width:0 必須寫在最內層 span，否則 flex item 不會縮到比內容窄，ellipsis 永遠不觸發）。可用文字欄寬實測 <strong>230 / 252 / 284px</strong>（360／390／430）。以 23 字（intrinsic 391px）壓力測試：三個寬度都<strong>單行 ellipsis</strong>、列高恆 64px、與「更換」保留 12px 淨距、無水平溢出。「更換」為 flex-shrink:0，永不被名稱擠壓。<strong style="color:#B5745A">收藏名稱是否設字數上限尚未決定</strong>（docs/MVP.md §5.2）；版面已能安全處理任意長度，<strong>不得以版面限制反推產品字數上限</strong></span>
+          <span style="color:#777">　更換按鈕</span><span style="font-weight:700">14px Quicksand 600 · 點擊區 44 × 44</span>
+          <span style="color:#777">無收藏引導卡</span><span style="font-weight:700">同 NoticeCard：r20 · 1.5px dashed · padding 20 / 18 · outline 動作 40px</span>
+          <span style="color:#777">SourceRow（persisted）</span><span style="font-weight:700">上距 14 · 高 64（實測，三個寬度與所有持久狀態相同）· r14 · padding 10 / 10 / 10 / 14 · IG 24 · URL 單行截斷（min-width:0 + ellipsis）·「開啟」點擊區 44 · role="group" aria-label「這筆匯入的來源貼文（唯讀）」</span>
+          <span style="color:#777">ResumeSummaryRow</span><span style="font-weight:700">只在 entry=resume 出現 · 與 SourceRow gap 10 · 高 46（實測，三個寬度與所有 resume／completed 狀態相同，meta 恆單行）· r14 · padding 11 / 14 · chip 11.5px r999 · meta 12px</span>
+          <span style="color:#777">失敗提示區（卡內）</span><span style="font-weight:700">上距 12 · padding 10 / 12 · r12 · 底 coral-100 · 12.5px / 1.55 · 標籤 Quicksand 700 coral-600 + 全角空格（失敗「加入失敗」／重試中「重試中」） · 高 79 / 60 / 60（實測；360 為 3 行）</span>
+          <span style="color:#777">處置標示列（completed）</span><span style="font-weight:700">取代動作列：上距 12 · min-height 44（與動作列等高，卡高不變）· ✓／✕ 15px + 標籤 13.5px Quicksand 700 · 已加入 blue-500／已拒絕 ink-400 · <strong>無按鈕</strong></span>
+          <span style="color:#777">§5.10 欄位界線</span><span style="font-weight:700">§5.10 的「解析出的候選地點數量」是<strong>匯入紀錄頁（/imports）的需求，本次不設計</strong>。ResumeSummaryRow 是單一匯入的狀態列，並非§5.10 的實作面；completed 省略候選數<strong>不影響§5.10 的滿足</strong>，不得讀作漏做</span>
+          <span style="color:#777">匯入時間格式｜設計假設</span><span style="font-weight:700">7 天內用相對時間（「3 小時前」「2 天前」）· 超過 7 天改絕對日期且不含時分（「8 月 26 日」）。<strong style="color:#B5745A">時間格式與 7 天門檻為設計假設，MVP.md 未定義</strong>（§5.10 只要求「匯入時間與狀態」）；時分屬 /imports 列表頁需求，本次不設計</span>
+          <span style="color:#777">來源區塊三種形態</span><span style="font-weight:700">composer 118（欄位 52 + gap 12 + CTA 54）→ 僅 SourceRow 64（−54；entry=new 的持久狀態）→ SourceRow + 摘要列 120（+2；entry=resume）。三個寬度完全相同，無例外</span>
+          <span style="color:#777">CompletedSummaryCard</span><span style="font-weight:700">上距 20 · 高 106（實測）· r20 · padding 18 / 18 / 19 · 標題 15.5 / 內文 12.5</span>
+          <span style="color:#777">NoticeCard 出口列</span><span style="font-weight:700">上距 15 · gap 10 · Button md 48 滿寬 · 文字鍵 44</span>
+          <span style="color:#777">結束處理確認列</span><span style="font-weight:700">上距 15 · 上 padding 14 · 1px dashed #EDE4D2 · 說明 13／12 · 按鈕列上距 13 · gap 8 · sm 44</span>
+          <span style="color:#777">補充區</span><span style="font-weight:700">上距 15 · 上 padding 14 · 欄位群 gap 14 · label 11px .1em 下距 6</span>
+          <span style="color:#777">　欄位</span><span style="font-weight:700">單行 46 · 貼文文字 78 · 其他資訊 66 · r12 · 1.5px #E3D9C6 · 底 #F9F5ED · 13px</span>
+          <span style="color:#777">　截圖槽</span><span style="font-weight:700">76 × 76 · r12 · gap 8 · 刪除 ✕ 22px 圖形／44 × 44 點擊區（top:-6 right:-6，僅向上向右各溢出 6px，與右鄰槽留 3px 淨距，不跨到隔壁截圖；實測 390 槽 95–171／179–255／263–339，✕ 點擊區 132–176／216–260／300–344，360 與 430 同樣 3px 淨距）· 新增槽 1.5px dashed #C4D8EF</span>
+          <span style="color:#777">　提交 / 取消補充</span><span style="font-weight:700">primary md 48 滿寬 · 文字鍵 44 · 兩者 gap 8</span>
+          <span style="color:#777">目標收藏列 → LinkInput</span><span style="font-weight:700">14px</span>
+          <span style="color:#777">LinkInput</span><span style="font-weight:700">滿寬 · 52px · r14 · padding 0 12 0 14</span>
+          <span style="color:#777">IG icon / clear</span><span style="font-weight:700">24px / 24px（點擊區補到 44）</span>
+          <span style="color:#777">錯誤訊息</span><span style="font-weight:700">欄位下 8px，12px / 1.55</span>
+          <span style="color:#777">LinkInput → CTA</span><span style="font-weight:700">12px</span>
+          <span style="color:#777">Analyze CTA</span><span style="font-weight:700">滿寬 · 50px · r14</span>
+          <span style="color:#777">CTA → 狀態列</span><span style="font-weight:700">20px</span>
+          <span style="color:#777">狀態列高度</span><span style="font-weight:700">min-height 24px（idle 也保留）</span>
+          <span style="color:#777">狀態 → 卡片群</span><span style="font-weight:700">16px</span>
+          <span style="color:#777">結果卡片間距</span><span style="font-weight:700">16px</span>
+          <span style="color:#777">卡片 padding / 圓角</span><span style="font-weight:700">12px / 20px</span>
+          <span style="color:#777">卡片陰影</span><span style="font-weight:700">0 4px 14px rgba(122,96,58,.07)</span>
+          <span style="color:#777">照片欄</span><span style="font-weight:700">108 / 120 / 132 × 122 / 136 / 150</span>
+          <span style="color:#777">照片白框</span><span style="font-weight:700">5px + r6 + sticker shadow（PlaceResultCard 內建，非獨立 PhotoFrame 元件）</span>
+          <span style="color:#777">卡內動作列</span><span style="font-weight:700">滿寬（跨照片欄 + 文字欄）· 上距 12px · gap 8 · Edit 1 : 拒絕 1 : 加入 1.35</span>
+          <span style="color:#777">卡片 → Batch 面板</span><span style="font-weight:700">20px</span>
+          <span style="color:#777">Batch 面板</span><span style="font-weight:700">padding 16/14 · 1.5px dashed · r20</span>
+          <span style="color:#777">Batch → commit CTA</span><span style="font-weight:700">12px</span>
+          <span style="color:#777">內容底部留白</span><span style="font-weight:700">32px（+ safe-area inset）</span>
+          <span style="color:#777">BottomNav</span><span style="font-weight:700">72px · 兩格 · 無 FAB</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">RESPONSIVE RULES</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">Breakpoint 變數</span><span style="color:#777">只有兩個：gutter（16/20/24）與照片欄（108/120/132）。其餘完全共用</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">BottomNav 72（兩格，無 FAB）、Back 44、Wordmark 40、信封 52、IG icon 24、clear 24、輸入框 52、CTA 50、Batch commit 50、目標收藏列高 64 與 pin 13、更換點擊區 44、所有裝飾</span>
+          <span style="font-weight:700;color:#4C76C2">Fluid</span><span style="color:#777">內容寬、LinkInput 寬、SourceRow 寬、兩顆 CTA 寬、卡片寬、文字欄寬、Batch 面板寬、失敗提示區寬、目標收藏列寬（名稱欄吸收寬度，單行 ellipsis；可用 230／252／284）</span>
+          <span style="font-weight:700;color:#4C76C2">Photo ratio</span><span style="color:#777">固定 0.88（108/122 · 120/136 · 132/150），cover + center</span>
+          <span style="font-weight:700;color:#4C76C2">Text : image</span><span style="color:#777">三個寬度都約 62:38（實測 184:108 · 194:120 · 214:132）；文字欄恆 ≥ 184px</span>
+          <span style="font-weight:700;color:#4C76C2">Header</span><span style="color:#777">space-between 一列；左右都是固定尺寸，只有中間空隙變化，三個寬度排列相同</span>
+          <span style="font-weight:700;color:#4C76C2">說明文字</span><span style="color:#777">max-width 304px，430 不跟著拉寬（避免單行過長）；360 允許換到三行</span>
+          <span style="font-weight:700;color:#4C76C2">允許換行</span><span style="color:#777">說明文字、地址（最多 2 行）、Tags（wrap 多行）、Batch 面板標題</span>
+          <span style="font-weight:700;color:#4C76C2">Line clamp</span><span style="color:#777">地點說明 2 行、地址 2 行；地點名稱單行 ellipsis（DS 已內建）</span>
+          <span style="font-weight:700;color:#4C76C2">360 可讀性</span><span style="color:#777">字級一律不縮；先縮照片欄與 gutter，再讓 Tags 換行，最後才靠 clamp</span>
+          <span style="font-weight:700;color:#4C76C2">430 不過寬</span><span style="color:#777">照片欄放大吸收多餘寬度、說明文字設上限、Tags 仍照原字級不放大</span>
+          <span style="font-weight:700;color:#4C76C2">不做的事</span><span style="color:#777">不換卡片版式、不改欄位方向、不因寬度隱藏任何元素</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">UI STATE TABLE</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">No collection</span><span style="color:#777"><strong>依據 docs/MVP.md §5.3 明文</strong>：「使用者尚未建立任何旅行收藏時，不能建立匯入…必須先引導使用者建立旅行收藏…已貼上或由分享帶入的網址在此期間必須保留」（2026-08-27 回寫，不再是推導）。目標收藏列換成 dashed 引導卡 +「建立旅行收藏」outline（導向 /trips/new，不在頁內建立）；欄位保留分享或已貼上的 URL 且仍可編輯，CTA disabled；無狀態列、無結果區</span>
+          <span style="font-weight:700;color:#4C76C2">Idle</span><span style="color:#777">空欄位、CTA disabled（45% 不變色）、狀態列保留 24px 空間、無結果區；結果區位置改放 IdleHint（次要層級、無 CTA、無邊框，一有輸入即移除）</span>
+          <span style="font-weight:700;color:#4C76C2">Filled</span><span style="color:#777">有值 → clear 按鈕出現、CTA enabled；長 URL 於輸入框內水平捲動，不換行、不縮字</span>
+          <span style="font-weight:700;color:#4C76C2">Reel URL</span><span style="color:#777"><strong>已定案｜/p/ 與 /reel/ 同為有效來源格式</strong>（docs/MVP.md §5.3、ARCHITECTURE 決策表）。Reel 連結通過格式驗證、CTA enabled，與 Filled <strong>同一份版面、同一顆 CTA</strong>，不另做欄位或分支。placeholder 改為「instagram.com/p/… 或 /reel/…」。Reel 的文字來源優先取可取得的 caption／Share Target 文字或分享附帶文字，<strong>MVP 不要求取得或分析影片本身</strong>（ARCH §3.4）</span>
+          <span style="font-weight:700;color:#4C76C2">來源唯讀｜跨狀態規則</span><span style="color:#777">URL <strong>只有在 Import 尚未建立的 composer 階段可編輯</strong>（No collection／Idle／Filled／Reel URL／Invalid／四種 Keyboard）。一旦進入 received 之後的任何狀態，來源一律以 <strong>SourceRow 唯讀</strong>呈現：不用可編輯 input、不出現 Clear、不能改寫本筆 Import 的 URL，畫面 URL 與實際處理來源永遠一致（§5.3 · ARCH §3.3）。要分析其他連結＝離開本筆 Import，建立新的一筆</span>
+          <span style="font-weight:700;color:#4C76C2">Analyzing</span><span style="color:#777">＝ lifecycle <strong>processing</strong>。Import 已建立，因此 <strong>LinkInput 與 Analyze CTA 一併換成唯讀 SourceRow</strong>：沒有可編輯欄位、沒有 Clear、也沒有可重複按的 CTA（重複提交在此不可能發生）。狀態列「正在讀取這則貼文…」＋ sparkle 1400ms opacity 1→.5 脈動，prefers-reduced-motion 時關閉。來源區塊由 composer 118px 收成 64px，三個寬度一致；實測捲動層 736px，不需捲動</span>
+          <span style="font-weight:700;color:#4C76C2">Success</span><span style="color:#777">＝ lifecycle <strong>review_required</strong>。SourceRow 唯讀 + 狀態列「分析完成！找到 N 個地點。」+ 手繪箭頭；結果卡片（逐項 Edit／拒絕／加入）、Batch 面板、珊瑚 commit CTA。實測捲動層總高 1399／1371／1339，最後的 commit CTA 距 nav 上緣 72px、距 FAB 頂 58px</span>
+          <span style="font-weight:700;color:#4C76C2">Empty result（零候選）</span><span style="color:#777">needs_input 的第二種來源：讀到內容但解析不出地點。三個出口都在，順序為<strong>換一個連結（primary）→ 沒有可用地點，結束處理（outline）→ 補充資料後重試（文字鍵）</strong>。來源列維持唯讀，不因失敗而變回可編輯欄位。實測卡高 289（三個寬度相同），捲動層 736px 不需捲動</span>
+          <span style="font-weight:700;color:#4C76C2">needs_input · 資料不足</span><span style="color:#777">needs_input 的第一種來源（MVP §5.5「資料不足」／ARCH §6.1「資料不足／零候選」）：來源內容根本讀不到。同一個 NoticeCard 版面、不同文案，出口順序改為<strong>補充資料後重試（primary）→ 換一個連結（outline）→ 沒有可用地點，結束處理（文字鍵）</strong>。實測卡高 360:310 · 390／430:289</span>
+          <span style="font-weight:700;color:#4C76C2">Received（排隊）</span><span style="color:#777">與 processing 共用版面，只換文案「已收到連結，排隊處理中…」；Import 已建立 → 來源唯讀、沒有 Analyze CTA、無結果區。<strong>不做第二種版面</strong>——兩者對使用者的下一步相同（等待），多一種版面會製造沒有動作差異的狀態</span>
+          <span style="font-weight:700;color:#4C76C2">Resume · review_required</span><span style="color:#777">回到未處置完的匯入（entry=resume，/imports/:importId/review）：SourceRow 唯讀 + ResumeSummaryRow 取代 LinkInput 與 Analyze CTA；狀態列改持久文案「上次分析找到 3 個地點，還有 1 個沒處置。」；結果列表回填已加入／已拒絕／未處置，Batch 只計未處置。<strong>來源區塊三種形態</strong>（三個寬度完全一致）：composer 118（欄位 52 + gap 12 + CTA 54）→ 僅 SourceRow 64（−54，entry=new 的持久狀態）→ SourceRow + 摘要列 120（+2，entry=resume；64 + gap 10 + 46）。ResumeSummaryRow <strong>只在 entry=resume 出現</strong>，entry=new 的持久狀態不顯示「2 天前匯入」這類回訪語</span>
+          <span style="font-weight:700;color:#4C76C2">Resume · received</span><span style="color:#777">回訪時該筆匯入還在排隊：SourceRow + 摘要列（狀態 chip「排隊中」、「還沒開始分析」），狀態列排隊文案，無結果區。這是「排隊中」對使用者唯一有意義的地方——它說明可以先離開</span>
+          <span style="font-weight:700;color:#4C76C2">Completed · 有加入</span><span style="color:#777">從匯入紀錄<strong>回訪</strong>（entry=resume）：只要至少一筆已加入即屬此類，包含部分加入 + 部分拒絕。<strong>ImportItem 是唯讀處置紀錄</strong>——卡內不提供 Edit／Add／Reject／Retry／重新搜尋／補充資料，動作列整條換成靜態處置標示；「更換」原生 disabled；無 commit CTA。要修改已加入地點的內容，寫入對象是 <strong>TripPlace</strong>，不得回頭改寫 ImportItem（§5.5 · §5.7 · ARCH §6.2 / §10）。摘要卡「已加入 N 個地點到「{收藏}」」，實測摘要卡高 106、摘要列 46、卡片 255／227／230、捲動層 1400／1372／1353。<strong>meta 不列候選數</strong>：§5.5 定義 completed 為「所有候選項目都已確認或拒絕」，因此此狀態候選數恆等於已加入數 + 已拒絕數，列出等於把前兩者的和再印一次——砍掉不損失資訊，且 360 因此收回單行（resume 區塊三個寬度一律 134，+2，無例外）。<strong>此推導只適用於 completed</strong>；review_required 的未處置數無法由其他欄位推得，候選數與未處置數都必須保留</span>
+          <span style="font-weight:700;color:#4C76C2">Completed · 全部拒絕</span><span style="color:#777">同一版面、<strong>不同文案</strong>：「這則貼文沒有地點被加入」+「N 個候選都拒絕了，這筆匯入已結束。之後仍可重新貼上同一連結，建立一筆新的匯入。」不用「已完成」作收尾——沒有任何地點被加入時那是誤導。所有卡片同為唯讀（✕ 已拒絕），不提供取消拒絕。實測摘要卡 106、捲動層 1400／1372／1353</span>
+          <span style="font-weight:700;color:#4C76C2">Supplement · 空 / 已填 / 由 error</span><span style="color:#777">補充資料在卡內就地展開（五種內容 + 截圖）。空欄位時提交 disabled 45%；任一欄位有值即 enabled。實測 NoticeCard 總高：空 360:823 · 390／430:804；已填（3 張截圖 + 文字 + 店名 + 區域）360:849 · 390／430:829；補充區本身 694／674／674。360 下需捲動兩屏（捲動層總高 空 1324／1304／1304、已填 1349／1330／1330，可視 736），屬選擇頁內展開時已接受的取捨</span>
+          <span style="font-weight:700;color:#4C76C2">End import confirm</span><span style="color:#777">出口列原地換成確認列（取消 solid 1.35／結束處理 outline 1）；文案寫明影響範圍且<strong>不寫「不可復原」</strong>。實測卡高 244（三個寬度相同）</span>
+          <span style="font-weight:700;color:#4C76C2">Invalid URL</span><span style="color:#777">欄位邊框轉珊瑚 + 3px 柔光、inline 訊息點明只支援 Instagram 貼文（/p/）與 Reel（/reel/）；輸入內容保留、CTA 原生 disabled。<strong>只有三種情況算 invalid</strong>：非 Instagram 網址、不屬於 /p/ 或 /reel/ 的 Instagram 路徑、網址格式不完整。<strong style="color:#B5745A">合法的 /p/ 或 /reel/ 網址因私人帳號、需要登入、內容已移除、來源存取限制或讀不到 caption 而失敗時，一律不得顯示為 invalid</strong>，必須建立 Import 並進入 needs_input 引導補充（§5.3 明文）</span>
+          <span style="font-weight:700;color:#4C76C2">Error</span><span style="color:#777">＝ ARCHITECTURE §6.1 的 <strong>failed</strong>，只能重新嘗試回 processing，<strong>不提供結束處理</strong>（§6.1 只有 needs_input 有往 completed 的轉換）。出口：補充資料後重試（primary）· 重新分析（outline）· 換一個連結。URL 不清除；不用大型警告圖示。實測卡高 289</span>
+          <span style="font-weight:700;color:#4C76C2">Mixed disposition</span><span style="color:#777">部分加入 + 部分拒絕 + 部分未處置：三種卡片狀態同時存在；Batch 標題只數未處置，副標補「已拒絕的 N 個不會加入」；CTA 保留。仍有未處置 → 維持 <strong>review_required</strong>，卡內動作全數可用</span>
+          <span style="font-weight:700;color:#4C76C2">Batch partial failure</span><span style="color:#777"><strong>批次加入採部分成功，不是全成全敗</strong>（docs/MVP.md §5.7 · ARCHITECTURE 決策表）。示範：批次 3 筆 → 2 成功、1 失敗。成功的 2 筆<strong>立即顯示已加入且不回滾</strong>；失敗的 1 筆<strong>維持尚未處置</strong>，絕不顯示為已加入；Import <strong>維持 review_required</strong>。失敗卡內出現一塊<strong>單一責任的失敗提示區</strong>（coral-100 底、r12、12.5px、<code>role="status" aria-live="polite"</code>），位置在 Tags 之下、動作列之上——不是 overlay、不壓縮動作列、不與下一張卡重疊。<strong>重試入口＝原本的「加入」鍵</strong>（不新增第四顆按鈕，動作列 360 寬度預算已用盡），其 <code>aria-describedby</code> 指向失敗提示，aria-label 改「重新加入旅行收藏：{地點}」。Batch 面板重新計算：標題「還有 1 個地點沒加入成功」、副標「已加入的 2 個會留在「{收藏}」，不會因為這次失敗被移除。」、CTA「重試加入 1 個地點」、無 sparkle。實測失敗卡 346／327／302（比同一張成功卡 +91／+72／+72，失敗區 79／60／60 + 上距 12），捲動層 1486／1439／1419，無水平溢出</span>
+          <span style="font-weight:700;color:#4C76C2">Batch retry（重試中）</span><span style="color:#777">重試進行中：失敗提示區<strong>整段換成重試語</strong>——前綴由「加入失敗」改「重試中」、內文改「正在重新加入…」（前綴不可留著，否則 live region 會一口氣念出「加入失敗　正在重新加入」互相矛盾），「加入」鍵與 Batch CTA <strong>都用原生 disabled</strong>（opacity .4 / .45，位置與尺寸不變）防重複提交，Batch CTA 文案「正在加入…」。已加入的卡片不受影響。實測失敗卡 307／307／282（單行提示，比 batch-fail 收回 39／20／20），捲動層 1447／1419／1400</span>
+          <span style="font-weight:700;color:#4C76C2">All processed</span><span style="color:#777">＝ lifecycle <strong>completed</strong>，entry=new：使用者<strong>仍停留在本次 Import</strong>，部分加入、部分拒絕、沒有未處置項目。所有結果卡轉唯讀處置紀錄（不留 Edit／Add／Reject／Retry，動作列換成 ✓ 已加入／✕ 已拒絕靜態標示，仍佔 44px，卡高不變）；BatchAddPanel 與珊瑚 commit CTA 一併由 <strong>CompletedSummaryCard</strong> 取代；「更換」原生 disabled。實測卡高 255／227／230、摘要卡 106、捲動層 1344／1316／1297</span>
+          <span style="font-weight:700;color:#4C76C2">Match · 待選 / 展開 / 未匹配</span><span style="color:#777">三個可切換 state。待選：地址列換成「請選擇實際地點 · 3 筆候選 ›」、加入 disabled、拒絕仍可用。展開：候選清單原地展開 + 末列「重新搜尋」。未匹配：地址列換成「找不到對應的實際地點」+ 滿寬「重新搜尋」。狀態列補「找到 3 個地點，1 個要選地點。」（360 實測單行 24px，未撐高）；Batch 面板 CTA 只計已匹配的未處置項目（360 實測標題 2 行 + 副標 1 行，共 3 行）</span>
+          <span style="font-weight:700;color:#4C76C2">Reject confirm</span><span style="color:#777">第一張卡的動作列換成確認列（兩行說明 + 取消 solid／拒絕 outline）；其餘卡片不變、Batch 面板計數不變（尚未處置）；該卡增高 +53px、其下卡片同步下移，屬明列例外，見 PLACE RESULT CARD</span>
+          <span style="font-weight:700;color:#4C76C2">All rejected</span><span style="color:#777">＝ lifecycle <strong>completed</strong>，entry=new，三筆全部拒絕。卡片唯讀、留在原位與原排序（✕ 已拒絕），<strong>不提供取消拒絕</strong>（§5.7 明訂 MVP 無此入口）；CompletedSummaryCard「這則貼文沒有地點被加入」+「3 個候選都拒絕了，這筆匯入已結束。之後仍可重新貼上同一連結，建立一筆新的匯入。」；無 commit CTA、無 sparkle</span>
+          <span style="font-weight:700;color:#4C76C2">Partial added</span><span style="color:#777">已加入卡片原地不動、Add 換成「✓ 已加入」；Batch 標題與 CTA 只數未加入的地點</span>
+          <span style="font-weight:700;color:#4C76C2">All added</span><span style="color:#777">＝ lifecycle <strong>completed</strong>，entry=new，三筆全部已加入。與 All processed 同一版面與同一套唯讀規則，只有摘要卡文案不同。<strong>舊作法「Batch 面板改完成語」已作廢</strong>——全部處置完即進入 completed，BatchAddPanel 本身就不該存在，改由 CompletedSummaryCard 承接；無 confetti</span>
+          <span style="font-weight:700;color:#4C76C2">Keyboard open</span><span style="color:#777">BottomNav 隱藏、鍵盤佔位、欄位與 CTA 皆在可視範圍；空 / 有值 / 長 URL / <strong>長 Reel URL</strong> / invalid 五種都可切換。鍵盤只出現在 composer 階段（持久 Import 沒有可編輯欄位，也就沒有鍵盤狀態）。實測捲動層 601px、三個寬度都不需捲動、無水平溢出</span>
+          <span style="font-weight:700;color:#4C76C2">Extreme</span><span style="color:#777">長名稱、長地址、長類別、兩行 Tags、5 張卡片、混合已加入狀態</span>
+          <span style="font-weight:700;color:#4C76C2">共通</span><span style="color:#777">狀態切換只換內容，header／欄位／CTA 位置永不移動；元件與間距全部共用</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">PLACE RESULT CARD</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">容器</span><span style="color:#777">padding 12 · r20 · #FFFDFA · 單層暖陰影 · 無邊框 · overflow:hidden</span>
+          <span style="font-weight:700;color:#4C76C2">兩欄</span><span style="color:#777">照片欄 flex-shrink:0；文字欄 flex:1 + min-width:0；gap 12</span>
+          <span style="font-weight:700;color:#4C76C2">Photo</span><span style="color:#777">108/120/132 寬、ratio 0.88、最小 108×122；5px 白框 + r6 + sticker shadow</span>
+          <span style="font-weight:700;color:#4C76C2">object-fit / position</span><span style="color:#777">cover + center；照片高度固定不隨卡片拉伸，因此不需 aspect-ratio</span>
+          <span style="font-weight:700;color:#4C76C2">Category badge</span><span style="color:#777">flex-shrink:0，永遠在名稱右側同列、不換行。<strong style="color:#3B3B3D">category 是 MVP 固定五分類的列舉值，不是自由文字</strong>：food／cafe／attraction／shopping／other，UI 一律顯示二字（美食／咖啡／景點／購物／其他），label 由 <code>CAT_LABEL</code> 推導、不逐筆手寫。<strong>因為固定二字，badge 實測 50px，地點名稱不需再為 badge 讓位</strong></span>
+          <span style="font-weight:700;color:#4C76C2">截斷順序｜契約</span><span style="color:#777">目前分類固定二字，名稱不因 badge 而截斷。<strong style="color:#B5745A">若未來要支援較長分類，規則是 badge 先截斷（給 badge max-width + ellipsis），不是名稱先 ellipsis</strong> — 地點名稱是主資訊，分類是次要標籤</span>
+          <span style="font-weight:700;color:#4C76C2">Place name</span><span style="color:#777">18.5px Quicksand 700，單行 nowrap + ellipsis（不 clamp 兩行）</span>
+          <span style="font-weight:700;color:#4C76C2">Description</span><span style="color:#777">13px KR / 1.6，line-clamp 2，右側留 16px 給邊緣小記號</span>
+          <span style="font-weight:700;color:#4C76C2">Mark slot</span><span style="color:#777">卡片 relative 容器內 right:10 top:46（badge 下方 16px），20×20；三個 viewport、所有 state、任何文字長度都同一組數值，不遮 title／description／address／tags／actions</span>
+          <span style="font-weight:700;color:#4C76C2">Address</span><span style="color:#777">Google Maps 對應地址，12.5px + 藍 pin；line-clamp 2，pin flex-shrink:0</span>
+          <span style="font-weight:700;color:#4C76C2">Tags</span><span style="color:#777">flex-wrap gap 5，允許兩行以上；不縮字、不裁切、不橫向捲動</span>
+          <span style="font-weight:700;color:#4C76C2">Tags｜規範來源</span><span style="color:#777"><strong>標籤已由 docs/MVP.md 定義</strong>：§5.6 列入 AI 辨識欄位、§5.7 列入可編輯欄位、§5.8 列入正式收藏保存欄位（2026-08-27 回寫）。<strong>保留呈現</strong>：移除 tags 與其上方虛線後，三個寬度的每一張卡都落回照片決定的下限（202／216／230），卡高不再隨內容變動，文字欄底部留 17／31／45px 空白</span>
+          <span style="font-weight:700;color:#4C76C2">不在本卡呈現的欄位</span><span style="color:#777"><strong>推薦品項 · 城市或區域 · 辨識信心程度</strong>三項都不呈現（依據見 PRODUCT DECISION 盒）。若要加，實測代價：各為一列 12.5px 文字，+27／+27／+24px；三項全加後三個寬度一律 280px，長內容卡由 301 升到約 328，360 下首屏可見卡片從 2.5 張降到 2 張</span>
+          <span style="font-weight:700;color:#4C76C2">分隔線</span><span style="color:#777">Tags 上方 1px dashed cream，margin 11/10</span>
+          <span style="font-weight:700;color:#4C76C2">動作列</span><span style="color:#777"><strong>滿寬橫跨照片欄與文字欄</strong>，位於卡片下半、上距 12px、gap 8；三個動作：Edit（outline，pencil + 「編輯」，flex 1）: 拒絕（outline 純文字、無圖示，flex 1）: 加入（solid + ＋／✓，flex 1.35）。動作列不再位於文字欄內，因此不受文字欄寬度限制。<strong>按鈕高 44px</strong>（Button sm 由 40 提高到 44，對齊本頁四處寫明的點擊區 ≥44 下限；sm 僅由 PlaceResultCard 內部使用——動作列 3 顆、確認列 2 顆、重新搜尋 1 顆，故直接改 DS token 而非 per-usage 覆寫）</span>
+          <span style="font-weight:700;color:#4C76C2">動作列寬度預算</span><span style="color:#777">Button sm 為 13px 字 + padding 0 10 + icon gap 5，whiteSpace:nowrap 不可壓縮，實際寬度由內容決定而非 flex 比例。滿寬後 360 可用寬 <strong>304px</strong>（卡片 328 − padding 24）：終態（✎ 編輯／已拒絕／✓ 已加入）實測 88 + 88 + 111 + gap 16 = <strong>303px</strong>，剩 1px。<strong>餘裕已用盡</strong>——再加第四個動作或加長任一終態文案都會溢出，拒絕鍵仍不得帶圖示</span>
+          <span style="font-weight:700;color:#4C76C2">Added</span><span style="color:#777">按鈕留在原位，僅 + → ✓、文案改「已加入」，尺寸與版位不變；拒絕與 Edit 轉 disabled 45%（不移除）。已處置的候選不再提供修改與拒絕入口。<strong>此規則只適用於 review_required</strong>；Import 進入 completed 後整條動作列不存在（見「completed｜唯讀處置紀錄」）</span>
+          <span style="font-weight:700;color:#4C76C2">Rejected</span><span style="color:#777">同一原則：拒絕鍵原位、文案改「已拒絕」（維持無圖示，見動作列寬度預算），底色轉 cream-200 + ink-400 文字並轉 disabled（復原入口 PENDING，不留未定義的再點擊）；加入與 Edit 轉 disabled 45%，卡片照片與文字不變、不淡出、不移除</span>
+          <span style="font-weight:700;color:#4C76C2">Match slot（地址列）</span><span style="color:#777">地址列升級為實際地點匹配槽，三種樣態：<strong>已匹配</strong>＝正式名稱地址 + blue pin（有候選時右端 ›，整列 44px 點擊區）／<strong>待選擇</strong>＝「請選擇實際地點 · N 筆候選 ›」／<strong>未匹配</strong>＝地址列換成「找不到對應的實際地點」，卡片下半滿寬「重新搜尋」outline（實測卡片高 360:301）。MVP 核心原則 4：只有匹配到實際地點的項目才能成為正式收藏</span>
+          <span style="font-weight:700;color:#4C76C2">候選清單（卡內展開）</span><span style="color:#777">點地址列後在卡片下半<strong>滿寬</strong>展開（與動作列同一欄）：每筆 13px/700 正式名稱 + 12px 地址、單選記號、列高 ≥44、r12 邊框（選中轉 blue-400 + blue-050），末列固定滿寬「重新搜尋」（sm，高 44）。滿寬後每筆候選地址收在單行，實測卡片總高 360:507 · 390:479 · 430:479（未展開 255／227／230）。選定後收合、地址列換成該候選、Add 解除 disabled。不開 sheet：候選欄位（名稱／地址／城市／經緯度／地圖連結／外部 ID）一行半就放得下，且畫面已有一個形式未定的面（更換目標）</span>
+          <span style="font-weight:700;color:#4C76C2">候選上限 3 筆｜設計假設</span><span style="color:#777"><strong style="color:#B5745A">OPEN — 不是產品或 API 上限</strong>：MVP.md 與 ARCHITECTURE.md 都未規定候選數量，且 ARCH §2.2 明訂地圖／Places 供應商不得預設，典型回傳筆數與排序品質未知。preview 裡的 3 筆<strong>只是設計測試資料</strong>，不得寫成「最多 3 筆實際地點候選」。超過 3 筆時的 UI（捲動／分頁／地圖預覽／升級為 sheet）<strong>尚未定義，待 Places API 與搜尋策略決定後重新檢視</strong>。<strong>與「每筆匯入最多選取 3 張補充截圖」是兩件事</strong>——後者已定案（§5.4），前者未定</span>
+          <span style="font-weight:700;color:#4C76C2">三種匹配樣態的動作可用性</span><span style="color:#777">（動作列改滿寬後版位改變、可用性規則不變）<strong>已匹配</strong>：Edit ○ · 拒絕 ○ · 加入 ○。<strong>待選擇</strong>：Edit ○ · 拒絕 ○ · 加入 ✕（disabled 45%）。<strong>未匹配</strong>：Edit ○ · 拒絕 ○ · 加入 ✕。<strong>拒絕在三種樣態下一律可執行</strong>——否則未匹配項目永遠停在未處置，Import 依 MVP §5.5 / ARCHITECTURE §6.2 就離不開 review_required</span>
+          <span style="font-weight:700;color:#4C76C2">展開時的捲動</span><span style="color:#777">展開後卡片實測 479–507px，靠近下緣時要避免把地點名稱與照片推出視野。沿用鍵盤那套作法：以容器 scrollTop 計算（不用 scrollIntoView），把「卡片頂端（名稱 + 照片）到候選清單末列」這一段對齊到可視區，上緣保留 16px 呼吸；若整段超過可視高度，優先保住卡片頂端</span>
+          <span style="font-weight:700;color:#4C76C2">拒絕確認列</span><span style="color:#777">按下拒絕後，整條動作列原地換成確認列：13px「拒絕後這個地點不會加入「{target}」。」+ 12px「拒絕不能復原。」+ 取消（solid 藍 flex 1.35）／拒絕（outline flex 1）。確認列同樣滿寬，360 可用 304px 只放兩顆鍵，比三鍵寬鬆許多，不觸發截斷；文案與按鈕配置不需調整。同時只有一張卡可處於確認狀態</span>
+          <span style="font-weight:700;color:#4C76C2">確認列的版面位移｜明列例外</span><span style="color:#777">確認列使卡片增高 <strong>+53px</strong>（sm 提高到 44 後實測 360:255→308、390:227→280、430:230→283；增量與 40px 時相同，因基準與確認列同時 +4；兩行說明在 304px 下各自單行），其下卡片整批下移同樣距離。這是<strong>使用者主動觸發的區域性展開</strong>，屬「狀態切換不改版面骨架／不產生 layout shift」原則的明列例外——該原則約束的是系統狀態驅動、使用者未預期的位移；主動展開的位移可預期且可用取消還原，照片欄、裝飾與卡片排序都不變</span>
+          <span style="font-weight:700;color:#4C76C2">確認列的取消時機</span><span style="color:#777">取消鍵、按下其他卡片的任何動作、<strong>該卡完全捲離可視範圍</strong>（IntersectionObserver ratio 0）才取消確認。<strong>不採位移門檻</strong>：px 門檻在不同螢幕與慣性捲動下不可預測，且使用者常會捲動去看確認影響的內容；「捲出視野」是明確、可實作、與意圖一致的邊界</span>
+          <span style="font-weight:700;color:#4C76C2">completed｜唯讀處置紀錄</span><span style="color:#777">Import 進入 completed 後（All added／All processed／All rejected／Completed 回訪），<strong>整條動作列被移除</strong>，換成靜態處置標示列：✓ 已加入（blue-500）／✕ 已拒絕（ink-400），min-height 44 與動作列等高，因此卡高不變（255／227／230）。<strong>不留任何看似可按但無效的控制</strong>——Edit、Add、Reject、Retry、重新搜尋、補充資料在此一律不存在（§5.5 · §5.7 · ARCH §6.2）。已加入地點的內容修改對象是 <strong>TripPlace</strong>，其路由與畫面不在本畫面範圍且尚未定案；已拒絕項目完成後不再提供編輯，也沒有取消拒絕</span>
+          <span style="font-weight:700;color:#4C76C2">批次失敗提示區</span><span style="color:#777">卡內<strong>單一責任區塊</strong>，不是另一種卡片版型：位置在 Tags 之下、動作列之上，上距 12、padding 10/12、r12、coral-100 底、12.5px/1.55，前綴「加入失敗」／重試中改「重試中」（Quicksand 700 coral-600，與內文同步切換，不留矛盾語）。<code>role="status" aria-live="polite"</code> 且有 id，由該卡「加入」鍵的 <code>aria-describedby</code> 指向，失敗原因因此與卡片建立關聯。<strong>自適應高度</strong>（79／60／60 實測），不是 overlay、不遮內容、不壓縮動作列、不與下一張卡重疊。重試＝再按同一顆「加入」（不新增第四顆鍵，寬度預算已無餘裕）；重試中該鍵與 Batch CTA 皆原生 disabled</span>
+          <span style="font-weight:700;color:#4C76C2">三態互斥</span><span style="color:#777">每張卡只能是未處置／已加入／已拒絕之一；已處置的卡片留在原位與原排序</span>
+          <span style="font-weight:700;color:#4C76C2">高度</span><span style="color:#777">下限 = 照片高 + 12 + 44（動作列）+ 24（計算 360:202 · 390:216 · 430:230；390／430 實測相符，360 實測 206，差 4px 為行高進位）。實測 <strong>360</strong>：常規 255 · 最短 206（Extreme 的短內容卡）· 長內容 301（地址 2 行 clamp 生效後）；<strong>390</strong>：常規 227 · 最短 216 · 長內容 301；<strong>430</strong>：常規 230 · 最短 230 · 長內容 301。匹配樣態實測：待選 360:282 · 390:254 · 430:254；未匹配 360:309 · 390:281 · 430:284；展開 360:507 · 390／430:479。批次失敗卡 360:346 · 390:327 · 430:302（同一張成功卡 +91／+72／+72）；重試中 360／390:307 · 430:282。completed 唯讀卡與 review_required 常規卡等高（255／227／230）。<strong>Button sm 40→44 後，所有卡片一律 +4px，無其他版面變化</strong>（照片欄、gutter、文字欄寬、裝飾、排序都不變）</span>
+          <span style="font-weight:700;color:#4C76C2">內容增長</span><span style="color:#777">文字欄變高時卡片跟著長高，照片維持原高靠上；動作列永遠在卡片最下並滿寬，不再貼文字欄底部</span>
+          <span style="font-weight:700;color:#4C76C2">360 空間不足</span><span style="color:#777">依序：縮照片欄 → 縮 gutter → Tags 換行 → clamp；不改欄位方向、不換版式</span>
+          <span style="font-weight:700;color:#4C76C2">430 過寬</span><span style="color:#777">照片欄放大吸收；文字不放大、Tags 不放大、按鈕比例不變</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">DECORATION RULES</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">Container</span><span style="color:#777">裝飾一律放卡片外層 wrapper（position:relative），不進 PlaceResultCard</span>
+          <span style="font-weight:700;color:#4C76C2">Tape</span><span style="color:#777">60–64 × 17px，top:-7，left 24/26/30，opacity .92，r2，跨過卡片上緣</span>
+          <span style="font-weight:700;color:#4C76C2">Variation</span><span style="color:#777">依 category 固定，不看 index：cafe 藍格紋 −8° · food butter +6° · attraction 淡紫點點 −5° · shopping／other butter +6°</span>
+          <span style="font-weight:700;color:#4C76C2">Envelope</span><span style="color:#777">Header 內、wordmark 右側 gap 6，52px，rotate(4°)，全頁僅一枚</span>
+          <span style="font-weight:700;color:#4C76C2">Curved arrow</span><span style="color:#777">狀態列容器 absolute right:2 top:-8，36px；僅剛分析完成的 review_required 出現（success／partial／extreme）。completed 與批次失敗不出現——那不是值得慶祝的收尾</span>
+          <span style="font-weight:700;color:#4C76C2">Sparkle（CTA）</span><span style="color:#777">Analyze 按鈕內圖示，analyzing 時脈動；不是裝飾層，屬按鈕內容</span>
+          <span style="font-weight:700;color:#4C76C2">Sparkles（Batch）</span><span style="color:#777">面板右側 34px；<strong>批次失敗時移除</strong>（面板不慶祝失敗），completed 沒有 Batch 面板所以也不存在。素材已為真透明，multiply 只是元件內建的沿用值，不再是遮底手段</span>
+          <span style="font-weight:700;color:#4C76C2">Luggage</span><span style="color:#777">Batch 面板左側 52px，rotate(-4°) + drop-shadow</span>
+          <span style="font-weight:700;color:#4C76C2">PlaceCardMark</span><span style="color:#777">單一共用 slot（PlaceResultCard 的 markSrc）：variant heart／star／flower · size 20（預設）· aria-hidden · pointer-events:none · absolute 不參與文件流；三個圖案共用同一組定位，不各自寫 CSS</span>
+          <span style="font-weight:700;color:#4C76C2">Mark variant</span><span style="color:#777">依 category 固定：cafe 珊瑚愛心 · food 黃色星星 · attraction 紫色小花 · shopping／other 不傳 src 即不渲染</span>
+          <span style="font-weight:700;color:#4C76C2">同一地點</span><span style="color:#777">排序、added 狀態、三個 viewport、所有 state 都套同一組膠帶與小記號；視覺身份不因情境改變</span>
+          <span style="font-weight:700;color:#4C76C2">Rotation</span><span style="color:#777">−9° ~ +6°，同畫面不重複同角度</span>
+          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">膠帶 2（卡片之上、nav 之下）；卡內小記號沿用元件內層</span>
+          <span style="font-weight:700;color:#4C76C2">Responsive</span><span style="color:#777">位移一律固定 px，三個寬度不變；不用 % 定位，避免窄螢幕壓到名稱或 badge</span>
+          <span style="font-weight:700;color:#4C76C2">互動</span><span style="color:#777">全部 pointer-events:none + aria-hidden；不得作為狀態或資訊的唯一來源</span>
+          <span style="font-weight:700;color:#4C76C2">Clipping</span><span style="color:#777">wrapper 不可 overflow:hidden（膠帶會被切）；水平溢出由捲動層 overflow-x:clip 收</span>
+          <span style="font-weight:700;color:#4C76C2">數量</span><span style="color:#777">維持現況：Header 1 枚、狀態列 1 枚、每卡最多 1 條膠帶 + 1 枚小記號，不增加</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">MOBILE LAYOUT / SAFE AREA / SCROLL</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">Top safe area</span><span style="color:#777">env(safe-area-inset-top)，內容再加 8px；不自繪狀態列</span>
+          <span style="font-weight:700;color:#4C76C2">Bottom safe area</span><span style="color:#777">nav 高 = 72px + env(safe-area-inset-bottom)，內容 padding 同步加 inset</span>
+          <span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">與 Home 完全同一元件與數值：72px、上圓角 26、兩格等寬、無 FAB、nav 上緣不再有任何凸出物</span>
+          <span style="font-weight:700;color:#4C76C2">Scroll container</span><span style="color:#777">唯一捲動層：flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">狀態列區、BottomNav、（鍵盤開啟時）鍵盤；frame overflow:hidden</span>
+          <span style="font-weight:700;color:#4C76C2">Content bottom pad</span><span style="color:#777"><strong>32px + inset</strong>：原本的 72px 是為了讓 CTA 閃過上凸 14px 的 FAB（72 − 14 ＝ 距 FAB 頂端 58px）。FAB 移除後 nav 上緣沒有任何凸出物，留白只需負責 CTA 與 nav 之間的呼吸；取 2× 卡片間距 ＝ 32px，最後一張卡、Batch 面板與 commit CTA 都完整捲到 nav 之上</span>
+          <span style="font-weight:700;color:#4C76C2">遮擋驗證｜實測</span><span style="color:#777">捲到底後最後一個內容元素的下緣距 <strong>nav 上緣 32px</strong>（nav 上緣已無凸出物，不再有 FAB 淨空需求）。commit CTA 只存在於 review_required，因此以<strong>實際有 CTA 的 Success／Batch partial failure／Extreme</strong> × 360／390／430 共 9 組捲到底實測（scrollTop 已達底、餘量 0）：九組的 CTA 下緣距 nav 上緣皆為 32px，CTA 完整可見、未被 BottomNav 遮住。completed（All added／All processed／All rejected／Completed 回訪）沒有 commit CTA，量的是最後一張唯讀卡片。三個寬度、所有狀態的水平溢出量皆為 <strong>0px</strong>（捲動層與 frame 都是 scrollWidth − clientWidth = 0）</span>
+          <span style="font-weight:700;color:#4C76C2">需要捲動的狀態</span><span style="color:#777">可視高 736（鍵盤開啟時 601）。底部留白由 72 → 32px 後每個狀態的內容高各降 40px。不需捲動：No collection／Idle／Filled／Reel URL／Invalid／received／analyzing／Empty／needs_input 資料不足／Error／End confirm／Resume 排隊中／五種 Keyboard（needs_input 資料不足在 360 由 756 降為 736px，現在剛好不需捲動）。需要捲動：所有含結果列表的狀態與補充資料（重新實測約 1236–1967）</span>
+          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">內容 0 · 膠帶 2 · nav 5 · 鍵盤 7</span>
+          <span style="font-weight:700;color:#4C76C2">Overscroll</span><span style="color:#777">contain；不做下拉裝飾，回彈交給系統</span>
+          <span style="font-weight:700;color:#4C76C2">Horizontal</span><span style="color:#777">捲動層 overflow-x:clip、卡片 overflow:hidden、文字欄 min-width:0，三者同時具備</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">KEYBOARD BEHAVIOR（正式方案）</div>
+        <div style="display:flex;flex-direction:column;gap:10px;background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">聚焦</span> — 欄位邊框轉藍 + 3px 柔光，不放大、不位移；聚焦時不清空既有內容。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Visual viewport</span> — App Shell 高度改跟 visualViewport.height，不用 100vh；鍵盤升起等於捲動層變短，header／欄位／CTA 的相對位置不變。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav</span> — 鍵盤開啟時隱藏（不是被蓋住）。輸入是專注任務，nav 留著只會與鍵盤的「前往」鍵搶注意力，且會吃掉 72px 可視高度。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Analyze CTA</span> — 必須保持可見。捲動層以「欄位 + 錯誤訊息 + CTA」為一整組對齊到鍵盤上緣，需要時捲動 header，不捲走 CTA。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Scroll into view</span> — 聚焦時把該群組捲到鍵盤上方，保留 16px 呼吸；用容器 scrollTop 計算，不用 scrollIntoView（會連 App Shell 一起位移）。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Clear button</span> — 24px 圖形、44px 點擊區，位置固定在欄位右內側，鍵盤開啟時仍可直接點。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">遮擋</span> — 鍵盤不得遮住欄位、錯誤訊息或 Analyze CTA；結果列表可以被遮住（使用者此時不需要它）。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">補充表單｜對齊單位</span> — LinkInput 那條「欄位 + 錯誤訊息 + CTA 一整組」的規則<strong>不適用</strong>：補充表單五個欄位、總高 694px，一整組遠超一屏。對齊單位改為<strong>單一欄位 + 它的 label</strong>：聚焦時以容器 scrollTop（不用 scrollIntoView）把 label 上緣對齊鍵盤上方可視區頂端 + 16px；若該欄位本身高於可視高度，改對齊欄位上緣，優先保住插入點。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">補充表單｜提交鍵</span> — <strong>允許被鍵盤遮住</strong>。填寫途中不需要看到提交鍵，且五個欄位下強制保持可見會讓可用高度剩不到一個欄位。收起鍵盤後提交鍵必須可見（還原 scrollTop 即滿足）。這是與 Analyze CTA 的明確差異：Analyze 是單一欄位的唯一出口，補充表單不是。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">補充表單｜多行欄位增高</span> — 貼文文字與其他資訊隨內容增高，到 5 行後改欄位內部捲動、不再推長卡片。增高時<strong>以 scrollTop 補償</strong>維持插入點與鍵盤上緣的距離，畫面不得跳動；欄位以下的內容整批下移，欄位以上不動。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">補充表單｜BottomNav</span> — 與 LinkInput 一致：任何補充欄位聚焦時同樣隱藏，收起後 200ms 淡入回來。不因表單較長而改變規則。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">補充表單｜截圖槽</span> — 截圖槽不吃鍵盤：點「＋新增」或 ✕ 前先收起鍵盤（避免系統選擇器與鍵盤疊加），收起後還原 scrollTop 再開選擇器。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">收起</span> — 記住收起前的 scrollTop 並還原；nav 以 200ms 淡入回來，不做滑入。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Safe area + 鍵盤</span> — 兩者不疊加：鍵盤開啟時底部 inset 由鍵盤吃掉，內容 padding 改為 16px；收起後才恢復 72px + inset。</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">INTERACTION</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">Back</span><span style="color:#777">返回上一頁（通常 Home）；不清空輸入。press scale(.97)+brightness(.96) 120ms</span>
+          <span style="font-weight:700;color:#4C76C2">Paste URL</span><span style="color:#777">貼上即做格式檢查，<strong>只認格式不認可讀性</strong>：instagram.com/p/… 與 instagram.com/reel/… 皆合法 → CTA enabled；非 Instagram、非 /p/ 或 /reel/ 路徑、格式不完整 → invalid，內容保留。<strong>私人帳號、需要登入、內容已移除、存取限制、讀不到 caption 都不是 invalid</strong>——那些要先建立 Import 再進 needs_input</span>
+          <span style="font-weight:700;color:#4C76C2">Clear</span><span style="color:#777">清空欄位並回到 idle（狀態列與結果一併清掉），焦點留在欄位</span>
+          <span style="font-weight:700;color:#4C76C2">Analyze</span><span style="color:#777">停留原頁；analyzing 期間 disabled 防重複提交，完成後就地換成 success／empty／error</span>
+          <span style="font-weight:700;color:#4C76C2">Retry</span><span style="color:#777">error 的「重新分析」outline，重跑同一連結（ARCH §6.1 failed → processing）；重試中 disabled 45%，URL 不清除</span>
+          <span style="font-weight:700;color:#4C76C2">補充資料後重試</span><span style="color:#777">MVP §5.4 + §5.5：展開卡內補充區，涵蓋五種內容（貼文文字／貼文截圖／店名或景點名稱／地址或區域／其他資訊）。<strong>五項任一有值即可提交</strong>（docs/MVP.md §5.4「五種補充內容至少填寫一項才能送出」；提交鍵在全空時 disabled 45%）；送出後回 processing，狀態列改「正在讀取這則貼文…」。empty 與 error 都能進入，onSupplementSubmit(payload) 為邊界。核心原則第 7 條要求失敗時必有手動補充流程，此為其介面</span>
+          <span style="font-weight:700;color:#4C76C2">截圖上傳</span><span style="color:#777">MVP §5.4 的必要能力。上限 <strong>3 張｜已定案</strong>（docs/MVP.md §5.4 明訂「每筆匯入最多選取 3 張截圖」，2026-08-27 回寫，不再是設計假設）；滿 3 張時「＋新增」槽移除並顯示「已選滿 3 張，刪掉一張才能再新增。」。<strong>儲存供應商、檔案大小上限與保存期限 OUT OF SCOPE</strong>（ARCH §2.2 未決），本頁不寫成既定方案</span>
+          <span style="font-weight:700;color:#4C76C2">刪除截圖</span><span style="color:#777">每張右上 ✕（22px 圖形／44 點擊區），<strong>直接刪除不確認</strong>——docs/MVP.md §5.4：「補充資料送出前，已選取的截圖可以直接移除且不需確認；移除尚未送出的表單內容不構成破壞性動作，核心產品原則第 10 條不適用於此。」<strong>不是破壞性動作的豁免</strong>，而是它本來就不構成破壞性動作，確認規則的前提不成立。送出後的截圖移除不在 MVP 範圍</span>
+          <span style="font-weight:700;color:#4C76C2">結束處理</span><span style="color:#777">MVP §5.5「沒有可用地點／結束處理」使 Import 進入 completed。<strong>執行前需確認</strong>，依據是 §5.5 明訂 completed 為處理終態、且 ARCH §6.1 狀態圖中 completed 沒有任何往外的轉換。確認文案寫明實際影響（這筆匯入就此結束、不再等待補充資料；之後仍可重新貼上同一連結建立新的匯入），<strong>不得寫「不可復原」</strong>——可用新的匯入重跑，寫成不可復原是錯誤敘述（CLAUDE.md 第 3 條）。onEndImport() 為邊界</span>
+          <span style="font-weight:700;color:#4C76C2">結束後的界線｜不得誤解</span><span style="color:#777">結束處理只能<strong>建立一筆新的 Import 沿用同一連結</strong>，<strong style="color:#B5745A">不得重開已完成的 Import</strong>。MVP §5.5 只允許 failed 與 needs_input 重新嘗試，ARCH §6.1 的 completed 無往外轉換；做成 completed → processing 等於新增兩份規範文件都沒有定義的狀態轉換</span>
+          <span style="font-weight:700;color:#4C76C2">換一個連結</span><span style="color:#777">清空欄位回 idle，狀態列與 NoticeCard 一併清掉。它既不補充資料也不結束匯入，因此不能單獨滿足 §5.5 的兩個出口；在零候選時是主要出口（primary），在資料不足與 failed 時降為次要／文字鍵</span>
+          <span style="font-weight:700;color:#4C76C2">needs_input 兩種來源</span><span style="color:#777">MVP §5.5「資料不足或沒有候選地點」、ARCH §6.1「資料不足／零候選」＝兩種來源，共用同一個 NoticeCard 版面，只調文案與出口主次（見 UI STATE TABLE 兩列）。<strong>不做成兩種版型</strong>；三個出口在兩種情境下都存在</span>
+          <span style="font-weight:700;color:#4C76C2">entry 模式</span><span style="color:#777">同一份設計、兩個掛載：<strong>new</strong>（/share、/imports/new）顯示 LinkInput + Analyze CTA；<strong>resume</strong>（/imports/:importId/review）顯示唯讀 SourceRow + ResumeSummaryRow。差異只有這兩列與狀態列文案，其餘元件完全共用</span>
+          <span style="font-weight:700;color:#4C76C2">回到未處置完的匯入</span><span style="color:#777">已加入／已拒絕的卡片維持原位與原狀態，未處置的可繼續處理，Batch CTA 只計未處置且已匹配。Import 是持久任務（§5.10 明訂可查看「尚未處置的候選項目」），離開再回來不重跑分析</span>
+          <span style="font-weight:700;color:#4C76C2">completed 回訪｜唯讀</span><span style="color:#777">不提供任何會改變該筆 Import 狀態的動作：無 commit CTA、無補充資料、無結束處理，<strong>completed 不得回到 processing</strong>（§5.5 處理終態、§6.1 無往外轉換）。要重跑只能重新貼上同一連結建立新的一筆。completed 的 ImportItem 僅為唯讀處置紀錄，不提供 Edit；已加入地點若需修改，應進入 TripPlace 編輯流程</span>
+          <span style="font-weight:700;color:#4C76C2">完成後不導向｜明列決定</span><span style="color:#777">completed 採<strong>唯讀摘要而非導向</strong>：「加入之後的導向」目前是 <strong style="color:#B5745A">OPEN</strong>（是否跳頁、顯示 toast 或前往旅行收藏頁尚未定案，本次不自行決定）；/trips/:tripId 尚未設計，導過去無法驗證終點；全部拒絕時導向一個毫無變化的收藏頁也不合理。呈現決定屬設計職責、且符合 ARCH §11（可看到狀態、失敗原因與下一步）；日後若產品決定導向，與這個呈現不衝突</span>
+          <span style="font-weight:700;color:#4C76C2">received vs processing</span><span style="color:#777">只差文案不差版面（理由見 UI STATE TABLE）。received「已收到連結，排隊處理中…」／processing「正在讀取這則貼文…」；兩者 CTA 都 disabled、sparkle 都脈動</span>
+          <span style="font-weight:700;color:#4C76C2">Edit</span><span style="color:#777"><strong>呈現形式已定案（2026-08-26 專案決策紀錄）：全螢幕頁面</strong>（多欄位加上手機鍵盤會擠壓 bottom sheet）；儲存或取消後<strong>返回 Import 並保留分析結果與原本的捲動位置</strong>。<strong style="color:#B5745A">畫面本身尚未設計｜待設計</strong>（非 PENDING）——欄位清單（§5.7：名稱、分類、介紹、推薦品項、標籤）與路由（ARCH §10：/imports/:importId/items/:itemId/edit）已定案，版面待另案設計。本頁仍只定義按鈕的 normal / pressed / disabled / focus-visible 與 onEdit(placeId) 邊界，且三種匹配樣態下 Edit 一律可用。<strong style="color:#B5745A">此路由只服務 review_required</strong>：Import 進入 completed 後不得再進入（ARCH §10 明文），completed 卡片也不再顯示 Edit 入口</span>
+          <span style="font-weight:700;color:#4C76C2">Reject place</span><span style="color:#777">拒絕該候選地點：<strong>docs/MVP.md §5.7「拒絕該候選地點；拒絕前必須先確認」</strong>與<strong>§3 核心產品原則第 10 條</strong>（破壞性動作執行前必須先確認並說明影響範圍）為上位依據。拒絕 → <strong>就地確認列</strong> → Rejected，卡片留在列表原位；確認內容與按鈕角色依 CLAUDE.md「破壞性動作確認規則」實作，本頁不重複定義。Import 只有在全部候選都已加入或拒絕後才離開 review_required（§5.5 / ARCHITECTURE §6.2）；onReject(placeId) 於確認後才觸發，onCancelReject 取消確認。<strong>只適用 review_required</strong>；completed 的已拒絕項目唯讀，且 MVP 不提供取消拒絕（§5.7）</span>
+          <span style="font-weight:700;color:#4C76C2">Add place</span><span style="color:#777">確認加入畫面上方已選定的目標旅行收藏，不再詢問要加到哪裡。Add → Adding（按鈕原位、標籤不變、40% 透明度 + <strong>原生 disabled</strong> 防重複點擊）→ Added（+ 換 ✓）。<strong>失敗時該項維持尚未處置</strong>，卡內出現失敗提示區，重試＝再按同一顆「加入」（aria-label 改「重新加入旅行收藏：{地點}」）。onAdd(placeId) · onRetryAdd(placeId)；只適用 review_required</span>
+          <span style="font-weight:700;color:#4C76C2">選擇實際地點</span><span style="color:#777">onToggleCandidates(placeId) 展開／收合候選清單、onPickCandidate(placeId, candidate) 選定；選定後該卡 matchState 轉 matched、Add 解除 disabled。未匹配與待選擇的項目不得成為正式收藏或地圖標記（MVP §5.7），也不進批次</span>
+          <span style="font-weight:700;color:#4C76C2">重新搜尋｜待設計（MVP 必要能力）</span><span style="color:#777"><strong style="color:#B5745A">尚未設計，屬驗收範圍</strong>——MVP §5.7 明列「重新搜尋或補充資料」。它是候選清單的<strong>唯一逃生口</strong>：若正確匹配不在回傳清單中，這是使用者唯一的出路。標記為 <strong style="color:#B5745A">PENDING DESIGN — required before frontend implementation</strong>（需要鍵盤、輸入與結果清單，是完整一頁而非一列）。本次只做<strong>入口、觸發狀態（僅 review_required）與 onResearch(placeId) 邊界</strong>；<strong>不得把「只有入口」讀成完整流程已設計完成</strong></span>
+          <span style="font-weight:700;color:#4C76C2">Batch add</span><span style="color:#777">CTA「加入 N 個地點」的 N 必須由<strong>「已匹配實際 Place 且尚未處置」</strong>推導，<strong>不得使用候選總數</strong>：已加入、已拒絕、尚未匹配三類都不計入、也不會被批次加入。被排除者於副標點名（「已拒絕的 N 個不會加入。」「還沒對到地點的 N 個不會加入。」）。若未處置項目全都尚未匹配，<strong>不顯示 CTA</strong>，面板改「還有 N 個地點要先選實際地點」。全部處置完即進入 completed，面板與 CTA 一併由 CompletedSummaryCard 取代（<strong>不再有「面板改完成語」的舊作法</strong>）。onBatchAdd(eligibleIds)</span>
+          <span style="font-weight:700;color:#4C76C2">更換目標</span><span style="color:#777">開啟旅行收藏選擇入口（<strong style="color:#B5745A">選擇介面本身 PENDING DESIGN</strong>：bottom sheet／頁面未確認，本次不得自行決定）；只定義入口與 onChangeTarget callback 邊界，44px 點擊區。<strong>completed 時必須 disabled</strong>（§5.5「回訪 completed Import 時，不得提供更換其目標旅行收藏的操作」）：保持原位避免版面跳動、用<strong>原生 disabled</strong>（點擊與鍵盤都不可觸發）、opacity .45 不改色不改尺寸</span>
+          <span style="font-weight:700;color:#4C76C2">只有一個收藏</span><span style="color:#777">更換維持顯示且可進入選擇介面（該介面同時是建立新收藏的入口）；不因選項只有一個而隱藏或 disable — 與「不讓元素從版面消失」一致，也避免收藏數變化時按鈕忽隱忽現</span>
+          <span style="font-weight:700;color:#4C76C2">建立旅行收藏</span><span style="color:#777">無收藏時的唯一出口，導向既有建立流程 /trips/new（<strong style="color:#B5745A">該畫面不在本次範圍</strong>）；離開與返回期間欄位內容保留（MVP §5.3 預填不得被清掉），返回後有收藏即回到 Filled</span>
+          <span style="font-weight:700;color:#4C76C2">來源 URL 的可編輯邊界</span><span style="color:#777">URL 只有在 <strong>Import 尚未建立</strong>時可編輯（composer：No collection／Idle／Filled／Reel URL／Invalid／Keyboard ×5）。Import 進入 received 之後一律 SourceRow 唯讀：無可編輯 input、無 Clear、不能改寫本筆 Import 的 URL。要分析其他網址＝<strong>離開目前 Import，回到新增匯入流程建立另一筆</strong>（§5.3 · ARCH §3.3）。「開啟」只是在新視窗查看來源貼文，不改變任何狀態</span>
+          <span style="font-weight:700;color:#4C76C2">批次部分失敗</span><span style="color:#777">已定案的是<strong>對外產品行為</strong>：成功項目立即保留為已加入且不回滾；失敗項目維持尚未處置、逐項顯示可理解的失敗原因、可重新嘗試；Import 維持 review_required（§5.7 · ARCH 決策表）。失敗提示與該卡以 aria-describedby 建立關聯，以 role="status" aria-live="polite" 播報。<strong style="color:#B5745A">內部交易、批次協調、併發控制與冪等策略不在此定案</strong>（ARCH §6.2 明載待資料庫與背景任務方案決定），設計端不得寫成既定實作。onRetryAdd(placeId)、onBatchAdd(eligibleIds)</span>
+          <span style="font-weight:700;color:#4C76C2">completed 的唯讀邊界</span><span style="color:#777">completed 是處理終態：不可重新開啟、不可回到 processing、不可重新分析本筆、不可更換目標收藏、不可補充資料、不可重新搜尋、不可再次結束處理、不顯示 Batch CTA。ImportItem 只是唯讀處置紀錄，卡內不留任何無效控制。再次分析相同或不同 URL 都必須<strong>建立新的 Import</strong>（§5.5 · ARCH §6.1／§6.2）。已加入地點的正式內容修改對象是 <strong>TripPlace</strong>，其路由與畫面 <strong style="color:#B5745A">OUT OF SCOPE（尚未定案）</strong>，不得在本畫面自行發明 modal／sheet／新頁</span>
+          <span style="font-weight:700;color:#4C76C2">Nav 旅行收藏</span><span style="color:#777">切到 Home；未選取圖示去飽和並降至 55%，不換 icon</span>
+          <span style="font-weight:700;color:#4C76C2">Nav 匯入</span><span style="color:#777">目前頁；再次點擊回捲到頂端，不重新分析</span>
+          <span style="font-weight:700;color:#4C76C2">Disabled</span><span style="color:#777">原生 disabled（鍵盤與點擊皆不可觸發），opacity .45，顏色與尺寸不變</span>
+          <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset，圓角跟隨元件</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;background:#FBF3EE;border:1.5px dashed #E6BFAE;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#8A5A46">
+          <div style="font-family:Quicksand,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:0.1em;color:#B5745A">FINAL DECISION LEDGER — FINAL / OPEN / PENDING DESIGN / OUT OF SCOPE</div>
+          <div style="font-size:11.5px;line-height:1.6">每個項目只掛<strong>一個</strong>標記，全檔一致；同一項目不會在別處出現相反標記。</div>
+          <div><strong>URL 支援格式｜FINAL</strong> — instagram.com/p/… 與 instagram.com/reel/…（§5.3 · ARCH 決策表）。合法但讀不到內容不算格式錯誤，走 needs_input。</div>
+          <div><strong>Reel 文字取得策略｜FINAL</strong> — 優先使用可取得的 caption、Share Target 文字或分享附帶文字；<strong>不要求取得或分析影片本身</strong>（ARCH §3.4）。取得服務本身見「技術事項」。</div>
+          <div><strong>composer 與 persisted Import 的來源呈現｜FINAL</strong> — 未建立 Import 前用 LinkInputSection（可編輯）；received 之後一律 SourceRow（唯讀、無 Clear、不可改寫），所有持久狀態共用同一元件。</div>
+          <div><strong>Import lifecycle state mapping｜FINAL</strong> — 見 STATE MAPPING TABLE；正式狀態只有 received／processing／needs_input／review_required／completed／failed，其餘全是 UI preview variant。</div>
+          <div><strong>No collection｜FINAL</strong> — 仍屬 composer：URL 保留且可編輯、不建立 Import、不開始分析、CTA disabled、提供「建立旅行收藏」導向 /trips/new，返回後恢復 Filled（§5.3）。</div>
+          <div><strong>Completed 行為｜FINAL</strong> — 處理終態：不可重開、不可回 processing、不可重新分析本筆、不可更換目標收藏、不可補充、不可重新搜尋、不可再次結束處理、不顯示 Batch CTA；「更換」原生 disabled 且保持原位（§5.5 · ARCH §6.1）。</div>
+          <div><strong>Completed ImportItem 唯讀｜FINAL</strong> — 動作列整條移除，換成靜態處置標示；不留任何無效的 Edit／Add／Reject／Retry（§5.5 · ARCH §6.2）。</div>
+          <div><strong>TripPlace 後續編輯邊界｜OUT OF SCOPE</strong> — 已加入地點的內容修改對象是 TripPlace；其路由與畫面尚未定案，不在本次 Import Screen 範圍，也不得在本畫面發明 modal／sheet／新頁（ARCH §10）。</div>
+          <div><strong>Target Trip 行為｜FINAL</strong> — 在建立匯入前即已選定；Add 與 Batch Add 都是確認加入該收藏，不再詢問加到哪裡（第 4 章 · §5.3）。</div>
+          <div><strong>Target Trip 更換介面｜PENDING DESIGN</strong> — 只保留入口與 onChangeTarget 邊界；bottom sheet 或頁面未定，本次不自行決定。</div>
+          <div><strong>Add｜FINAL</strong> — 逐項加入既定目標收藏；Add → Adding（原生 disabled）→ Added，只換標籤不改版位。只適用 review_required。</div>
+          <div><strong>Reject｜FINAL</strong> — 卡內就地確認後才拒絕，卡片留在原位；不可復原、無取消拒絕入口（§5.7 · §3 第 10 條）。只適用 review_required。</div>
+          <div><strong>Edit｜FINAL（畫面待設計）</strong> — 全螢幕頁面、路由 /imports/:importId/items/:itemId/edit、欄位為名稱／分類／介紹／推薦品項／標籤；只服務 review_required，completed 不得進入。本次維護入口、可用狀態、onEdit 邊界與返回時保留結果與捲動位置的規格；頁面版面另案設計。</div>
+          <div><strong>Batch Add｜FINAL</strong> — 數量由「已匹配且尚未處置」推導，不得用候選總數；已加入／已拒絕／未匹配都不計入也不被加入。</div>
+          <div><strong>Batch partial failure｜FINAL（對外行為）</strong> — 部分成功、不回滾、失敗項維持尚未處置且可重試、Import 維持 review_required。內部交易／協調／併發／冪等不在此定案。</div>
+          <div><strong>Post-add navigation｜OPEN</strong> — 加入完成後是否跳頁、顯示 toast 或前往旅行收藏頁尚未定案；本檔任何 navigation 敘述都不視為已定案。</div>
+          <div><strong>Match candidate selection｜FINAL</strong> — 卡內就地展開候選、單選、選定後收合並解除 Add disabled；未匹配與待選擇不得成為正式收藏或地圖標記，也不進批次（§5.7）。</div>
+          <div><strong>Places 候選數量｜OPEN</strong> — preview 的 3 筆<strong>只是設計測試資料</strong>，不是產品或 API 上限；超過 3 筆時的 UI 待 Places API 與搜尋策略決定後重新檢視。與「最多選取 3 張補充截圖」無關。</div>
+          <div><strong>Re-search flow｜PENDING DESIGN — required before frontend implementation</strong> — 只維護入口、觸發狀態（僅 review_required）與 onResearch 邊界；完整搜尋頁尚未設計，不得讀作已完成。</div>
+          <div><strong>Supplement flow｜FINAL</strong> — 五種補充內容（貼文文字／截圖／店名或景點名稱／地址或區域／其他資訊），至少一項有值才能送出，卡內就地展開、不開 sheet、不新增路由（§5.4）。</div>
+          <div><strong>Screenshot 上限｜FINAL</strong> — 每筆匯入最多<strong>選取</strong> 3 張；送出前移除不需確認（不構成破壞性動作，§5.4）。儲存供應商與保存期限見「技術事項」。</div>
+          <div><strong>Responsive behavior｜FINAL</strong> — 單一捲動容器、單一份 markup、三個寬度只差 gutter 與照片欄；字級不因 360 縮小；實測結果見 UI STATE TABLE 與 MOBILE LAYOUT。</div>
+          <div><strong>Accessibility｜FINAL</strong> — 見 ACCESSIBILITY 卡；completed 不保留任何無效控制。</div>
+          <div><strong>Design System 修改｜FINAL（本次已改）</strong> — Button 新增 ariaLabel／ariaDescribedby 透傳；PlaceResultCard 新增 readOnly + dispositionLabel（唯讀處置列）、failed + failureText + failureId + failureLabel（失敗提示區）、adding（重試 loading）、editAriaLabel／rejectAriaLabel／addAriaLabel、onRetry；CategoryBadge／PlaceResultCard 的 KINDS 與 TAG_TONE 對齊 MVP 固定五分類（shop → shopping、移除 stay、新增 other，底色 --ink-400 暖灰，不沿用任何既有 kind），原本 shopping 與 other 會靜默 fallback 成 cafe 的珊瑚色。<strong>這些屬於元件責任，不應留在本頁的覆寫層</strong>，需回寫 DS 元件原始碼。</div>
+          <div><strong>技術事項｜OUT OF SCOPE（不得寫成已定案）</strong> — Instagram 公開內容取得服務、AI 模型或供應商、資料庫、背景任務方案、批次協調實作、併發控制、冪等策略、Authentication 套件、Places API 供應商與候選數量上限、截圖儲存供應商與保存期限、TripPlace 編輯路由與畫面、應用端 UI 元件庫。</div>
+          <div><strong>Edit Place 的判定理由（上表 Edit｜FINAL 的依據）</strong> — 欄位取兩份來源的聯集：推薦品項有四處規範來源不能移除；決策紀錄的「Google Maps 地點／地址」對應 §5.7 既有的「選擇正確的實際地點」，不是新欄位；實際新增的只有標籤。呈現形式為全螢幕頁面而非 bottom sheet，因為多欄位加上手機鍵盤會擠壓 sheet；儲存或取消後返回 /imports/:importId/review 並保留分析結果與捲動位置。</div>
+          <div><strong>結果卡不呈現的三個欄位｜FINAL</strong> — 推薦品項、城市或區域、辨識信心程度都<strong>不在 PlaceResultCard 呈現</strong>。§5.9「每張卡片至少顯示…推薦品項」指的是旅行收藏頁的卡片清單，不是 Import 的候選結果卡，兩者是不同的卡；§5.6 是 AI 辨識欄位清單、§5.8 是保存要求，都未要求在結果卡呈現。城市或區域：§5.9 寫的是「地址或區域」二擇一，且卡內候選清單本來就已顯示城市。辨識信心程度只有 §5.6 一處來源，未要求呈現。<strong>推薦品項仍須在 Edit Place（§5.7 可編輯）與旅行收藏頁卡片（§5.9）呈現，兩者都尚未設計 — 不在結果卡呈現不等於漏做。</strong></div>
+          <div><strong>拒絕不做復原的理由（上表 Reject｜FINAL 的依據）</strong> — §5.7 已明訂「MVP 不提供取消拒絕的入口」。復原會新增狀態轉換（已拒絕能否回待確認、completed 後能否復原），會動到 §5.5 與 ARCH §6.2 的狀態機；因此確認步驟為必要而非可選，確認內容與按鈕角色依 CLAUDE.md 破壞性動作確認規則。</div>
+          <div><strong>/trips/new 建立畫面｜OUT OF SCOPE</strong> — 本次只做 Import 頁的引導出口與返回後的欄位保留，建立旅行收藏的畫面本身尚未設計。</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">ASSETS</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">wordmark-script</span><span style="color:#777">內頁 header 專用，高 40px（Home 用 serif 版）</span>
+          <span style="font-weight:700;color:#4C76C2">sticker-envelope</span><span style="color:#777">Header 右側一枚，52px rotate(4°)</span>
+          <span style="font-weight:700;color:#4C76C2">icon-instagram</span><span style="color:#777">composer 的 LinkInput 來源徽章與 SourceRow 的來源圖示，24px；<strong>貼文與 Reel 共用同一枚</strong>，不做兩種徽章；MVP 只有 Instagram 一種來源，不放其他平台圖示</span>
+          <span style="font-weight:700;color:#4C76C2">arrow-back</span><span style="color:#777">返回鍵，44px paper IconButton 內</span>
+          <span style="font-weight:700;color:#4C76C2">sparkle</span><span style="color:#777">Analyze CTA 圖示；analyzing 時脈動，其他狀態靜止</span>
+          <span style="font-weight:700;color:#4C76C2">check-circle</span><span style="color:#777">success 狀態列圖示</span>
+          <span style="font-weight:700;color:#4C76C2">arrow-curve</span><span style="color:#777">success 狀態列旁手繪箭頭，decorative</span>
+          <span style="font-weight:700;color:#4C76C2">pin-blue</span><span style="color:#777">Google Maps 對應地址（Home 的國家層級用 pin-coral）</span>
+          <span style="font-weight:700;color:#4C76C2">pencil</span><span style="color:#777">Edit 動作圖示</span>
+          <span style="font-weight:700;color:#4C76C2">place-*-clean.jpg</span><span style="color:#777">正式地點照片，1x 132×150／2x 264×300／3x 396×450，皆由原始高解析檔真實縮小；cover + center，無 frame／膠帶／郵票／貼紙／文字</span>
+          <span style="font-weight:700;color:#4C76C2">place-*.png（舊）</span><span style="color:#777">裝飾已合成，僅留作 handoff 對照，不出現在任何手機 state</span>
+          <span style="font-weight:700;color:#4C76C2">place-mark-*</span><span style="color:#777">heart／star／flower 透明 PNG，輸出 60px（顯示 20px＝3x）</span>
+          <span style="font-weight:700;color:#4C76C2">sparkles / arrow</span><span style="color:#777">sticker-sparkles-transparent 102px（顯示 34）、arrow-curve-3x 108px（顯示 36），皆真透明、不需 multiply 遮底</span>
+          <span style="font-weight:700;color:#4C76C2">sticker-luggage</span><span style="color:#777">Batch 面板左側 52px rotate(-4°)；右側 sparkles 見上一列，素材已真透明</span>
+          <span style="font-weight:700;color:#4C76C2">mark variant 對應</span><span style="color:#777">cafe 珊瑚愛心 · food 黃色星星 · attraction 紫色小花 · shopping／other 不渲染。<strong>依 category 固定，不依 index、不依序輪替</strong></span>
+          <span style="font-weight:700;color:#4C76C2">nav-trips / imports</span><span style="color:#777">與 Home 同一組 nav 圖示</span>
+          <span style="font-weight:700;color:#4C76C2">washi tape</span><span style="color:#777">CSS 漸層產生（格紋／實色／點點），非圖檔</span>
+          <span style="font-weight:700;color:#4C76C2">status-bar</span><span style="color:#777">僅 mockup；產品端由系統狀態列取代</span>
+          <span style="font-weight:700;color:#4C76C2">路徑</span><span style="color:#777">全部相對路徑 ./assets/**；字體由 DS tokens/fonts.css 提供</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">PHOTO LAYERING — PREVIOUS / CLEAN / RECOMPOSED</div>
+        <div style="display:flex;flex-direction:column;gap:14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:#fff;border-radius:6px;padding:5px;box-shadow:0 2px 5px rgba(122,96,58,0.14)"><img src="assets/photos/place-cafe-jeju.png" alt="裝飾已合成的舊素材" style="display:block;width:100%;height:114px;object-fit:cover;border-radius:3px"></div>
+              <div style="font-size:11.5px;font-weight:700;color:#3B3B3D">Previous</div>
+              <div style="font-family:'Noto Sans KR',sans-serif;font-size:11px;line-height:1.55;color:#A9A6A0">紙框、郵票與愛心都燒進像素，只有 234×236，無 2x／3x</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:#fff;border-radius:6px;padding:5px;box-shadow:0 2px 5px rgba(122,96,58,0.14)"><img src="assets/photos/place-cafe-jeju-clean-2x.jpg" alt="乾淨照片來源" style="display:block;width:100%;height:114px;object-fit:cover;border-radius:3px"></div>
+              <div style="font-size:11.5px;font-weight:700;color:#3B3B3D">Clean</div>
+              <div style="font-family:'Noto Sans KR',sans-serif;font-size:11px;line-height:1.55;color:#A9A6A0">純攝影，無 frame／膠帶／郵票／文字；1x／2x／3x 由 4032×3024 原檔縮小</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="position:relative">
+                <div aria-hidden="true" style="position:absolute;top:-6px;left:14px;width:52px;height:15px;background:repeating-linear-gradient(90deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px),repeating-linear-gradient(0deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px);opacity:0.92;border-radius:2px;transform:rotate(-8deg);z-index:2;pointer-events:none"></div>
+                <img aria-hidden="true" src="assets/icons/place-mark-heart.png" alt="" style="position:absolute;right:-4px;bottom:8px;width:20px;z-index:3;pointer-events:none">
+                <div style="background:#fff;border-radius:6px;padding:5px;box-shadow:0 2px 5px rgba(122,96,58,0.14)"><img src="assets/photos/place-cafe-jeju-clean-2x.jpg" alt="乾淨照片加上分層裝飾" style="display:block;width:100%;height:114px;object-fit:cover;border-radius:3px"></div>
+              </div>
+              <div style="font-size:11.5px;font-weight:700;color:#3B3B3D">Recomposed</div>
+              <div style="font-family:'Noto Sans KR',sans-serif;font-size:11px;line-height:1.55;color:#A9A6A0">白框由元件、藍格紋膠帶由 CSS、珊瑚愛心為透明 PNG，三層可各自替換</div>
+            </div>
+          </div>
+          <div style="font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">僅為交付對照，不是產品 UI，也不是可切換的 state；舊 PNG 保留在 repo 內只供此比較使用。</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">切版注意事項 / PITFALLS</div>
+        <div style="display:flex;flex-direction:column;gap:11px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#5A5A5C">
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">360px 窄螢幕</span><br>文字欄約 184px。照片欄必須降到 108px，否則名稱幾乎只剩 ellipsis、Tags 會擠成三行。字級一律不縮。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長 URL</span><br>input 本身水平捲動即可，不要 text-overflow（會讓使用者看不到自己在改哪一段）；欄位不長高、不換行，clear 按鈕永遠留在右內側。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長地點名稱</span><br>單行 nowrap + ellipsis，兩者不重疊。分類固定二字（badge 50px）後名稱不再為 badge 讓位：360px 的文字欄 184px 中名稱可用 126px（原本長分類時只剩 66px）。<strong style="color:#3B3B3D">Extreme 的 15 字名稱（需 278px）仍會 ellipsis，那是刻意的極端內容，不是 badge 造成</strong>。要支援較長分類時改成 badge 先截斷，不要回頭壓名稱。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長地址</span><br>Google Maps 地址允許換到第二行後 clamp；pin 圖示 flex-shrink:0。地址在動作列上方，長地址只會讓卡片變高，不會壓縮按鈕。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Tags 換行與溢出</span><br>flex-wrap + gap 5，允許兩行以上；不要 nowrap 或橫向捲動，也不要縮小字級。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">卡片高度自適應</span><br>不要寫死高度。照片高度固定、文字欄決定卡片高度；下限 = 照片高 + 12 + 44（滿寬動作列）+ 24，實測 206–301px。動作列永遠貼卡片底部且滿寬，位置在所有狀態下不動。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">照片 object-fit / position</span><br>一律 cover + center。白框是 border 而非外層 padding，換算寬度時要含 10px 邊框。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">裝飾定位與溢出</span><br>膠帶在卡片外層、跨過上緣，所以外層不可 overflow:hidden；旋轉後可能超出右緣，靠捲動層 overflow-x:clip 收掉，不要用 overflow-x:hidden（會意外建立捲動容器）。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav 層級</span><br>nav 是 shell 的固定層並自己吃掉 safe-area inset，內容 padding 同步加 inset；nav 之上不要再疊 scrim 或漸層。兩格各佔 50%，中央不留缺口。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">最後一顆 commit CTA 的底部留白</span><br>這個數字曾經是 72px，因為要閃過上凸 14px 的 FAB。FAB 移除後改為 <strong style="color:#3B3B3D">32px + inset</strong>；別沿用舊值，也別歸零 — CTA 直接貼著 nav 上緣同樣不能接受。已在實際具有 commit CTA 的 Success、Batch partial failure 與 Extreme，分別以 360／390／430px 共 9 組捲到底重新驗證。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Layout shift</span><br>狀態列固定 24px、錯誤訊息只在 invalid 佔位；不要用 skeleton 取代整個結果區。<strong>例外只有兩處</strong>：composer → SourceRow 的來源區塊 −54px（Import 建立那一刻，使用者主動按下 Analyze 才發生），以及使用者主動觸發的卡內展開（拒絕確認、候選清單、失敗提示）。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">別把 UI variant 當資料狀態</span><br>Batch partial failure、All processed、Reel URL 這些名字都只是畫面變體，資料庫裡沒有這些狀態。lifecycle 只有六個值；失敗項目的「尚未處置」不是新狀態，就是原本的未處置。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">來源列不可退化成輸入框</span><br>最容易寫錯的一點：needs_input 與 failed 需要使用者做事，很容易順手把 LinkInput 放回去。規範是 Import 建立後<strong>一律</strong> SourceRow；「換一個連結」＝建立新的 Import，不是把目前這筆的 URL 改掉。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">批次失敗不要做成整批失敗</span><br>成功項目立即落地且不回滾；失敗項目維持未處置並可單獨重試。不要用「整批 rollback」或「全部重跑」的實作，那會違反 §5.7 的對外語意。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">completed 不要用 disabled 佔位</span><br>唯讀卡片是<strong>移除</strong>動作列、換成處置文字，不是把三顆按鈕設成 disabled 留在畫面上——後者仍是「看似可操作」，也讓螢幕閱讀器讀到不存在的能力。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">收藏名稱的 min-width:0</span><br>目標收藏列的名稱 span 是 flex item，只寫 nowrap + ellipsis 不會生效，必須在<strong>最內層</strong>也寫 min-width:0，祖先兩層也要有。少一層，長名稱就直接溢出並壓到「更換」。</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">ACCESSIBILITY</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">Invalid 欄位</span><span style="color:#777"><code>aria-invalid="true"</code> + <code>aria-describedby="import-link-error"</code>，非 invalid 時兩個屬性都移除</span>
+          <span style="font-weight:700;color:#4C76C2">Invalid 訊息</span><span style="color:#777"><code>role="alert" aria-live="assertive"</code>，欄位下方 8px，不是只靠邊框顏色</span>
+          <span style="font-weight:700;color:#4C76C2">Analyze disabled</span><span style="color:#777">原生 <code>disabled</code>（Button 的 disabled prop），鍵盤與點擊都不可觸發；不用 pointer-events 模擬</span>
+          <span style="font-weight:700;color:#4C76C2">「更換」（completed）</span><span style="color:#777">原生 <code>disabled</code>，保持原位、opacity .45、不改色不改尺寸</span>
+          <span style="font-weight:700;color:#4C76C2">持久來源</span><span style="color:#777"><strong>不是可編輯 input</strong>，是 <code>role="group"</code> 容器 + 文字；<code>aria-label</code>「這筆匯入的來源貼文（唯讀）」，小標「來源貼文（唯讀）」也在視覺上說明</span>
+          <span style="font-weight:700;color:#4C76C2">狀態列</span><span style="color:#777"><code>aria-live="polite"</code> 播報分析結果與地點數量</span>
+          <span style="font-weight:700;color:#4C76C2">Add / Reject / Edit</span><span style="color:#777">aria-label 一律含地點名稱：「加入旅行收藏：春日咖啡」／「拒絕候選地點：春日咖啡」／「編輯候選地點：春日咖啡」；Added 後改「已加入旅行收藏：…」，該卡三個動作鍵一併原生 disabled（留在原位、不移除）</span>
+          <span style="font-weight:700;color:#4C76C2">批次失敗播報</span><span style="color:#777">每張失敗卡的提示區是 <code>role="status" aria-live="polite"</code> 且有唯一 id；<strong>該卡「加入」鍵以 <code>aria-describedby</code> 指向它</strong>，失敗原因因此與對應卡片建立關聯，不是一則籠統的全頁訊息</span>
+          <span style="font-weight:700;color:#4C76C2">Retry aria-label</span><span style="color:#777">失敗後改「重新加入旅行收藏：{地點}」；重試中原生 disabled，標籤與版位不變</span>
+          <span style="font-weight:700;color:#4C76C2">completed 卡片</span><span style="color:#777"><strong>不保留任何看似可操作但無效的控制</strong>——Edit／Add／Reject／Retry 在 DOM 中不存在（不是 disabled 佔位），改為靜態處置文字</span>
+          <span style="font-weight:700;color:#4C76C2">Clear aria-label</span><span style="color:#777">DS 預設輸出英文 <code>aria-label="Clear"</code>；PinTrip 在頁面層顯式覆寫為<strong style="color:#3B3B3D">「清除連結」</strong>（所有有值的 composer 與鍵盤狀態實測通過：No collection、Filled、Invalid URL、Reel URL、Keyboard filled／long URL／long Reel URL／invalid 共八個。Idle 與 Keyboard empty 因欄位為空沒有這顆鍵；received 之後的唯讀狀態根本沒有 LinkInput）。收回元件時改為 LinkInput 的 <code>clearLabel</code> prop，不改 <code>_ds_bundle.js</code></span>
+          <span style="font-weight:700;color:#4C76C2">點擊區</span><span style="color:#777">一律 ≥ 44 × 44：Back、開啟、更換、截圖 ✕、卡內所有按鈕（Button sm 已提高到 44）、候選列</span>
+          <span style="font-weight:700;color:#4C76C2">裝飾</span><span style="color:#777">膠帶、mark、信封、箭頭、sparkles、狀態列與軟鍵盤全部 <code>aria-hidden</code> + <code>pointer-events:none</code>；不作為任何狀態的唯一訊號</span>
+          <span style="font-weight:700;color:#4C76C2">prefers-reduced-motion</span><span style="color:#777">關閉 sparkle 脈動與所有非必要動畫；狀態切換改為即時，不改版位</span>
+          <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset，圓角跟隨元件</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">React / NEXT.JS</div>
+        <div style="display:flex;flex-direction:column;gap:10px;background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">拆分</span> — ImportHeader / ScreenIntro / TargetCollectionRow / LinkInputSection（composer only）/ SourceRow + ResumeSummaryRow（persisted）/ AnalyzeStatusArea / NoticeCard / ResultList / ResultCardSlot / BatchAddSection / CompletedSummaryCard。ResultCardSlot 依 place 的 category 決定膠帶與 mark（不看 index、不看 render order），PlaceResultCard 只接資料與狀態，兩者責任分離後卡片可在其他頁重用。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Server / Client 邊界</span> — AppShell、Header、ScreenIntro、規格性靜態內容可留 Server Component；LinkInputSection 以下（輸入、驗證、analyzing、Add/Added、鍵盤處理）為 Client Component。邊界切在 LinkInputSection 之上，讓 header 與說明文字不因輸入重繪。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">State presentation</span> — 分成兩層，不要混用：<strong>Import lifecycle</strong>（received / processing / needs_input / review_required / completed / failed，來自資料）與 <strong>畫面呈現變體</strong>（由 lifecycle + entry mode + 各 item 的處置狀態推導）。<strong>不要把 UI variant 存成新的資料狀態。</strong>來源呈現只看「Import 是否已建立」：未建立 → LinkInputSection，已建立 → SourceRow。每張卡片的 added / rejected / failed 是獨立的 item 狀態；Batch 數量由「已匹配且尚未處置」推導；completed 一律 readOnly。同一棵樹渲染所有狀態，不為狀態分岔版面。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">切版</span> — 只有一個捲動容器；gutter 與照片欄用兩個 breakpoint 變數（CSS 變數或 container query），其餘共用。裝飾 PNG 用一般 img + aria-hidden，不進 next/image；地點照片給 sizes（108/120/132）並保留 cover。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Accessibility</span> — 完整清單見 ACCESSIBILITY 卡，此處只補實作面：composer 欄位有視覺隱藏的 label（for="import-link-input"）與 inputmode="url"；Button 的 aria-label / aria-describedby 走 <code>ariaLabel</code> / <code>ariaDescribedby</code> prop（本次已加入 DS Button），不要在 wrapper 上補 aria；失敗提示區的 id 必須逐項唯一（<code>import-add-error-{itemId}</code>）。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Motion</span> — 狀態變化 200ms cubic-bezier(.32,.72,.28,1)；一律淡入不滑入，尊重 prefers-reduced-motion 時關掉 sparkle 脈動。</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;previewState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;no-collection&quot;,&quot;idle&quot;,&quot;filled&quot;,&quot;reel&quot;,&quot;invalid&quot;,&quot;kb-empty&quot;,&quot;kb-filled&quot;,&quot;kb-long&quot;,&quot;kb-reel&quot;,&quot;kb-invalid&quot;,&quot;received&quot;,&quot;analyzing&quot;,&quot;empty&quot;,&quot;insufficient&quot;,&quot;error&quot;,&quot;supp&quot;,&quot;supp-filled&quot;,&quot;supp-error&quot;,&quot;end-confirm&quot;,&quot;success&quot;,&quot;partial&quot;,&quot;mixed&quot;,&quot;confirm&quot;,&quot;choosing&quot;,&quot;candidates&quot;,&quot;unmatched&quot;,&quot;batch-fail&quot;,&quot;batch-retry&quot;,&quot;extreme&quot;,&quot;resume&quot;,&quot;resume-queued&quot;,&quot;all&quot;,&quot;processed&quot;,&quot;rejected-all&quot;,&quot;completed-added&quot;,&quot;completed-rejected&quot;],&quot;section&quot;:&quot;預覽&quot;},&quot;previewWidth&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;390&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;360&quot;,&quot;390&quot;,&quot;430&quot;],&quot;section&quot;:&quot;預覽&quot;},&quot;showSpec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;}}">
+const IG_OK = 'https://www.instagram.com/p/Cu123abcDEF/';
+const IG_LONG = 'https://www.instagram.com/p/Cu123abcDEF/?utm_source=ig_web_copy_link&igshid=MzRlODBiNWFlZA==&hl=zh-tw';
+const IG_REEL = 'https://www.instagram.com/reel/C8xY9zAbQrS/';
+const IG_REEL_LONG = 'https://www.instagram.com/reel/C8xY9zAbQrS/?utm_source=ig_web_copy_link&igshid=MzRlODBiNWFlZA==&hl=zh-tw';
+const IG_BAD = 'https://maps.app.goo.gl/8fT2xQwErTy9';
+
+// ---------------------------------------------------------------------------
+// STATE MAP — one source for the state controller, the runtime gating, and the
+// mapping table in SPEC. Every id below is a UI preview variant, never a data
+// status: `life` is the only real Import lifecycle value (MVP §5.5 / ARCH §6.1).
+// created:false ⇒ composer (no Import yet, URL editable, LinkInputSection)
+// created:true  ⇒ persisted Import (URL read-only, SourceRow)
+// ---------------------------------------------------------------------------
+const CO = 'LinkInputSection', SR = 'SourceRow', SRS = 'SourceRow + ResumeSummaryRow';
+const NO_URL_EDIT = '編輯／清除 URL、重新分析目前 Import';
+const CMPL_NO = 'Edit · Add · Reject · Retry · 重新搜尋 · 補充資料 · 結束處理 · 更換目標收藏 · Batch CTA · 編輯 URL';
+const STATES = [
+  { id: 'no-collection', chip: 'No collection', label: 'No collection', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: false,
+    can: '貼上／編輯 URL（分享帶入的網址保留）、建立旅行收藏（/trips/new）', no: '建立 Import、開始分析（Analyze 原生 disabled）、清除已帶入的 URL' },
+  { id: 'idle', chip: 'Idle', label: 'Idle', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: false,
+    can: '貼上 URL', no: 'Analyze（欄位為空）' },
+  { id: 'filled', chip: 'Filled', label: 'Filled', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: false,
+    can: '編輯 URL、Clear、Analyze（建立 Import）', no: '—' },
+  { id: 'reel', chip: 'Reel URL', label: 'Reel URL', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: false,
+    can: '同 Filled：/reel/ 與 /p/ 同為有效來源格式（MVP §5.3 · ARCH 決策表）', no: '—' },
+  { id: 'invalid', chip: 'Invalid', label: 'Invalid URL', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: false,
+    can: '修正 URL、Clear', no: 'Analyze（格式不支援）' },
+  { id: 'kb-empty', chip: '⌨ 空欄位', label: 'Keyboard · empty', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: true,
+    can: '輸入 URL', no: 'Analyze（欄位為空）' },
+  { id: 'kb-filled', chip: '⌨ 有值', label: 'Keyboard · filled', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: true,
+    can: '編輯 URL、Analyze', no: '—' },
+  { id: 'kb-long', chip: '⌨ 長 URL', label: 'Keyboard · long URL', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: true,
+    can: '編輯 URL（欄位內水平捲動）', no: '換行、縮字、截斷' },
+  { id: 'kb-reel', chip: '⌨ 長 Reel URL', label: 'Keyboard · long Reel URL', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: true,
+    can: '編輯 Reel URL（帶查詢字串，欄位內水平捲動）', no: '換行、縮字、截斷' },
+  { id: 'kb-invalid', chip: '⌨ invalid', label: 'Keyboard · invalid', life: '—（未建立）', created: false, entry: 'new', src: CO, list: false, cta: false, kb: true,
+    can: '修正 URL', no: 'Analyze' },
+
+  { id: 'received', chip: 'received 排隊', label: 'Received (queued)', life: 'received', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '開啟來源貼文、離開後再回來', no: NO_URL_EDIT },
+  { id: 'analyzing', chip: 'Analyzing', label: 'Analyzing', life: 'processing', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '開啟來源貼文、離開後再回來', no: NO_URL_EDIT + '、重複提交' },
+
+  { id: 'empty', chip: 'Empty', label: 'Empty result', life: 'needs_input', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '換一個連結（新 Import）、結束處理、補充資料後重試', no: NO_URL_EDIT },
+  { id: 'insufficient', chip: 'needs_input 資料不足', label: 'needs_input · 資料不足', life: 'needs_input', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '補充資料後重試（primary）、換一個連結、結束處理', no: NO_URL_EDIT + '；不得判為 URL 格式錯誤' },
+  { id: 'error', chip: 'Error', label: 'Error', life: 'failed', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '重新分析（→ processing）、補充資料後重試、換一個連結', no: NO_URL_EDIT.replace('、重新分析目前 Import', '') + '、結束處理（§6.1 無 failed → completed）' },
+  { id: 'supp', chip: '補充 · 空', label: 'Supplement · empty', life: 'needs_input', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '填五種補充內容任一、選最多 3 張截圖', no: '五項全空時送出（提交鍵原生 disabled）' },
+  { id: 'supp-filled', chip: '補充 · 已填', label: 'Supplement · filled', life: 'needs_input', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '送出（→ processing）、直接移除截圖（不需確認）、取消補充', no: '第 4 張截圖' },
+  { id: 'supp-error', chip: '補充 · 由 error', label: 'Supplement · from error', life: 'failed', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '同上，由 failed 進入', no: '同上' },
+  { id: 'end-confirm', chip: '結束處理確認', label: 'End import confirm', life: 'needs_input', created: true, entry: 'new', src: SR, list: false, cta: false, kb: false,
+    can: '確認結束處理（→ completed）、取消', no: '一按即結束（§3 第 10 條）' },
+
+  { id: 'success', chip: 'Success', label: 'Success', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '逐項 Edit／Reject／Add、Batch Add、重新搜尋', no: NO_URL_EDIT },
+  { id: 'partial', chip: 'Partial added', label: 'Partial added', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '同 Success；CTA 只數未處置且已匹配', no: '把已加入項目重新計入批次' },
+  { id: 'mixed', chip: 'Mixed', label: 'Mixed disposition', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '同 Success', no: '把已拒絕項目計入批次' },
+  { id: 'confirm', chip: 'Reject confirm', label: 'Reject confirm', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '確認拒絕、取消', no: '一按即拒絕；同時兩張卡進入確認' },
+  { id: 'choosing', chip: 'Match 待選', label: 'Match · choosing', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '展開候選、Edit、Reject', no: 'Add（未匹配）、計入批次' },
+  { id: 'candidates', chip: 'Match 展開', label: 'Match · candidates open', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '選定候選、重新搜尋、Edit、Reject', no: '未匹配即成為正式收藏（§5.7）' },
+  { id: 'unmatched', chip: 'Match 未匹配', label: 'Match · unmatched', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '重新搜尋、Edit、Reject', no: 'Add、計入批次' },
+  { id: 'batch-fail', chip: 'Batch 部分失敗', label: 'Batch partial failure', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '單項重試（加入）、Edit、Reject、再次 Batch Add', no: '回滾已成功項目、把失敗項顯示為已加入、整批視為失敗' },
+  { id: 'batch-retry', chip: 'Batch 重試中', label: 'Batch retry (重試中)', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '等待重試結果', no: '重複點擊（加入與 Batch CTA 皆原生 disabled）' },
+  { id: 'extreme', chip: 'Extreme', label: 'Extreme content', life: 'review_required', created: true, entry: 'new', src: SR, list: true, cta: true, kb: false,
+    can: '同 Success（5 張卡、長名稱、長地址、兩行 Tags）', no: '因內容長度隱藏任何元素' },
+  { id: 'resume', chip: 'Resume 未處置完', label: 'Resume · review_required', life: 'review_required', created: true, entry: 'resume', src: SRS, list: true, cta: true, kb: false,
+    can: '續處置未處置項目、Batch Add', no: NO_URL_EDIT + '、重跑分析' },
+  { id: 'resume-queued', chip: 'Resume 排隊中', label: 'Resume · received', life: 'received', created: true, entry: 'resume', src: SRS, list: false, cta: false, kb: false,
+    can: '離開等待、開啟來源貼文', no: NO_URL_EDIT },
+
+  { id: 'all', chip: 'All added', label: 'All added', life: 'completed', created: true, entry: 'new', src: SR, list: true, cta: false, kb: false,
+    can: '檢視唯讀處置紀錄；要改內容請走 TripPlace 編輯（不在本畫面）', no: CMPL_NO },
+  { id: 'processed', chip: 'All processed', label: 'All processed', life: 'completed', created: true, entry: 'new', src: SR, list: true, cta: false, kb: false,
+    can: '檢視唯讀處置紀錄（部分加入、部分拒絕、無未處置）', no: CMPL_NO },
+  { id: 'rejected-all', chip: 'All rejected', label: 'All rejected', life: 'completed', created: true, entry: 'new', src: SR, list: true, cta: false, kb: false,
+    can: '檢視唯讀處置紀錄', no: CMPL_NO },
+  { id: 'completed-added', chip: 'Completed 有加入', label: 'Completed · 有加入', life: 'completed', created: true, entry: 'resume', src: SRS, list: true, cta: false, kb: false,
+    can: '從匯入紀錄回訪檢視（至少一筆已加入）', no: CMPL_NO },
+  { id: 'completed-rejected', chip: 'Completed 全拒絕', label: 'Completed · 全部拒絕', life: 'completed', created: true, entry: 'resume', src: SRS, list: true, cta: false, kb: false,
+    can: '從匯入紀錄回訪檢視（全部拒絕）', no: CMPL_NO }
+];
+const BY_ID = {};
+STATES.forEach(s => { BY_ID[s.id] = s; });
+const P = './assets/photos/', I = './assets/icons/', S = './assets/stickers/';
+// Decoration is derived from category, never from list index.
+// cafe → blue gingham tape + coral heart · food → butter tape + yellow star
+// attraction → lavender dotted tape + purple flower · everything else → butter tape, no mark
+// MVP 固定五分類；UI 一律二字。category 是列舉值，label 由此表推導，不是自由文字。
+const CAT_LABEL = { food: '美食', cafe: '咖啡', attraction: '景點', shopping: '購物', other: '其他' };
+const DECOR = {
+  cafe:       { tape: 'A', mark: I + 'place-mark-heart.png' },
+  food:       { tape: 'B', mark: I + 'place-mark-star.png' },
+  attraction: { tape: 'C', mark: I + 'place-mark-flower.png' }
+};
+const DECOR_FALLBACK = { tape: 'B', mark: '' };
+
+const TARGET = '濟州咖啡';
+// Extreme 用的長收藏名稱：刻意超出三個寬度的可用文字欄，用來驗證單行 ellipsis 與「更換」不重疊。
+// 這是版面壓力測試資料，不是產品字數上限（MVP §5.2 未定上限）。
+const TARGET_LONG = '京都秋季賞楓與老喫茶店巡禮以及嵐山周邊散步路線';
+
+const BASE = [
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', name: '春日咖啡', desc: '面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。', address: '濟州市涯月邑涯月路1街24', tags: ['#海景', '#風格咖啡', '#涯月咖啡'] },
+  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', name: '溫谷鮭魚', desc: '鮭魚丼與生魚片都很新鮮，需要排隊但很值得。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼', '#濟州美食', '#蓮洞'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', name: '城山日出峰', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人。', address: '西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景'] }
+];
+
+// 3 筆為設計假設（Places API 未定），非已驗證規格。
+const CANDIDATES = [
+  { name: '春日咖啡 涯月本店', address: '濟州市涯月邑涯月路1街 24' },
+  { name: '春日咖啡 咸德店', address: '濟州市朝天邑咸德里 1004-3' },
+  { name: '春日 Roastery', address: '濟州市涯月邑高內里 486' }
+];
+
+const EXTREME = [
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', name: '涯月海岸線春日咖啡與甜點工作室', desc: '沿著涯月海岸線散步後最適合停下來的一站，二樓靠窗的位置可以看到整片海，招牌紅蘿蔔蛋糕與手沖咖啡都值得等。', address: '大韓民國 濟州特別自治道 濟州市涯月邑涯月路1街 24 號 2 樓', tags: ['#海景咖啡', '#風格咖啡', '#涯月咖啡', '#紅蘿蔔蛋糕', '#手沖咖啡', '#靠窗座位'], added: true },
+  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', name: '溫谷鮭魚', desc: '短句。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', name: '城山日出峰世界自然遺產步道', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人，登頂約需三十分鐘。', address: '大韓民國 濟州特別自治道 西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景', '#世界遺產', '#健行步道'], added: true },
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'shopping', name: '涯月小店', desc: '海邊的小型選物店，明信片與陶器都是當地作者作品。', address: '濟州市涯月邑涯月路 132', tags: ['#選物店', '#明信片'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'other', name: '海邊民宿', desc: '走三分鐘就到海邊，早餐是自家做的濟州風味。', address: '西歸浦市城山邑城山里 88-2', tags: ['#海邊住宿', '#含早餐', '#安靜'] }
+];
+
+class Component extends DCLogic {
+  state = { st: null, w: null, supp: null };
+  componentDidMount() { this.syncField(); this.syncMarks(); }
+  // Every card mark comes from the single PlaceResultCard markSrc slot; this only adds the
+  // aria-hidden the slot should carry itself. No per-variant element, no per-variant CSS.
+  syncMarks() {
+    document.querySelectorAll('[data-card="place"] article > img').forEach(img => {
+      img.setAttribute('aria-hidden', 'true');
+    });
+  }
+  componentDidUpdate(prev) {
+    if (prev.previewState !== this.props.previewState) this.setState({ st: null, supp: null });
+    if (prev.previewWidth !== this.props.previewWidth) this.setState({ w: null });
+    this.syncField();
+    this.syncMarks();
+  }
+  syncField() {
+    const input = this._field && this._field.querySelector('input');
+    if (!input) return;
+    input.id = 'import-link-input';
+    input.setAttribute('inputmode', 'url');
+    const invalid = this.st === 'invalid' || this.st === 'kb-invalid';
+    if (invalid) {
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', 'import-link-error');
+    } else {
+      input.removeAttribute('aria-invalid');
+      input.removeAttribute('aria-describedby');
+    }
+    /* Handoff override: LinkInput hard-codes aria-label="Clear"（英文）。
+       PinTrip 從頁面層顯式覆寫為繁中，不改 _ds_bundle.js。
+       → 收回元件時應改成 LinkInput 的 clearLabel prop。 */
+    const clear = [...this._field.querySelectorAll('button')].find(b => (b.getAttribute('aria-label') || '') === 'Clear');
+    if (clear) clear.setAttribute('aria-label', '清除連結');
+  }
+  get st() { return this.state.st || this.props.previewState || 'success'; }
+  get wv() { return Number(this.state.w || this.props.previewWidth || 390); }
+
+  results() {
+    const st = this.st;
+    if (st === 'no-collection') return [];
+    if (st === 'extreme') return EXTREME;
+    if (st === 'success') return BASE;
+    if (st === 'partial') return BASE.map((r, i) => ({ ...r, added: i === 0 }));
+    if (st === 'all') return BASE.map(r => ({ ...r, added: true }));
+    if (st === 'mixed') return BASE.map((r, i) => ({ ...r, added: i === 0, rejected: i === 1 }));
+    if (st === 'processed') return BASE.map((r, i) => ({ ...r, added: i !== 1, rejected: i === 1 }));
+    if (st === 'rejected-all') return BASE.map(r => ({ ...r, rejected: true }));
+    if (st === 'confirm') return BASE.map((r, i) => ({ ...r, confirming: i === 0 }));
+    if (st === 'choosing') return BASE.map((r, i) => i === 0 ? { ...r, matchState: 'choosing', candidates: CANDIDATES } : r);
+    if (st === 'candidates') return BASE.map((r, i) => i === 0 ? { ...r, matchState: 'choosing', candidates: CANDIDATES, expanded: true } : r);
+    if (st === 'unmatched') return BASE.map((r, i) => i === 0 ? { ...r, matchState: 'unmatched' } : r);
+    if (st === 'batch-fail') return BASE.map((r, i) => i === 2 ? { ...r, failed: true } : { ...r, added: true });
+    if (st === 'batch-retry') return BASE.map((r, i) => i === 2 ? { ...r, failed: true, adding: true } : { ...r, added: true });
+    if (st === 'resume') return BASE.map((r, i) => i === 0 ? { ...r, added: true } : i === 1 ? { ...r, rejected: true } : r);
+    if (st === 'completed-added') return BASE.map((r, i) => i === 1 ? { ...r, rejected: true } : { ...r, added: true });
+    if (st === 'completed-rejected') return BASE.map(r => ({ ...r, rejected: true }));
+    return [];
+  }
+
+  renderVals() {
+    const st = this.st, w = this.wv;
+    // needs_input has two sources (MVP §5.5 / ARCH §6.1): 資料不足 and 零候選 — same card, different copy + exit order
+    const NOTICE_COPY = {
+      empty: {
+        title: '這則貼文沒有可辨識的地點',
+        body: '貼文讀到了，但裡面沒有可以整理成地點的內容。換一個貼文通常最快，也可以補充資料再試一次。',
+        exits: [{ label: '換一個連結', variant: 'primary' }, { label: '沒有可用地點，結束處理', variant: 'outline' }],
+        text: '補充資料後重試'
+      },
+      insufficient: {
+        title: '這則貼文的內容讀不到',
+        body: '我們拿不到足夠的貼文內容，可能是私人帳號或內容已經移除。貼上貼文文字或截圖，我們就能再試一次。',
+        exits: [{ label: '補充資料後重試', variant: 'primary' }, { label: '換一個連結', variant: 'outline' }],
+        text: '沒有可用地點，結束處理'
+      },
+      error: {
+        title: '這次沒分析成功',
+        body: '連線好像不太穩定，連結我們先幫你留著，直接再試一次或補充一點資料都可以。',
+        exits: [{ label: '重新分析', variant: 'primary' }, { label: '補充資料後重試', variant: 'outline' }],
+        text: '換一個連結'
+      }
+    };
+    const m = BY_ID[st] || BY_ID.success;
+    const kb = m.kb;
+    // needs_input / failed supplement flow: these states reuse the empty / error notice copy
+    const NOTICE_BASE = { supp: 'empty', 'supp-filled': 'empty', 'end-confirm': 'empty', 'supp-error': 'error' };
+    const nb = NOTICE_BASE[st] || st;
+    const supplementOpen = st === 'supp' || st === 'supp-filled' || st === 'supp-error';
+    const supplementFilled = st === 'supp-filled';
+    const endConfirming = st === 'end-confirm';
+    // 補充欄位為真正可輸入的受控欄位：state.supp 為 null 時用該 preview state 的種子值
+    const suppSeed = {
+      text: supplementFilled ? '오늘은 애월 카페 세 곳 다녀왔어요. 봄날카페 → 오션뷰 베이커리 → 성산일출봉 근처 국수집!' : '',
+      name: supplementFilled ? '봄날카페' : '',
+      area: supplementFilled ? '제주 애월읍' : '',
+      extra: '',
+      shots: supplementFilled ? 3 : 0
+    };
+    const supp = this.state.supp || suppSeed;
+    const patchSupp = (p) => this.setState({ supp: Object.assign({}, supp, p) });
+    const setSupp = (k) => (e) => patchSupp({ [k]: e.target.value });
+    const shotCount = supp.shots;
+    const shots = Array.from({ length: shotCount }, (_, i) => ({
+      n: '截圖 ' + (i + 1),
+      onRemove: () => patchSupp({ shots: Math.max(0, shotCount - 1) })
+    }));
+    // MVP 的補充資料共五種類型：四個文字欄位 + 貼文截圖，截圖同樣計入「至少填寫一項」
+    const suppAny = !!(supp.text.trim() || supp.name.trim() || supp.area.trim() || supp.extra.trim() || shotCount > 0);
+    const NOTICE_OF = { empty: 'empty', supp: 'empty', 'supp-filled': 'empty', 'end-confirm': 'empty', insufficient: 'insufficient', error: 'error', 'supp-error': 'error' };
+    const noticeKind = NOTICE_OF[st] || null;
+    const nc = NOTICE_COPY[noticeKind];
+    // entry: "new" (/share, /imports/new) vs "resume" (/imports/:importId/review) — one design, two mounts.
+    // The source row is driven by whether the Import EXISTS, not by entry mode (MVP §5.3 · ARCH §3.3).
+    const created = m.created;
+    const isResume = m.entry === 'resume';
+    const isCompleted = m.life === 'completed';
+    const noTarget = st === 'no-collection';
+    const target = st === 'extreme' ? TARGET_LONG : TARGET;
+    const showDecor = this.props.showDecor ?? true;
+    const results = this.results().map((r, i) => ({
+      ...r,
+      added: !!r.added,
+      rejected: !!r.rejected,
+      confirming: !!r.confirming,
+      confirmLine1: '拒絕後這個地點不會加入「' + target + '」。',
+      matchState: r.matchState || 'matched',
+      candidates: r.candidates || [],
+      expanded: !!r.expanded,
+      chooseLabel: '請選擇實際地點 · ' + ((r.candidates || []).length) + ' 筆候選',
+      // completed ⇒ ImportItem 是唯讀處置紀錄：整條動作列換成靜態處置標示，不留無效控制
+      readOnly: isCompleted,
+      dispositionLabel: r.added ? '已加入' : '已拒絕',
+      failed: !!r.failed,
+      adding: !!r.adding,
+      failureId: 'import-add-error-' + i,
+      failureLabel: r.adding ? '重試中' : '加入失敗',
+      failureText: r.adding
+        ? '正在重新加入…'
+        : '網路不太穩定，這個地點剛才沒加入成功。它還留在未處置，再按一次「加入」就會重試。',
+      editAria: '編輯候選地點：' + r.name,
+      rejectAria: (r.rejected ? '已拒絕候選地點：' : '拒絕候選地點：') + r.name,
+      addAria: r.added
+        ? '已加入旅行收藏：' + r.name
+        : (r.failed ? '重新加入旅行收藏：' : '加入旅行收藏：') + r.name,
+      categoryLabel: CAT_LABEL[r.category] || CAT_LABEL.other,
+      mark: (DECOR[r.category] || DECOR_FALLBACK).mark,
+      tapeA: showDecor && (DECOR[r.category] || DECOR_FALLBACK).tape === 'A',
+      tapeB: showDecor && (DECOR[r.category] || DECOR_FALLBACK).tape === 'B',
+      tapeC: showDecor && (DECOR[r.category] || DECOR_FALLBACK).tape === 'C'
+    }));
+    const pending = results.filter(r => !r.added && !r.rejected).length;
+    const pendingMatched = results.filter(r => !r.added && !r.rejected && r.matchState === 'matched').length;
+    const unmatchedCount = pending - pendingMatched;
+    const rejectedN = results.filter(r => r.rejected).length;
+    const excludedParts = [];
+    if (rejectedN > 0) excludedParts.push('已拒絕的 ' + rejectedN + ' 個');
+    if (unmatchedCount > 0) excludedParts.push('還沒對到地點的 ' + unmatchedCount + ' 個');
+    const excluded = excludedParts.length ? excludedParts.join('、') + '不會加入。' : '';
+    const failedCount = results.filter(r => r.failed).length;
+    const anyAdding = results.some(r => r.adding);
+    const addedCount = results.filter(r => r.added).length;
+    const rejectedCount = results.filter(r => r.rejected).length;
+    const hasResults = results.length > 0;
+    const allProcessed = hasResults && pending === 0;
+    const allAdded = allProcessed && rejectedCount === 0;
+    const allRejected = allProcessed && addedCount === 0;
+
+    const inputValue =
+      st === 'idle' || st === 'kb-empty' ? '' :
+      st === 'invalid' || st === 'kb-invalid' ? IG_BAD :
+      st === 'kb-long' ? IG_LONG :
+      st === 'reel' ? IG_REEL :
+      st === 'kb-reel' ? IG_REEL_LONG : IG_OK;
+    const isInvalid = st === 'invalid' || st === 'kb-invalid';
+    const isAnalyzing = st === 'analyzing' || st === 'received' || st === 'resume-queued';
+
+    const statusMap = {
+      analyzing: { icon: S + 'icon-instagram.png', text: '正在讀取這則貼文…', em: '' },
+      success: { icon: I + 'check-circle.png', text: '分析完成！', em: '找到 3 個地點。' },
+      partial: { icon: I + 'check-circle.png', text: '分析完成！', em: '找到 3 個地點。' },
+      all: { icon: I + 'check-circle.png', text: '這筆匯入已完成。', em: '' },
+      extreme: { icon: I + 'check-circle.png', text: '分析完成！', em: '找到 5 個地點。' },
+      mixed: { icon: I + 'check-circle.png', text: '分析完成！', em: '找到 3 個地點。' },
+      processed: { icon: I + 'check-circle.png', text: '這筆匯入已完成。', em: '' },
+      'rejected-all': { icon: I + 'check-circle.png', text: '這筆匯入已結束。', em: '' },
+      confirm: { icon: I + 'check-circle.png', text: '分析完成！', em: '找到 3 個地點。' },
+      'batch-fail': { icon: I + 'check-circle.png', text: '加入了 2 個地點，', em: '1 個沒加入成功。' },
+      'batch-retry': { icon: S + 'icon-instagram.png', text: '正在重新加入 1 個地點…', em: '' },
+      choosing: { icon: I + 'check-circle.png', text: '找到 3 個地點，', em: '1 個要選地點。' },
+      candidates: { icon: I + 'check-circle.png', text: '找到 3 個地點，', em: '1 個要選地點。' },
+      unmatched: { icon: I + 'check-circle.png', text: '找到 3 個地點，', em: '1 個沒對到地點。' },
+      empty: { icon: I + 'check-circle.png', text: '分析完成，', em: '沒有找到可辨識的地點。' },
+      error: { icon: S + 'icon-instagram.png', text: '分析中斷了。', em: '' },
+      received: { icon: S + 'icon-instagram.png', text: '已收到連結，排隊處理中…', em: '' },
+      insufficient: { icon: S + 'icon-instagram.png', text: '讀不到這則貼文的內容。', em: '' },
+      resume: { icon: I + 'check-circle.png', text: '上次分析找到 3 個地點，', em: '還有 1 個沒處置。' },
+      'resume-queued': { icon: S + 'icon-instagram.png', text: '已收到連結，排隊處理中…', em: '' },
+      'completed-added': { icon: I + 'check-circle.png', text: '這筆匯入已完成。', em: '' },
+      'completed-rejected': { icon: I + 'check-circle.png', text: '這筆匯入已結束。', em: '' }
+    };
+    const status = statusMap[nb];
+
+    const label = m.label;
+    const chipDefs = STATES.map(s => [s.id, s.chip]);
+
+    const on = '#4C76C2', off = '#FFFDFA';
+    const gutter = w === 360 ? 16 : w === 430 ? 24 : 20;
+    const photo = w === 360 ? '108 × 122' : w === 430 ? '132 × 150' : '120 × 136';
+
+    return {
+      showSpec: this.props.showSpec ?? true,
+      showDecor,
+      w: String(w),
+      frameWidth: w + 'px',
+      screenLabel: label,
+      frameMeta: w + ' × 844 · gutter ' + gutter + (w === 390 ? ' · 定稿基準' : ''),
+      scrollRef: (el) => { this._scroll = el; },
+      fieldRef: (el) => { this._field = el; if (el) this.syncField(); },
+      navItems: [{ id: 'trips', label: '旅行收藏', iconSrc: I + 'nav-trips.png' }, { id: 'imports', label: '匯入', iconSrc: I + 'nav-imports.png' }],
+      navVisible: !kb,
+      keyboardOpen: kb,
+      kbRow1: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      kbRow2: ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+      kbRow3: ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+
+      inputValue,
+      isInvalid,
+      fieldState: isInvalid ? 'invalid' : kb ? 'focus' : 'rest',
+      isAnalyzing,
+      ctaDisabled: noTarget || inputValue === '' || isInvalid || isAnalyzing,
+      ctaLabel: isAnalyzing ? '分析中…' : '分析連結',
+
+      statusVisible: !!status,
+      statusIcon: status ? status.icon : '',
+      statusText: status ? status.text : '',
+      statusEmphasis: status ? status.em : '',
+      showArrow: showDecor && (st === 'success' || st === 'partial' || st === 'extreme'),
+
+      hasTarget: !noTarget,
+      noTarget,
+      changeTargetDisabled: isCompleted,
+      showIdleHint: st === 'idle',
+      showNotice: !!nc,
+      showNoticeTape: showDecor && !!nc,
+      noticeTitle: nc ? nc.title : '',
+      noticeBody: nc ? nc.body : '',
+      noticeExitsVisible: !!nc && !supplementOpen && !endConfirming,
+      exits: nc ? nc.exits : [],
+      textExit: nc ? nc.text : '',
+      isResume,
+      showComposer: !created,
+      showSourceRow: created,
+      showResumeSummary: isResume,
+      sourceKindLabel: '來源貼文（唯讀）',
+      sourceUrl: IG_OK,
+      resumeStatus: st === 'resume-queued' ? '排隊中' : isCompleted ? '已完成' : '待處理',
+      resumeMeta: st === 'resume-queued'
+        ? '2 天前匯入 · 還沒開始分析'
+        : isCompleted
+          ? '2 天前匯入 · ' + (addedCount > 0 ? '已加入 ' + addedCount + ' 個、拒絕 ' + rejectedCount + ' 個' : '全部拒絕')
+          : '2 天前匯入 · 3 個候選 · ' + pending + ' 個未處置',
+      showBatch: hasResults && !isCompleted,
+      showCompletedSummary: isCompleted,
+      completedTitle: addedCount > 0 ? '已加入 ' + addedCount + ' 個地點到「' + target + '」' : '這則貼文沒有地點被加入',
+      completedBody: addedCount > 0
+        ? (rejectedCount > 0 ? '另外 ' + rejectedCount + ' 個候選已拒絕。' : '') + '這筆匯入已完成，不需要再處理。想改已加入地點的內容，請到旅行收藏裡編輯。'
+        : rejectedCount + ' 個候選都拒絕了，這筆匯入已結束。之後仍可重新貼上同一連結，建立一筆新的匯入。',
+      supplementOpen,
+      supplementFilled,
+      endConfirming,
+      shots,
+      showAddShot: shotCount < 3,
+      atShotLimit: shotCount >= 3,
+      onAddShot: () => patchSupp({ shots: Math.min(3, shotCount + 1) }),
+      suppText: supp.text,
+      suppName: supp.name,
+      suppArea: supp.area,
+      suppExtra: supp.extra,
+      onSuppText: setSupp('text'),
+      onSuppName: setSupp('name'),
+      onSuppArea: setSupp('area'),
+      onSuppExtra: setSupp('extra'),
+      // 提交鍵由實際欄位內容推導：任一欄有內容即 enabled（對應「填其中任一項就能重新分析」）
+      submitDisabled: !suppAny,
+
+      hasResults,
+      results,
+      targetName: target,
+      // BatchAddPanel only ever exists in review_required — 全部處置完即 completed，改由 CompletedSummaryCard 承接
+      batchTitle: failedCount > 0
+        ? (anyAdding ? '正在重新加入 ' + failedCount + ' 個地點…' : '還有 ' + failedCount + ' 個地點沒加入成功')
+        : pendingMatched > 0
+          ? '要把這 ' + pendingMatched + ' 個地點加入「' + target + '」嗎？'
+          : '還有 ' + unmatchedCount + ' 個地點要先選實際地點',
+      batchSubtitle: failedCount > 0
+        ? '已加入的 ' + addedCount + ' 個會留在「' + target + '」，不會因為這次失敗被移除。'
+        : pendingMatched > 0
+          ? (excluded || '確認後會直接加入「' + target + '」。')
+          : '選好地點之後才能加入「' + target + '」。',
+      batchSparkle: failedCount > 0 ? '' : S + 'sticker-sparkles-transparent.png',
+      showBatchCta: hasResults && pendingMatched > 0 && !isCompleted,
+      batchCtaDisabled: anyAdding,
+      batchCtaLabel: anyAdding
+        ? '正在加入…'
+        : (failedCount > 0 ? '重試加入 ' + pendingMatched + ' 個地點' : '加入 ' + pendingMatched + ' 個地點'),
+
+      setW360: () => this.setState({ w: 360 }),
+      setW390: () => this.setState({ w: 390 }),
+      setW430: () => this.setState({ w: 430 }),
+      w360Bg: w === 360 ? on : off, w360Fg: w === 360 ? '#fff' : '#3B3B3D',
+      w390Bg: w === 390 ? on : off, w390Fg: w === 390 ? '#fff' : '#3B3B3D',
+      w430Bg: w === 430 ? on : off, w430Fg: w === 430 ? '#fff' : '#3B3B3D',
+      stateMap: STATES.map(s => ({
+        name: s.label,
+        life: s.life,
+        created: s.created ? '○ 已建立' : '✕ 未建立',
+        entry: s.created ? s.entry : '—',
+        url: s.created ? '唯讀' : '可編輯',
+        src: s.src,
+        show: (s.list ? 'List ○' : 'List ✕') + ' · ' + (s.cta ? 'CTA ○' : 'CTA ✕') + ' · ' + (s.kb ? 'Nav ✕ · KB ○' : 'Nav ○ · KB ✕'),
+        can: s.can,
+        no: s.no,
+        rowBg: s.id === st ? '#F2F7FC' : '#FFFDFA'
+      })),
+      stateChips: chipDefs.map(([id, text]) => ({
+        label: text,
+        bg: st === id ? on : off,
+        fg: st === id ? '#fff' : '#3B3B3D',
+        onClick: () => this.setState({ st: id, supp: null })
+      })),
+
+      specGutter: gutter + 'px（16 / 20 / 24）',
+      specPhoto: photo + '，ratio 0.88 · cover + center',
+      specState: label + '｜' + m.life + '｜' + (noTarget ? '目標收藏列改為 dashed 引導卡；欄位保留預填 URL，CTA disabled' : kb ? '鍵盤開啟：nav 隱藏、欄位與 CTA 保持可見' : !created ? 'composer：Import 尚未建立，URL 可編輯' : isCompleted ? '持久 Import · completed：來源唯讀、結果卡唯讀、無 commit CTA' : hasResults ? '持久 Import：來源唯讀（SourceRow）；結果列表與面板可完整捲到 nav 之上' : '持久 Import：來源唯讀，結果區不存在，狀態列保留 24px 佔位'),
+      specCta: !created
+        ? (noTarget ? '分析連結 · disabled（尚無旅行收藏，Import 無法建立）' : inputValue === '' ? '分析連結 · disabled（欄位為空）' : isInvalid ? '分析連結 · disabled（URL 不合法）' : '分析連結 · enabled')
+        : isCompleted ? '無 Analyze／commit CTA（completed 唯讀）；「更換」原生 disabled'
+        : anyAdding ? '珊瑚 commit CTA · disabled（重試中）'
+        : (hasResults && pendingMatched > 0 ? '珊瑚 commit CTA「加入 ' + pendingMatched + ' 個地點」' : '無 Analyze CTA（來源唯讀）；此狀態不出現 commit CTA'),
+      specNav: kb ? '鍵盤開啟時隱藏，收起後 200ms 淡入' : '72px + inset · 兩格 · 無 FAB（與 Home 相同）'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

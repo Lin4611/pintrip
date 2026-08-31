@@ -1,0 +1,24 @@
+:root{
+  --sp-1:4px;
+  --sp-2:8px;
+  --sp-3:12px;
+  --sp-4:16px;
+  --sp-5:20px;   /* screen gutter */
+  --sp-6:24px;
+  --sp-7:28px;
+  --sp-8:32px;
+  --sp-10:40px;
+
+  --screen-gutter:20px;
+  --card-gap:16px;
+  --card-pad:16px;
+  --stack-gap:12px;
+
+  --nav-height:72px;
+  --nav-safe-bottom:24px;
+  --fab-size:60px;
+  --tap-min:44px;
+
+  --frame-width:390px;
+  --frame-height:844px;
+}

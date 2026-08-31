@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="PinTrip MVP mockups" description="Final hi-fi mockups of the two MVP screens: Home / Trip Collections and Import Link + Analyze Result" -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}</style>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:28px;padding:48px 56px 64px">
+
+  <div style="max-width:900px;background:#FBF3EE;border:1.5px dashed #E6BFAE;border-radius:20px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-family:Quicksand,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:0.1em;color:#B5745A">EARLIER VISUAL REFERENCE — 不是 SOURCE OF TRUTH</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46">這份是較早期的共用 mockup，只作視覺參考。照片、裝飾、間距與狀態都可能落後於正式 handoff（例如仍使用裝飾已合成的舊 place 照片、依畫面順序放置的膠帶）。任何規格衝突一律以正式 handoff 為準，不要從這裡取值。</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46">優先順序：1. <strong style="color:#3B3B3D">HomeScreen.dc.html</strong> → 2. <strong style="color:#3B3B3D">ImportScreen.dc.html</strong> → 3. <strong style="color:#3B3B3D">CLAUDE.md</strong> → 4. <strong style="color:#3B3B3D">_ds</strong> → 5. 本檔（僅 visual reference）。</div>
+    <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#8A5A46;border-top:1px dashed #E6BFAE;padding-top:6px"><strong>適用範圍</strong>：上述優先順序<strong style="color:#3B3B3D">僅適用於 claude-design-export 內部的視覺與 handoff 敘述</strong>。產品範圍與產品規則以 <strong style="color:#3B3B3D">docs/MVP.md</strong> 為準，技術決策與資料邊界以 <strong style="color:#3B3B3D">docs/ARCHITECTURE.md</strong> 為準；設計檔不得凌駕這兩份文件。</div>
+  </div>
+
+<div style="display:flex;gap:72px;justify-content:center;align-items:flex-start">
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:baseline;gap:10px;padding-left:6px">
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">01</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">首頁 / 旅程收藏</span>
+    </div>
+    <div data-screen-label="01 Home" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18)">
+      <img src="assets/icons/status-bar.png" alt="" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+      <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding:12px 20px 22px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div>
+            <img src="assets/stickers/wordmark-serif.png" alt="PinTrip" style="height:58px;display:block">
+            <img src="assets/stickers/tagline-script.png" alt="Pin your best trips. Cherish every place." style="width:152px;display:block;margin-top:10px">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;padding-top:6px">
+            <img src="assets/photos/avatar-user.png" alt="" style="width:52px;height:52px;border-radius:999px;border:2.5px solid #FFFDFA;box-shadow:0 4px 14px rgba(122,96,58,0.07);display:block">
+            <img src="assets/stickers/note-paper.png" alt="Collect moments, not things." style="width:100px;display:block;transform:rotate(-3deg)">
+          </div>
+        </div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
+          <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅程收藏</h2>
+          <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:12px">
+          <div style="position:relative">
+            <div style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo.png" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;bottom:-6px;right:22px;width:54px;height:16px;background:repeating-linear-gradient(90deg,#D8CBEC 0 3px,transparent 3px 7px),#EFE4FA;opacity:0.92;border-radius:2px;transform:rotate(7deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="京都" location="日本" note="慢慢散步，感受京都的四季與街景。" place-count="36" count-label="個地點" photo-src="./assets/photos/trip-kyoto.png" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;top:-9px;left:50%;margin-left:-31px;width:62px;height:18px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-2deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.StartTripCard" title="開始新的旅程" description="收藏地點，記錄回憶，開始屬於你的旅行故事。" map-src="./assets/stickers/worldmap.png" hint-size="100%,104px"></x-import>
+          </div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="trips" hint-size="100%,72px"></x-import>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;align-items:baseline;gap:10px;padding-left:6px">
+      <span style="font-family:Quicksand,sans-serif;font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">02</span>
+      <span style="font-family:Quicksand,sans-serif;font-size:16px;font-weight:700;color:#3B3B3D">匯入連結 + 分析結果</span>
+    </div>
+    <div data-screen-label="02 Import result" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18)">
+      <img src="assets/icons/status-bar.png" alt="" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+      <div style="flex:1;overflow-y:auto;scrollbar-width:none;padding:6px 20px 22px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px">
+          <img src="assets/icons/arrow-back.png" alt="Back" style="width:38px;height:38px;object-fit:contain;background:#FFFDFA;border-radius:999px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:9px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <img src="assets/stickers/wordmark-script.png" alt="PinTrip" style="height:40px;display:block">
+            <img src="assets/stickers/sticker-envelope.png" alt="" style="width:52px;display:block;transform:rotate(4deg)">
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <h1 style="margin:0;font-family:Quicksand,sans-serif;font-size:26px;font-weight:700;color:#3B3B3D;letter-spacing:-0.01em">匯入連結</h1>
+          <p style="margin:8px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:400;line-height:1.6;color:#81817D">貼上 Instagram 貼文連結，PinTrip 會幫你整理旅遊地點。</p>
+        </div>
+        <div style="margin-top:18px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.LinkInput" value="https://www.instagram.com/p/Cu123abcDEF/" icon-src="./assets/stickers/icon-instagram.png" hint-size="100%,54px"></x-import>
+        </div>
+        <div style="margin-top:12px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="primary" size="lg" full-width="{{ true }}" icon-src="./assets/icons/sparkle.png" hint-size="100%,50px">分析連結</x-import>
+        </div>
+        <div style="margin-top:18px;position:relative">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.AnalyzeStatus" icon-src="./assets/icons/check-circle.png" text="分析完成！" emphasis="找到 3 個地點。" hint-size="100%,44px"></x-import>
+          <img src="assets/stickers/arrow-curve.png" alt="" style="position:absolute;right:2px;top:-4px;width:36px;opacity:0.9">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:18px">
+          <div style="position:relative">
+            <div style="position:absolute;top:-7px;left:26px;width:64px;height:17px;background:repeating-linear-gradient(90deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px),repeating-linear-gradient(0deg,rgba(196,216,239,0.9) 0 5px,rgba(196,216,239,0.45) 5px 10px);opacity:0.92;border-radius:2px;transform:rotate(-8deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-cafe-jeju.png" category="cafe" category-label="咖啡" name="春日咖啡" description="面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。" address="濟州市涯月邑涯月路1街24" tags="{{ tags1 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/heart-outline.png" hint-size="100%,214px"></x-import>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;top:-7px;left:30px;width:60px;height:17px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(6deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-food-jeju.png" category="food" category-label="美食" name="溫谷鮭魚" description="鮭魚丼與生魚片都很新鮮，需要排隊但很值得。" address="濟州市蓮洞 261-27" tags="{{ tags2 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/star-outline.png" hint-size="100%,214px"></x-import>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;top:-7px;left:24px;width:62px;height:17px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-5deg);z-index:2"></div>
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.PlaceResultCard" photo-src="./assets/photos/place-nature-jeju.png" category="attraction" category-label="景點" name="城山日出峰" description="濟州最具代表性的自然景觀，趕上日出時分最動人。" address="西歸浦市城山邑城山里 1" tags="{{ tags3 }}" pin-src="./assets/icons/pin-blue.png" edit-icon-src="./assets/icons/pencil.png" edit-label="編輯" add-label="加入旅程" added-label="已加入" mark-src="./assets/icons/flower.png" hint-size="100%,214px"></x-import>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BatchAddPanel" title="要加入這 3 個地點嗎？" subtitle="儲存到我的旅程收藏，之後也能在行程中查看。" luggage-src="./assets/stickers/sticker-luggage.png" sparkle-src="./assets/stickers/sticker-sparkles.png" hint-size="100%,96px"></x-import>
+        </div>
+        <div style="margin-top:12px">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.Button" variant="action" size="lg" full-width="{{ true }}" hint-size="100%,50px">加入 3 個地點</x-import>
+        </div>
+      </div>
+      <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="imports" hint-size="100%,72px"></x-import>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:972,&quot;height&quot;:1010}}">
+class Component extends DCLogic {
+  renderVals(){
+    const S='../../assets/stickers/', I='../../assets/icons/';
+    return {
+      tokyoIcons:[{src:S+'icon-torii.png',alt:'Shrines'},{src:S+'icon-food.png',alt:'Food'},{src:S+'icon-train.png',alt:'Rail'}],
+      kyotoIcons:[{src:S+'icon-pagoda.png',alt:'Temples'},{src:S+'icon-maple.png',alt:'Autumn'},{src:S+'icon-matcha.png',alt:'Tea'}],
+      navItems:[{id:'trips',label:'旅程',iconSrc:I+'nav-trips.png'},{id:'imports',label:'匯入',iconSrc:I+'nav-imports.png'}],
+      tags1:['#海景','#風格咖啡','#涯月咖啡'],
+      tags2:['#鮭魚丼','#濟州美食','#蓮洞'],
+      tags3:['#日出景點','#濟州必訪','#自然風景']
+    };
+  }
+}
+
+</script>
+</body>
+</html>
