@@ -1,15 +1,17 @@
 # PinTrip Screen-Specific Rules
 
-Source: `HomeScreen.dc.html` (canonical for Home) and `ImportScreen.dc.html` (canonical for
-Import Link + Analyze Result). Global rules that apply to both live in
-[design-system.md](design-system.md) and [components.md](components.md); the Import state model and
-decision ledger live in [import-lifecycle.md](import-lifecycle.md). This file is only what's
-specific to one screen. Don't promote a number from here to a global rule, and don't apply a
-Home-only number to Import or vice versa.
+Source: `HomeScreen.dc.html` (canonical for Home), `NewTripScreen.dc.html` (canonical for the
+create/edit collection form) and `ImportScreen.dc.html` (canonical for Import Link + Analyze
+Result). Global rules that apply to all three live in [design-system.md](design-system.md) and
+[components.md](components.md); the Import state model and decision ledger live in
+[import-lifecycle.md](import-lifecycle.md). This file is only what's specific to one screen. Don't
+promote a number from here to a global rule, and don't apply a Home-only number to Import or vice
+versa.
 
-Both screens share: 390×844 base frame, App Shell (BottomNav 72px / FAB 60px lifted 14px),
-safe-area handling, and the "only the gutter plus one component's fixed column are fluid across
-360/390/430" responsive model.
+All three screens share: 390×844 base frame, App Shell (BottomNav 72px, two cells, no FAB),
+safe-area handling, and the "almost nothing is fluid across 360/390/430" responsive model. The
+number of fluid values differs: Home and Import each have the gutter **plus** one component's fixed
+column (photo 148/172/196 and 108/120/132 respectively); `/trips/new` has only the gutter.
 
 **Numbers marked 實測 in the source are measurements, not specs.** Use them to verify your build;
 never hardcode them as heights.
@@ -23,7 +25,7 @@ never hardcode them as heights.
 - Content top inset 12px. Wordmark (58px, serif lockup) → tagline (152px wide, script) 10px below.
   Avatar (52px circle, 2.5px paper border) + note sticker, right-aligned column, 12px gap, note
   rotated −3°.
-- Brand block → section header (「我的旅行收藏」+「查看全部 ›」) 26px. Header → collection-count
+- Brand block → section header (「我的旅行收藏」) 26px. Header → collection-count
   line (「目前有 2 個旅行收藏 · 64 個地點」) 6px. Count line → trip list 14px.
 - Trip cards: 16px gap between cards. Card padding 11/7/11/15 (top/right/bottom/left). Photo column
   fixed width per breakpoint: **148px @360 / 172px @390 / 196px @430**; right-anchored decorations
@@ -34,7 +36,7 @@ never hardcode them as heights.
 - Start New Trip card: 104px tall, full width, 1.5px dashed border, always the last item in the
   list; its world-map cut-out is right-aligned and does not scale with viewport width.
 - Content bottom padding 72px (+ safe-area inset) so the last card / Start New Trip fully clears
-  the nav and FAB.
+  the nav.
 
 ### Responsive (the only two variables that change)
 
@@ -43,7 +45,7 @@ never hardcode them as heights.
 | Gutter | 16px | 20px | 24px |
 | Photo column | 148px | 172px | 196px |
 
-Everything else — header layout, wordmark/tagline/avatar sizes, card padding, radii, nav/FAB, every
+Everything else — header layout, wordmark/tagline/avatar sizes, card padding, radii, nav, every
 decoration offset — is fixed across all three widths. The text column measures a near-constant
 150±6px. 360 is the narrowest safe value: if the text column gets any narrower, the 28px-equivalent
 title is forced onto two lines.
@@ -77,8 +79,10 @@ the text column and footer inflates from 8–55px to 66–115px and the card rea
   handoff shows it as a CSS override and it should be folded into the component.
 - Decoration positioning must live in the wrapper **outside** `TripCard`, and that wrapper must not
   be `overflow:hidden`, or the card can't be reused on other screens.
-- FAB must stay a child of BottomNav (shares the safe-area inset) — don't promote it to an
-  independent fixed layer, and don't stack a scrim or gradient over the nav.
+- Don't stack a scrim or gradient over the nav.
+- The `•••` menu must render above the card and its decorations but below the nav, and must not be
+  clipped by `TripCardSlot` or the card's own `overflow:hidden` — anchor it in an overlay layer, not
+  inside the card's flow.
 - Long place names, long hashtags and rotated tape can all push horizontal scroll — the three-part
   guard (`overflow-x:clip` on the scroll layer + `overflow:hidden` on the card + `min-width:0` on
   the text column) must all be present together.
@@ -92,7 +96,7 @@ the text column and footer inflates from 8–55px to 66–115px and the card rea
 | Error | Single dashed card, tone gentle and non-blaming; retry is an outline button, fixed at the card's bottom-left. |
 | Long list | Card spacing unchanged; Start New Trip always last; bottom 72px padding lets it fully clear the nav. |
 | Delete confirm | Screen-level sheet — see below. |
-| Common to all | BottomNav and FAB exist and stay positioned identically across every state — only the content region swaps, never the surrounding frame. Home has exactly one list region that changes; normal/empty/loading/error all render into it with the outer frame and spacing unchanged. |
+| Common to all | BottomNav exists and stays positioned identically across every state — only the content region swaps, never the surrounding frame. Home has exactly one list region that changes; normal/empty/loading/error all render into it with the outer frame and spacing unchanged. |
 
 #### Skeleton height — export-internal conflict, PENDING DESIGN
 
@@ -129,9 +133,9 @@ and verify ownership before deleting a Trip). It implements the four cross-scree
 rules in [design-system.md](design-system.md) — that card doesn't restate the rules, and neither
 does this one.
 
-- **Trigger path**: TripCard `•••` → bottom sheet (重新命名／刪除) → choosing 刪除 → this confirm
-  sheet. The 刪除 item in the `•••` sheet is **not** the executing control; it only opens the
-  confirmation.
+- **Trigger path**: TripCard `•••` → anchored dropdown (重新命名／刪除旅行收藏) → choosing
+  刪除旅行收藏 → this confirm sheet. The 刪除旅行收藏 item in the menu is **not** the executing
+  control; it only opens the confirmation.
 - **Form is decided: a screen-level sheet, not an in-card confirm row** (Import's reject
   confirmation uses the in-card row). The reason is information volume: it must list the place count
   plus four categories of data removed.
@@ -163,7 +167,7 @@ does this one.
 - **Behind the sheet**: the list keeps its scroll position and cannot scroll (`overflow:hidden`);
   cards, decorations and BottomNav do not move or fade. Cancel returns the screen exactly as it was.
 - **Motion**: sheet slides up over 320ms `cubic-bezier(.32,.72,.28,1)` with the dim fading in
-  together; the close is the same length in reverse. No spring — that's the FAB's vocabulary.
+  together; the close is the same length in reverse. No spring.
 - **OPEN — do not invent**: in-progress feedback and failure handling for the delete itself (retry
   entry point, how a partial delete is shown) are undefined in both `MVP.md` and `ARCHITECTURE.md`.
   This round defines only the confirmation UI and the `onConfirmDelete(tripId)` / `onCancel`
@@ -173,12 +177,36 @@ does this one.
 
 - The whole TripCard is tappable → navigates into that collection (**destination not designed this
   round**). Press: `scale(.97)` + `brightness(.96)`, 120ms.
-- Card `•••` menu: `stopPropagation`, opens a bottom sheet (rename/delete), 44px tap target; delete
-  leads to the confirm sheet above.
-- 「查看全部」navigates to a full collection list; press only dims, never shifts; text button, no
-  underline.
-- Start New Trip and the FAB share the same destination (new-collection flow); the FAB opens a
-  bottom sheet.
+- Card `•••` menu: `stopPropagation`, opens an **anchored dropdown**, not a screen-level sheet —
+  two single-line rows (重新命名 / 刪除旅行收藏), each 44px, no title row and no cancel button
+  (tapping outside closes it). The `•••` tap target is padded to 44×44. 重新命名 routes to the
+  `/trips/new` form with existing values; 刪除旅行收藏 opens the confirm sheet above. Only one menu
+  is open at a time: tapping card B's `•••` while card A's is open must collapse A **and** open B
+  on that same interaction — the outside-click close must not swallow it and force a second tap.
+  Tapping the same `•••` again toggles it closed; scrolling the list closes it.
+
+  **Anchoring — take these from the export, they are measured, not approximate:**
+
+  - Fixed **172 × 109**, r14, padding 6, 1px `#E3D9C6` hairline plus a two-layer shadow
+    (`0 14px 32px rgba(60,45,25,.24)` / `0 2px 6px rgba(60,45,25,.10)`). The menu and the card are
+    both `#FFFDFA` — the boundary comes from the hairline and shadow, never from a different fill.
+    The width is fixed rather than `max-content` because the shift clamp needs a known width.
+  - Horizontally the menu's right edge aligns to the `•••`'s right edge, and the inset must be
+    **measured at open time** (`wrapper right − trigger right`): the photo column steps 148/172/196
+    across breakpoints, so a hard-coded value silently becomes "aligned to the whole card" with
+    ~187px of slack. That alignment is only a *preference* — clamp it so the left edge never crosses
+    8px inside the frame, and **clamp against the frame, not the card**: clamping to the card makes
+    the left edge sit flush with the card and the menu reads as part of it. Overhanging the card
+    slightly is intended.
+  - Vertically the top edge is `max(trigger bottom, title text bottom) + 8px`. The 28px title line
+    box sits ~13px below the 18px `•••`, so anchoring to the trigger alone **clips the collection
+    name**; measured, the menu sits 8px below the title and 19px below the `•••`. Covering the
+    destination line underneath is expected — an overlay covers content, that is not clipping.
+  - Flips upward when `trigger bottom + 132px` (109 menu + 23 breathing room) would pass the nav's
+    top edge, anchoring 8px above the trigger instead. Direction is measured at open time, so
+    scrolling a card close to the nav and opening it there flips it.
+- Start New Trip routes to `/trips/new`. It is the only entry point for creating a collection now
+  that the FAB is gone, so it must stay reachable in every list state.
 - Nav 旅行收藏 tapped while already active scrolls to top without reloading. Nav 匯入 switches
   screen; the inactive icon desaturates to 55%, same icon (no swap).
 - Retry re-enters the loading skeleton then retries; disabled during retry at 45% opacity, no color
@@ -232,7 +260,7 @@ photo sits in the card is incidental. So there is nothing here to "fix":
 ### React / Next.js boundary
 
 AppShell belongs in the layout (status-bar safe area + scroll slot + BottomNav), shared with Import
-so nav and FAB never re-render or jump between pages. `TripCard` takes data props only; decoration
+so the nav never re-renders or jumps between pages. `TripCard` takes data props only; decoration
 is rendered by `TripCardSlot` from the collection's **persisted `decorPreset`** — never from card
 index or render order, never re-randomized on render, falling back to C when the field is missing.
 Photos go through `next/image` with `sizes` matching 148/172/196 and `fill` + `object-cover`;
@@ -240,11 +268,77 @@ decoration PNGs stay plain `<img>` + `aria-hidden`.
 
 ---
 
+## Create / Edit Trip Collection — /trips/new
+
+`NewTripScreen.dc.html`. One form serves both `/trips/new` and rename/edit — the same fields, order,
+spacing, validation and disabled rules. Build it as **one component with `mode: 'create' | 'edit'`
+and `initialValues`**; copying it into two forms lets the validation drift. Only three things differ:
+the screen title (建立旅行收藏 / 編輯旅行收藏), the CTA label (建立收藏 / 儲存變更), and whether
+values are prefilled.
+
+### Fields — exactly three, per MVP §5.2
+
+| Field | Required | Notes |
+|---|---|---|
+| 收藏名稱 | required | Trimmed non-empty is the only submit condition |
+| 目的地名稱 | optional | |
+| 收藏說明 | optional | `textarea`, min-height 82, `resize:none`, scrollable; grey line below says it does not affect category/filter/map |
+
+Required vs optional is shown by a chip beside the label (required `--coral-100`, optional
+`--cream-200`, both with `--ink-700` text — the background carries the meaning, the text colour
+carries contrast). No asterisks, and never colour alone.
+
+**No character limit.** MVP §5.2 leaves it undecided, so: no `maxlength`, no counter, no input
+blocking. The layout must survive any length — never reason backwards from the layout to a product
+rule. While typing, a long name **scrolls horizontally inside the input** (no ellipsis, no shrink,
+no wrap) — same rule as Import's long URLs. Truncation is the *display* side's job (`TripCard`
+title `line-clamp: 2`, target-collection row single-line ellipsis), not this form's.
+
+**Not on this screen**: dates, itinerary, cover photo picker, decoration picker. MVP §5.2 has no
+such fields, and the visual style is assigned automatically at creation (see Home's preset
+assignment) — the user never chooses it. Deleting a collection is also not here: it is a
+destructive action and its entry point is Home's `•••` → screen-level confirm sheet.
+
+### Submit and disabled
+
+- CTA is full-width 48px solid blue, a single commit action.
+- Disabled uses **native `disabled`** (45%, no colour/size/position change) — never
+  `pointer-events` or a fake translucent state.
+- While disabled, a `role="status"` line appears under the name field and the CTA's
+  `aria-describedby` points at it. The line reserves its space: nothing except the CTA moves.
+- Missing name only blocks submit — it never clears the other fields, and nothing is pre-marked red.
+- In edit mode the CTA is enabled on entry (the name is already filled). Whether it should disable
+  until something changes is **not decided** — don't assume either way.
+
+### Layout
+
+Frame 390×844, gutter 16/20/24. Header back 44 / wordmark 40 / envelope 52 rotate(4°) → title 14px;
+title → form card 18px; card full-width r20 padding 18 with `--shadow-card`; 16px between fields;
+label → field 6px. Single-line fields 48px, r12, 1.5px `#E3D9C6` border on `#F9F5ED`. Card → CTA
+16px. **Content bottom padding 32px** + safe-area inset, matching Import (not Home's 72px).
+BottomNav 72px, two cells, no FAB — the nav stays visible in every state; only the keyboard hides
+it, following Import's keyboard rules.
+
+### States
+
+Empty / filled / name-missing / edit-prefilled / edit-long-name. State changes swap values and CTA
+availability only — the title, the three fields and the CTA never move between states.
+
+### OPEN — do not invent
+
+- **Post-submit destination.** Whether a successful create returns to Home, opens the new
+  collection, or continues into the import flow is undecided. This screen defines the form and the
+  `onSubmit` boundary only.
+- Preset assignment happens at the moment of successful creation and persists; **editing an existing
+  collection never re-rolls it.**
+
+---
+
 ## Import Link + Analyze Result
 
 One screen, one set of components — every viewport (360/390/430) and every UI state renders through
-the *same* markup switched by state, not separate static screens. App Shell (BottomNav, FAB, safe
-area, scroll rules, keyboard behavior) is shared with Home.
+the *same* markup switched by state, not separate static screens. App Shell (BottomNav, safe area,
+scroll rules, keyboard behavior) is shared with Home.
 
 Two mount points share this design: **`entry=new`** (`/share`, `/imports/new`) shows the composer;
 **`entry=resume`** (`/imports/:importId/review`) shows the read-only source row plus a summary row.
@@ -315,7 +409,7 @@ pitfalls and assets.
 | Gutter | 16px | 20px | 24px |
 | Photo column | 108×122 | 120×136 | 132×150 |
 
-Fixed at every width: BottomNav 72, FAB 60 + 14 lift, back 44, wordmark 40, envelope 52, IG icon 24,
+Fixed at every width: BottomNav 72, back 44, wordmark 40, envelope 52, IG icon 24,
 clear 24, input 52, both CTAs 50, TargetCollectionRow 64 and its 13px pin, 「更換」44 tap target, and
 every decoration offset. Fluid: content width and everything that spans it — LinkInput, SourceRow,
 both CTAs, cards, text columns, the Batch panel, the failure notice, the target row (its name column
@@ -352,11 +446,11 @@ has to appear in Edit Place and on the trip-collection page card, both of which 
 - **The source row must never regress into an input.** `needs_input` and `failed` ask the user to do
   something, which tempts you to put `LinkInput` back. Once an Import exists the source is *always*
   the read-only `SourceRow`; 「換一個連結」creates a new Import rather than rewriting this one's URL.
-- **The commit CTA hiding behind the FAB** is the single easiest mistake on this screen: the FAB
-  protrudes 14px above a 72px nav, so content bottom padding must be 72px + inset. Verified across
-  9 combinations (Success / Batch partial failure / Extreme × 360/390/430): CTA bottom sits 72px
-  from the nav's top edge and 58px from the FAB's top, fully visible, with 0px horizontal overflow
-  everywhere.
+- **Content bottom padding on Import is 32px + inset, not Home's 72px.** The old 72px existed to
+  clear a FAB that protruded 14px above the nav; with the FAB gone it was recomputed. Verified
+  across 9 combinations (Success / Batch partial failure / Extreme × 360/390/430): the CTA's bottom
+  edge sits 32px above the nav's top edge, fully visible, with 0px horizontal overflow everywhere.
+  Don't copy Home's 72px onto Import.
 - Long URLs scroll horizontally *inside* the input — no `text-overflow` ellipsis (the user would
   lose track of what they're editing), no wrapping, no shrinking; the clear button stays fixed at
   the right inner edge.

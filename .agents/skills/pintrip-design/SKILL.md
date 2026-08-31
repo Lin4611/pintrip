@@ -48,7 +48,8 @@ lower-priority source:
 | Product behavior / acceptance | `docs/MVP.md` → `docs/ARCHITECTURE.md` |
 | Import screen & its interactions | decisions explicitly marked confirmed in the task → `ImportScreen.dc.html` → the DS components/tokens that genuinely apply |
 | Home screen & its interactions | `HomeScreen.dc.html` → design system |
-| Shared visuals & App Shell | `HomeScreen.dc.html`'s App Shell / BottomNav / FAB / safe area / responsive frame → design system |
+| Create / edit collection form | `NewTripScreen.dc.html` → `HomeScreen.dc.html` → design system |
+| Shared visuals & App Shell | `HomeScreen.dc.html`'s App Shell / BottomNav / safe area / responsive frame → design system |
 
 Two standing qualifiers:
 
@@ -97,7 +98,7 @@ Keep:
 - Three strictly-separated type roles (serif display / rounded-sans UI / handwriting script) —
   see [references/design-system.md](references/design-system.md)
 - Natural, unfiltered travel photography
-- Gentle, short motion — fades, not slides; a soft spring only on the FAB
+- Gentle, short motion — fades, not slides; 320ms for sheets, 140ms for the card menu
 
 Avoid (visual drift to catch in review):
 - Gradients, textures, full-bleed imagery, illustrated backdrops
@@ -121,11 +122,12 @@ Avoid (visual drift to catch in review):
   action confirmation rules, and global visual foundations (cards, stickers, photography, buttons/
   states, layout, iconography).
 - **[references/components.md](references/components.md)** — the App Shell (mobile viewport, safe
-  area, BottomNav, FAB, keyboard behavior), the design-system component inventory and its current
+  area, BottomNav, keyboard behavior), the design-system component inventory and its current
   props, the page-level composites that are *not* DS components, and the decoration system (Home
   presets, Import category mapping).
 - **[references/screens.md](references/screens.md)** — screen-specific layout numbers, responsive
-  variables, UI states, and the pitfalls each canonical file calls out, for Home and Import.
+  variables, UI states, and the pitfalls each canonical file calls out, for Home, the
+  create/edit collection form, and Import.
 - **[references/import-lifecycle.md](references/import-lifecycle.md)** — the Import data lifecycle
   vs. UI variants, entry modes, the source-read-only rule, completed read-only, batch partial
   failure, place matching, supplement flow, and the FINAL / OPEN / PENDING DESIGN / OUT OF SCOPE
@@ -177,7 +179,7 @@ Read the reference file(s) relevant to your task; you rarely need all of them at
   [references/import-lifecycle.md](references/import-lifecycle.md); as of this handoff it includes
   the change-target picker UI, the re-search flow (explicitly *required before frontend
   implementation*), the Edit Place page layout, post-add navigation, the Places candidate count,
-  TripPlace editing, `/trips/new`, and delete-in-progress/failure feedback.
+  TripPlace editing, and delete-in-progress/failure feedback.
 - Do not treat a navigation description found anywhere in the handoff as a decided destination.
 - Do not create a second design system or duplicate the token source — always reference
   `_ds/pintrip-design-system-*/tokens/*.css`.
@@ -204,11 +206,11 @@ Run this after implementing or changing PinTrip UI:
       `/design-assets/...` (never a `docs/...` path, never straight from `uploads/`); no decorated
       `*.png` plate shipped as a runtime asset — those are export fixtures; the production photo
       source is `OUT OF SCOPE / UNDECIDED`, so don't commit to one
-- [ ] **Bottom Navigation / FAB** — 72px nav with 26px top corners, FAB 60px lifted 14px with the
-      5px cream ring, FAB is a child of nav (not an independent fixed layer)
+- [ ] **Bottom Navigation** — 72px nav with 26px top corners, exactly two equal cells
+      (旅行收藏 / 匯入). No FAB: `BottomNav` is passed `showFab={false}`
 - [ ] **Safe area** — top/bottom safe-area insets respected; content bottom padding is 72px + inset
-      so the last card / commit CTA clears nav *and* FAB; no product UI drawn in the mockup-only
-      status bar area
+      on Home and 32px + inset on Import, so the last card / commit CTA clears the nav; no product
+      UI drawn in the mockup-only status bar area
 - [ ] **Responsive behavior** — only the documented fluid values change across 360/390/430; fixed
       elements stay fixed; type never shrinks; no layout reflow beyond what's specified
 - [ ] **Decoration** — outside the component, in a non-`overflow:hidden` wrapper, `aria-hidden` +

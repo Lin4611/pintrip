@@ -247,7 +247,8 @@ Boundaries: `onToggleCandidates(placeId)`, `onPickCandidate(placeId, candidate)`
 - The **picker's own form (bottom sheet vs. page) is PENDING DESIGN** — only the entry point, the
   44px tap target, and the `onChangeTarget` boundary are defined. Do not decide it yourself.
 - With **no collections at all**, the row becomes a dashed guidance card whose 建立旅行收藏 outline
-  button routes to `/trips/new` (that screen is out of scope). The pasted or shared URL must be
+  button routes to `/trips/new` — that screen is now designed, see
+  [screens.md](screens.md#create--edit-trip-collection--tripsnew). The pasted or shared URL must be
   preserved across leaving and returning (§5.3), and the screen returns to Filled once a collection
   exists.
 
@@ -311,7 +312,6 @@ Every item carries exactly one marker, consistent across the whole handoff.
 ### OUT OF SCOPE
 
 - `TripPlace` editing (route and screen) for already-added places.
-- `/trips/new`, the create-collection screen itself.
 - Technical choices that must not be written up as settled: the Instagram public-content fetching
   service, AI model/provider, database, background-job approach, batch coordination, concurrency
   control, idempotency strategy, authentication library, Places API provider and candidate cap,

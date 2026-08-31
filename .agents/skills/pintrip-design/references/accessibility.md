@@ -67,6 +67,41 @@ Screen-specific layout lives in [screens.md](screens.md); the state model in
 - When retry starts, the prefix and body both switch to retry wording — leaving the failure prefix
   in place would make the live region read out a contradiction in one breath.
 
+## Home screen — TripCard `•••` menu
+
+- The trigger carries `aria-haspopup="menu"` + `aria-expanded`, and a **Traditional Chinese**
+  `aria-label` naming the collection (e.g.「「東京」的更多選項」). Its tap target is padded to
+  44 × 44 even though the glyph is smaller.
+- **The DS hard-codes that label in English.** `TripCard` emits `aria-label="Trip options"` with no
+  collection name, so the Chinese label only exists because the page overrides it explicitly. Do
+  not assume the component gets it right, and do not patch `_ds_bundle.js` — override at page level
+  until the DS exposes a `menuLabel` prop (see the foldback list in
+  [design-system.md](design-system.md)).
+- Each row's `aria-label` also carries the collection name (「重新命名旅行收藏：東京」/
+  「刪除旅行收藏：東京」).
+- The menu is `role="menu"`; each row is `role="menuitem"`, 44px tall, single-line.
+- On open, focus moves to the first row. `Esc` closes it and returns focus to the `•••` button.
+  (Arrow-key movement between rows is the standard ARIA menu pattern rather than an export rule —
+  the export specifies focus-in and `Esc` only.)
+- **Only one menu is open at a time.** Tapping card B's `•••` while card A's is open collapses A
+  and opens B on that same interaction — the outside-dismiss must not swallow the tap and force a
+  second one. Focus lands on B's first row. Tapping the same `•••` again toggles it closed.
+- Scrolling the list closes the menu.
+- The menu is not modal: it has no dim and clicking outside simply closes it. Do not give it
+  `aria-modal` — that belongs to the delete confirmation below. (The export's forward-looking note
+  about a future DS `MenuPopover` mentions a focus trap; that describes the component it hopes to
+  build, not this page-level menu. Flag it rather than silently adopting one.)
+
+## Home screen — create / edit collection form
+
+- Required vs optional is conveyed by a text chip next to each label, never by colour alone and
+  never by an asterisk.
+- While the CTA is disabled, the hint under the name field is `role="status"` and the CTA points at
+  it with `aria-describedby`. The hint occupies its space whether or not it is visible, so revealing
+  it moves nothing but the CTA.
+- Disabled is the native attribute, so the CTA is skipped by the tab order rather than being
+  focusable-but-inert.
+
 ## Home screen — delete confirmation sheet
 
 - `role="dialog"` + `aria-modal="true"`, with `aria-labelledby` on the title and `aria-describedby`

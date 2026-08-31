@@ -66,7 +66,8 @@ there, don't round them to the nearest token.
 
 4px base scale: `--sp-1` 4px … `--sp-10` 40px. Screen gutter 20px (fluid 16/20/24 across
 360/390/430 — see [screens.md](screens.md)). Card gap 16px, card padding 16px, stack gap 12px.
-`--nav-height` 72px, `--fab-size` 60px, `--tap-min` 44px. Frame reference: 390×844. Real screens
+`--nav-height` 72px, `--tap-min` 44px (`--fab-size` 60px still exists but PinTrip has no FAB).
+Frame reference: 390×844. Real screens
 use the 4px-derived set 6 / 10 / 12 / 14 / 16 / 20 / 26 / 72.
 
 ### Radius, shadow, motion (`tokens/effects.css`)
@@ -75,15 +76,18 @@ use the 4px-derived set 6 / 10 / 12 / 14 / 16 / 20 / 26 / 72.
   input, source rows), `--r-lg` 20px (cards/panels), `--r-xl` 26px (sheets, nav top corners),
   `--r-pill` 999px. Elegant rounded everywhere except chips and CTAs, which are pill.
 - Shadows — always warm, low-contrast, never gray: `--shadow-card` `0 4px 14px rgba(122,96,58,.07)`,
-  `--shadow-raised`, `--shadow-sticker`, `--shadow-fab` (blue-tinted), `--shadow-cta` (coral-tinted),
+  `--shadow-raised`, `--shadow-sticker`, `--shadow-fab` (blue-tinted, currently unused),
+  `--shadow-cta` (coral-tinted),
   `--shadow-nav` (upward), `--shadow-inset-field`. The delete-confirm sheet uses its own upward
   `0 -8px 28px rgba(60,45,25,.20)` — same "shadow points up" technique as the nav.
 - Borders: `--border-1` (1px solid hairline), `--border-dash` (1.5px dashed — the "not a thing yet"
   affordance for Start-New-Trip / batch-add / notice cards), `--divider-dash` (1px dashed — in-card
-  section divider, never a solid line).
+  section divider, never a solid line). **Overlay exception:** the `•••` menu's row divider is 1px
+  **solid** `#F2EADC` inset 8px on both sides — it deliberately does not reuse the card's dashed
+  cream divider, because the overlay must read as a different surface.
 - Motion: `--ease-soft` `cubic-bezier(.32,.72,.28,1)` for state changes, `--ease-spring`
-  `cubic-bezier(.34,1.32,.52,1)` for the FAB and anything that should feel slightly springy —
-  never bouncy-cartoon. Durations: `--dur-fast` 120ms (press), `--dur-base` 200ms (state),
+  `cubic-bezier(.34,1.32,.52,1)` is still defined for anything that should feel slightly springy,
+  but nothing in PinTrip currently uses it (it was the FAB's vocabulary) — never bouncy-cartoon. Durations: `--dur-fast` 120ms (press), `--dur-base` 200ms (state),
   `--dur-slow` 320ms (sheets). Press state: `--press-scale` 0.97 + brightness(0.96). Sticker tilt
   default −4deg.
 
@@ -92,7 +96,7 @@ use the 4px-derived set 6 / 10 / 12 / 14 / 16 / 20 / 26 / 72.
 **All product UI copy is Traditional Chinese (繁體中文).** This replaced the earlier
 "bilingual by role, English structure + Korean feeling" model; do not reintroduce it. Structure and
 feeling are both carried in Chinese, including navigation, actions and object names
-(「我的旅行收藏」「建立旅行收藏」「匯入連結」「分析連結」「編輯」「查看全部」「28 個地點」).
+(「我的旅行收藏」「建立旅行收藏」「匯入連結」「分析連結」「編輯」「重新命名」「28 個地點」).
 
 The shipped screens are the source of truth for copy — take strings from them, not from the DS
 readme's examples.
@@ -204,21 +208,21 @@ both on Import: the composer → SourceRow collapse at the moment the user press
 user-triggered in-card expansions (reject confirm, candidate list, failure notice). Both are
 user-initiated and predictable; system-driven shift is not allowed.
 
-**Motion.** `--ease-soft` 200ms for state changes, `--ease-spring` for the FAB, 320ms for sheets.
+**Motion.** `--ease-soft` 200ms for state changes, 320ms for sheets, 140ms for the card menu
+(fade + 2px travel, reversed when it opens upward; instant under `prefers-reduced-motion`).
 Fades rather than slides for content. No bounce, no confetti, no parallax. Under
 `prefers-reduced-motion`, the sparkle pulse and all non-essential animation are switched off and
 state changes become instant — layout must not move as a result.
 
 **Transparency and blur.** Almost none. Tape 92% opacity; the Start-New-Trip map cut-out multiplies
 at 90%. No frosted glass, no protection gradients — the bottom bar is opaque paper with a soft
-upward shadow, and the FAB wears a 5px cream ring so it reads as sitting on top of the bar rather
-than floating in glass. The delete-confirm dim (`rgba(43,32,18,.24)`, flat, no blur, no gradient)
+upward shadow. The delete-confirm dim (`rgba(43,32,18,.24)`, flat, no blur, no gradient)
 is the single listed exception, justified by modality.
 
 **Layout.** 390×844 base frame, 20px gutters (fluid 16/20/24), 16px between cards. Only two fixed
 elements: the status-bar area and the bottom navigation (72px, top corners 26px radius) —
-everything else scrolls. Bottom bar is exactly 旅行收藏 — centered 新增 (FAB) — 匯入; the account
-lives in the Home header, never in the bar. Minimum tap target 44px.
+everything else scrolls. Bottom bar is exactly two equal cells, 旅行收藏 — 匯入; there is no centre
+FAB, and the account lives in the Home header, never in the bar. Minimum tap target 44px.
 
 ## Iconography
 
@@ -249,9 +253,8 @@ asset, stop and report it.
   default, no longer a way to hide a background.
 - Category stickers (trip-card footer only, 27px die-cut, hint at collection contents):
   `icon-torii`, `icon-food`, `icon-train`, `icon-pagoda`, `icon-maple`, `icon-matcha`.
-- Typographic glyphs carry a few small jobs instead of icons: `•••` (card menu), `›` (after
-  「查看全部」and on the match slot), `＋` (加入 / FAB), `→` (Start New Trip), `✓` / `✕` (added /
-  rejected disposition).
+- Typographic glyphs carry a few small jobs instead of icons: `•••` (card menu), `›` (on the match
+  slot), `＋` (加入), `→` (Start New Trip), `✓` / `✕` (added / rejected disposition).
 
 Emoji is never used as iconography — the one ✨ is Chinese helper text, not an icon.
 
@@ -283,9 +286,11 @@ Emoji is never used as iconography — the one ✨ is Chinese helper text, not a
 - The DS readme still describes photos as having stickers baked in; that has since been superseded
   by the clean-plate + layered-decoration approach (see `CLAUDE.md` and [components.md](components.md)).
   The readme keeps the old text as background only.
-- Two DS overrides currently live in the handoff's CSS and should be folded back into the
-  components: `BottomNav`'s `fabOffset` (−14px, vs. the DS default −26px) and `TripCard`'s
-  `photoWidth` + `line-clamp`.
+- Two DS overrides still live in the handoff and should be folded back into the components:
+  `TripCard`'s `photoWidth` + `line-clamp`, and the `•••` trigger's **`menuLabel`** — `TripCard`
+  hard-codes `aria-label="Trip options"` (English, no collection name), so PinTrip overrides it at
+  page level until the DS exposes a `menuLabel` prop. (`BottomNav`'s `fabOffset` override was
+  withdrawn when the FAB was removed.)
 
 These are documented by the design system itself as open items for review, not decisions this
 skill should resolve — flag rather than silently change if you hit one.

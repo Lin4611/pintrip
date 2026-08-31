@@ -8,37 +8,40 @@ behavior lives in [import-lifecycle.md](import-lifecycle.md).
 
 ## App Shell
 
-- One shared shell across Home and Import: status-bar safe area → scroll slot → BottomNav. Nav and
-  FAB do not re-render or jump when switching screens. Put it in the layout, not per page.
-- **Mobile viewport**: 390×844 base frame; 360 and 430 extend the same markup via two breakpoint
-  variables (gutter, and one component's fixed-width column) — there is no separate design per
-  breakpoint.
+- One shared shell across all three screens (Home, `/trips/new`, Import): status-bar safe area →
+  scroll slot → BottomNav. The nav does not re-render or jump when switching screens. Put it in the
+  layout, not per page.
+- **Mobile viewport**: 390×844 base frame; 360 and 430 extend the same markup via breakpoint
+  variables, not a separate design per breakpoint. Home and Import each have two (the gutter, and
+  one component's fixed-width column); `/trips/new` has only the gutter.
 - **Safe area**: top uses `env(safe-area-inset-top)` plus a fixed content offset (12px on Home, 8px
   on Import); the app never draws its own status bar (`status-bar.png` is preview-only, not product
-  UI). Bottom nav height = 72px + `env(safe-area-inset-bottom)`; content bottom padding matches so
-  the last card / CTA can scroll fully clear of the nav and FAB.
+  UI). Bottom nav height = 72px + `env(safe-area-inset-bottom)`; content bottom padding is 72px on
+  Home and 32px on Import, so the last card / CTA can scroll fully clear of the nav.
 - **Scroll**: exactly one scroll container per screen — `flex:1; min-height:0; overflow-y:auto;
   overscroll-behavior:contain`. The frame itself is `overflow:hidden`. Horizontal overflow is
   prevented by three things holding simultaneously: the scroll container `overflow-x:clip` (not
   `hidden`, which would create a second scroll container), each card `overflow:hidden`, and text
   columns `min-width:0`.
-- **z-index**: content 0 → decorations 2 (tape/wash) → large stickers 3 → nav 5 → FAB 6 (FAB is a
-  **child of nav**, not an independent fixed layer — required so both inherit the safe-area inset
-  together) → keyboard 7 → delete-confirm dim 8 → delete-confirm sheet 9. Never stack a scrim or
+- **z-index**: content 0 → decorations 2 (tape/wash) → large stickers 3 → card menu 4 → nav 5 →
+  keyboard 7 → delete-confirm dim 8 → delete-confirm sheet 9. The card menu sits above cards and
+  decorations but below the nav, and must not be clipped by the card. Never stack a scrim or
   gradient above nav (the delete dim is the one listed exception, and it deliberately blocks the
   list behind it rather than hiding nav).
 - **Overscroll**: `contain`; no pull-to-refresh decoration, rubber-banding is left to the system.
 
-### Bottom Navigation / FAB
+### Bottom Navigation
 
 - BottomNav: 72px tall, top corners radius 26px, opaque paper (`--paper-nav`) with a soft upward
-  shadow — never frosted glass. Exactly three destinations: 旅行收藏 — 新增 (center) — 匯入.
+  shadow — never frosted glass. Exactly two equal destinations: 旅行收藏 — 匯入.
   Account/avatar lives only in the Home header, never in the nav.
 - Inactive tabs: desaturated + 55% opacity, never swapped for an outline icon variant.
-- FAB: 60px circle, lifted 14px above the nav (`top:-14px`, exposed as `fabOffset` — the DS default
-  lift is −26px, PinTrip overrides it to −14px and that override should be folded back into the
-  component), wears a 5px cream ring so it reads as sitting on top of the bar. Press uses the
-  spring easing, not the soft easing.
+- **No FAB.** The centre `＋` is gone: every PinTrip screen passes `showFab={false}`, and the
+  `fabOffset` override was withdrawn with it. The DS still ships `FabButton` and `--fab-size` /
+  `--shadow-fab` / `--ease-spring` — PinTrip simply does not use them, so do not delete them from
+  the design system. Creating a collection now runs through Home's Start New Trip card only.
+- The nav has exactly the two cells above. Whether `/imports` (the import history list, MVP §5.10)
+  ever gets a nav slot is **not decided anywhere in the handoff** — don't infer one.
 - Tapping the currently-active nav item scrolls back to top rather than reloading/re-analyzing.
 - On Import, the nav is **hidden** (not just covered) whenever a text field is focused — it fades
   back in over 200ms on dismiss, no slide.
@@ -101,7 +104,7 @@ treat it as underspecified and ask.
 
 | Group | Components |
 |---|---|
-| buttons | `Button`, `IconButton`, `FabButton` |
+| buttons | `Button`, `IconButton`, `FabButton` (shipped by the DS but **not used by PinTrip** — see Bottom Navigation) |
 | forms | `LinkInput` |
 | cards | `TripCard`, `PlaceResultCard`, `StartTripCard`, `BatchAddPanel`, `NoteCard` |
 | display | `Wordmark`, `Avatar`, `ScreenTitle`, `SectionHeader`, `CategoryBadge`, `Tag`, `CategoryIcon`, `Sticker`, `LocationLine`, `AnalyzeStatus` |
@@ -123,7 +126,13 @@ These appear in the handoff component trees but are **not** in the design system
 app; don't go looking for them in the bundle, and don't push them into the DS without a decision.
 
 - **Home**: `BrandLockup`, `CollectionSummary`, `TripList`, `TripCardSlot` (decoration wrapper),
-  `TripCardSkeleton`, `ErrorCard`, and the delete-confirm sheet.
+  `TripCardSkeleton`, `ErrorCard`, the `•••` card menu (anchored dropdown), and the delete-confirm
+  sheet. The card menu is page-level markup — `_ds_manifest.json` has no menu/dropdown/popover
+  component. Its spec is `HomeScreen.dc.html`'s own markup. **Known gap:** that same export
+  recommends folding the behavior into a DS `MenuPopover` rather than leaving it Home-specific.
+  The user's decision is to keep it page-level and **not** ask Claude Design to promote it. When it
+  should be promoted is not settled — a second consumer (e.g. the target-collection picker landing
+  on a popover) would be the natural trigger, but treat that as a suggestion, not a rule.
 - **Import**: `ImportHeader`, `ScreenIntro`, `TargetCollectionRow`, `LinkInputSection` (composer
   only), `FieldError`, `SourceRow`, `ResumeSummaryRow`, `AnalyzeStatusArea`, `NoticeCard`,
   `ExitStack`, `EndImportConfirm`, `SupplementPanel` / `SupplementField` / `ShotSlots`, `ResultList`,
@@ -160,6 +169,13 @@ page-level overrides:
 - `PlaceResultCard` — added `readOnly` + `dispositionLabel` (completed read-only disposition row),
   `failed` + `failureText` + `failureId` + `failureLabel` (batch failure notice), `adding` (retry
   loading), `editAriaLabel` / `rejectAriaLabel` / `addAriaLabel`, and `onRetry`.
+- `BottomNav` — added `showFab` (defaults to `true`; all three PinTrip screens pass `false`). The
+  previous `fabOffset` (−14px) override was withdrawn along with the FAB.
+- `CategoryBadge` / `PlaceResultCard` — `KINDS` and `TAG_TONE` realigned to the five MVP
+  categories (`shop` → `shopping`, `stay` removed, `other` added), with `_adherence.oxlintrc.json`
+  updated to reject anything outside them.
+
+`docs/ARCHITECTURE.md` §2.1 carries the same list — keep the two in step when the bundle changes.
 
 ### Notable component contracts
 
@@ -167,8 +183,17 @@ page-level overrides:
   `solid`, `outline`, `ghost`. `sm` uses 13px type, 10px horizontal padding, 5px icon gap and
   `white-space:nowrap`, so its real width is content-driven, not flex-ratio-driven. `sm` is used by
   `PlaceResultCard` **and** by `EndImportConfirm` — see the consumer table above before changing it.
-- **`CategoryBadge`** — kinds `cafe`, `food`, `attraction`, `stay`, `shop`. `flex-shrink:0`; it
-  always wins the space fight against a long place name.
+- **`CategoryBadge`** — kinds are `cafe`, `food`, `attraction`, `shopping`, `other`, matching
+  `docs/MVP.md` §5.9 exactly. `TAG_TONE` was aligned in the same pass, and
+  `_adherence.oxlintrc.json` now fails lint on a `kind` / `category` outside those five, so a wrong
+  value is caught rather than silently falling through `KINDS[kind] || KINDS.cafe` to a cafe badge.
+  `category` is an enum, never free text — never widen it to match something the DS happens to
+  ship. `flex-shrink:0`; with the labels fixed at two Chinese characters the badge no longer
+  squeezes the place name, but if longer labels ever return, the **badge** truncates, not the name.
+  **Known gap:** at 12px bold white-on-fill none of the five reaches WCAG AA 4.5:1 — measured
+  `other` 3.91, `shopping` 2.89, `cafe` 2.80, `attraction` 2.36, `food` 1.51. This predates the
+  category work and is a property of the pastel palette, not of any one kind. Flag it; don't
+  recolour the palette on your own.
 - **`Tag`** — tones `blue`, `butter`, `lavender`.
 - **`Sticker`** — tape patterns `solid`, `gingham`, `dots`, all CSS-generated.
 - **`TripCard`** — two-column: text left, square photo right (photo column is the breakpoint value,
@@ -272,7 +297,7 @@ r2, crossing the card's top edge, z2.
   is a moment worth celebrating. The Analyze CTA's sparkle is button content, not a decoration
   layer.
 
-### General decoration rules (both screens)
+### General decoration rules (all screens)
 
 - Rotation: Home's rules give −14°…+6° (preset C's tape sits at +7°), Import's give −9°…+6°. Two
   decorations in the same preset or on the same card never share the exact same angle.
