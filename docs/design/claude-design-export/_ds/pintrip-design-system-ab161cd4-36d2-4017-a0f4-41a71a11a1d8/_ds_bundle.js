@@ -562,12 +562,12 @@ const KINDS = {
     bg: 'var(--lavender-400)',
     fg: '#fff'
   },
-  stay: {
-    bg: 'var(--blue-400)',
+  shopping: {
+    bg: 'var(--lavender-500)',
     fg: '#fff'
   },
-  shop: {
-    bg: 'var(--lavender-500)',
+  other: {
+    bg: 'var(--ink-400)',
     fg: '#fff'
   }
 };
@@ -1045,8 +1045,8 @@ const TAG_TONE = {
   cafe: 'blue',
   food: 'butter',
   attraction: 'lavender',
-  stay: 'blue',
-  shop: 'lavender'
+  shopping: 'lavender',
+  other: 'blue'
 };
 function PlaceResultCard({
   photoSrc,
@@ -1618,6 +1618,7 @@ function BottomNav({
   activeId,
   onSelect,
   onAdd,
+  showFab = true,
   style
 }) {
   return /*#__PURE__*/React.createElement("nav", {
@@ -1669,7 +1670,7 @@ function BottomNav({
         color: active ? 'var(--blue-600)' : 'var(--ink-500)'
       }
     }, it.label));
-  }), /*#__PURE__*/React.createElement("span", {
+  }), showFab ? /*#__PURE__*/React.createElement("span", {
     style: {
       position: 'absolute',
       left: '50%',
@@ -1678,7 +1679,7 @@ function BottomNav({
     }
   }, /*#__PURE__*/React.createElement(__ds_scope.FabButton, {
     onClick: onAdd
-  })));
+  })) : null);
 }
 Object.assign(__ds_scope, { BottomNav });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/navigation/BottomNav.jsx", error: String((e && e.message) || e) }); }

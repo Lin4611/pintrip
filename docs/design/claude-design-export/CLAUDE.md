@@ -10,16 +10,27 @@
 
 **Home 畫面與互動**：1. `HomeScreen.dc.html` → 2. Design System
 
-**共用視覺與 App Shell**：1. `HomeScreen.dc.html` 的 App Shell／BottomNav／FAB／safe area／響應式框架 → 2. Design System
+**共用視覺與 App Shell**：1. `HomeScreen.dc.html` 的 App Shell／BottomNav／safe area／響應式框架 → 2. Design System
 
 `CLAUDE.md`（本檔）記錄跨畫面的已定案決定。`MvpMockups.dc.html` **僅早期 visual reference，不是規格依據**，不得用來推導或覆蓋正式規則。設計檔不得凌駕 `docs/MVP.md` 與 `docs/ARCHITECTURE.md`；既有設計檔與這兩份文件衝突時，修改的是設計檔。
 
+## App Shell：BottomNav 兩格、無 FAB（2026-08-30 確認）
+
+- BottomNav 固定兩格等寬：**旅行收藏**與**匯入**，中央不再有 ＋ 按鈕，兩格之間不留缺口。
+- HomeScreen、ImportScreen 與 NewTripScreen 共用同一個 shell，三張稿一致；nav 上緣不再有任何凸出物。
+- 頁面以 `showFab={false}` 傳入 BottomNav；`fabOffset`（-14px）的 CSS 覆寫已一併移除。
+- **不從 Design System 移除** `FabButton`、`--fab-size`、`--shadow-fab`、`--ease-spring` — PinTrip 只是不再使用。
+- Home 新增旅行收藏的入口只剩列表最後的 Start New Trip 卡。
+- ImportScreen 內容底部留白由 **72px → 32px**：舊值是為了閃過上凸 14px 的 FAB（72 − 14 ＝ 距 FAB 頂端 58px），FAB 移除後只需 CTA 與 nav 之間的呼吸，取 2× 卡片間距。已於 360／390／430 × Success／Batch partial failure／Extreme 共 9 組捲到底實測：CTA 下緣距 nav 上緣 32px、完整可見、水平溢出 0px。
+
 ## Design System 本地修改（需回寫 DS 元件原始碼）
 
-`_ds/…/_ds_bundle.js` 目前帶有兩處本地修改，屬元件責任而非頁面覆寫：
+`_ds/…/_ds_bundle.js` 目前帶有四處本地修改，屬元件責任而非頁面覆寫：
 
 - `Button` — 新增 `ariaLabel` / `ariaDescribedby` 透傳。
+- `BottomNav` — 新增 `showFab`（預設 `true`，PinTrip 三張稿傳 `false`）。
 - `PlaceResultCard` — 新增 `readOnly` + `dispositionLabel`（completed 的唯讀處置列）、`failed` + `failureText` + `failureId` + `failureLabel`（批次失敗提示區）、`adding`（重試 loading）、`editAriaLabel` / `rejectAriaLabel` / `addAriaLabel`、`onRetry`。
+- `CategoryBadge` / `PlaceResultCard` — `KINDS` 與 `TAG_TONE` 對齊 MVP 固定五分類：`shop` → `shopping`、移除 `stay`、新增 `other`（底色 `--ink-400` 暖灰，不沿用任何既有 kind）。原本 `shopping` 與 `other` 會靜默 fallback 成 `cafe` 的珊瑚色。
 
 ## Home Screen 素材（2026-08-26 確認，2026-08-27 校正敘述）
 
@@ -93,6 +104,18 @@
 - **批次加入採部分成功｜FINAL（對外行為）** — 成功項目立即保留為已加入且**不回滾**；失敗項目維持尚未處置、不得顯示為已加入、可單獨重試；Import 維持 `review_required`。批次數量必須由「已匹配實際 Place 且尚未處置」推導，不得使用候選總數。內部交易、批次協調、併發控制與冪等策略不在設計端定案。
 - **UI variant ≠ 資料狀態** — 正式 Import lifecycle 只有 `received`／`processing`／`needs_input`／`review_required`／`completed`／`failed`。Batch partial failure、All processed、Reel URL 等名稱都只是畫面變體，不得存成新的資料狀態。
 - **Places 候選數量｜OPEN** — 設計檔裡的 3 筆候選只是測試資料，不是產品或 API 上限，待 Places API 與搜尋策略決定後重新檢視。與「每筆匯入最多**選取** 3 張補充截圖」（已定案）無關。
+
+## 建立／編輯旅行收藏表單（2026-08-30 確認）
+
+檔案：`NewTripScreen.dc.html`（路由 `/trips/new`）。
+
+- 欄位依 `docs/MVP.md` §5.2 只有三個：**收藏名稱（必填）**、目的地名稱（選填）、收藏說明（選填）。**不得加入日期、行程、封面照片選擇或裝飾挑選**。
+- 同一份表單版式同時服務「建立」與「重新命名／編輯收藏」，差異只有三處：畫面標題、CTA 文案、初始值。實作為一個元件 + `mode: 'create' | 'edit'` + `initialValues`，不複製成兩支表單。
+- 送出條件：名稱 trim 後非空。CTA 用**原生 `disabled`**（45%、不變色、不移位），名稱欄下方一句 `role="status"` 提示，CTA 以 `aria-describedby` 指向它。
+- 字數上限尚未決定：不設 `maxlength`、不顯示計數器。輸入中過長名稱在 input 內**水平捲動**（不 ellipsis）；截字是顯示面（TripCard line-clamp 2、目標收藏列 ellipsis）的責任。
+- 刪除收藏**不在**這張表單，入口仍是 Home 的 ••• → 畫面層級 sheet。
+- **OPEN**：送出後導向何處尚未定案；「編輯模式未變更時是否 disabled」亦未定案，本稿不假設。
+- 建立成功的那一刻抽 decoration preset 並持久化；編輯既有收藏不重抽。
 
 ## Navigation / 流程狀態
 

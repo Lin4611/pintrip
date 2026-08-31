@@ -12,8 +12,6 @@
 <script src="./ds-base.js"></script>
 <style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
 /* ---- Handoff overrides. Each one belongs inside the DS component; here for demonstration. ---- */
-/* BottomNav hard-codes the FAB at top:-26px; PinTrip lowers it to -14px (→ fabOffset prop). Same as Home. */
-[data-fab-lift] nav > span:last-of-type{top:-14px !important}
 /* Screen gutter — the only spacing that changes with viewport */
 [data-w="360"] [data-pad]{padding-left:16px !important;padding-right:16px !important}
 [data-w="430"] [data-pad]{padding-left:24px !important;padding-right:24px !important}
@@ -46,10 +44,10 @@
   <div style="display:flex;flex-direction:column;gap:10px">
     <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#A9A6A0">PINTRIP MVP · DESIGN HANDOFF</div>
     <h1 style="margin:0;font-family:'Playfair Display',serif;font-size:38px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">Import Link + Analyze Result</h1>
-    <p style="margin:0;max-width:760px;font-family:'Noto Sans KR',sans-serif;font-size:13.5px;line-height:1.7;color:#81817D">單一畫面、單一套元件：下方所有 viewport 與 UI state 都由同一份 markup 依 preview controls 切換，不是各自獨立的靜態畫面。390px 為視覺基準；App Shell（BottomNav、FAB、safe area、捲動規則）沿用最新 Home Screen handoff。畫面最上方的時間、訊號、Wi-Fi、電量與 Dynamic Island 僅屬 mockup，不是產品 UI。</p>
+    <p style="margin:0;max-width:760px;font-family:'Noto Sans KR',sans-serif;font-size:13.5px;line-height:1.7;color:#81817D">單一畫面、單一套元件：下方所有 viewport 與 UI state 都由同一份 markup 依 preview controls 切換，不是各自獨立的靜態畫面。390px 為視覺基準；App Shell（BottomNav、safe area、捲動規則）沿用最新 Home Screen handoff。畫面最上方的時間、訊號、Wi-Fi、電量與 Dynamic Island 僅屬 mockup，不是產品 UI。</p>
     <div style="max-width:760px;background:#FFFDFA;border-radius:16px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:14px 18px;display:flex;flex-direction:column;gap:6px">
       <div style="font-size:11.5px;font-weight:700;letter-spacing:0.1em;color:#A9A6A0">SOURCE OF TRUTH — 敘述衝突時的優先順序</div>
-      <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C"><strong style="color:#3B3B3D">依問題類型判斷來源，不用單一全域順序。</strong>　<strong style="color:#3B3B3D">產品行為與驗收條件</strong>：docs/MVP.md → docs/ARCHITECTURE.md。　<strong style="color:#3B3B3D">Import 畫面與互動</strong>：本輪明確標示為已確認的決定 → 本檔 ImportScreen.dc.html → Design System 中確實適用的共用元件與 token。　<strong style="color:#3B3B3D">共用視覺與 App Shell</strong>：HomeScreen.dc.html 的 App Shell／BottomNav／FAB／safe area／響應式框架 → Design System。</div>
+      <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C"><strong style="color:#3B3B3D">依問題類型判斷來源，不用單一全域順序。</strong>　<strong style="color:#3B3B3D">產品行為與驗收條件</strong>：docs/MVP.md → docs/ARCHITECTURE.md。　<strong style="color:#3B3B3D">Import 畫面與互動</strong>：本輪明確標示為已確認的決定 → 本檔 ImportScreen.dc.html → Design System 中確實適用的共用元件與 token。　<strong style="color:#3B3B3D">共用視覺與 App Shell</strong>：HomeScreen.dc.html 的 App Shell／BottomNav／safe area／響應式框架 → Design System。</div>
       <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C;border-top:1px dashed #EDE4D2;padding-top:6px">HomeScreen 只作為共用 App Shell 與視覺基準，<strong style="color:#3B3B3D">不得用 Home 專屬畫面規則覆蓋 Import</strong>。<strong style="color:#3B3B3D">MvpMockups.dc.html</strong> 僅早期 visual reference，不得用來推導或覆蓋正式規則。既有 ImportScreen 若與 MVP 或 ARCHITECTURE 衝突，<strong style="color:#3B3B3D">修改的是 ImportScreen</strong>。</div>
       <div style="font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.7;color:#5A5A5C;border-top:1px dashed #EDE4D2;padding-top:6px"><strong style="color:#B5745A">適用範圍</strong>：上述優先順序<strong style="color:#3B3B3D">僅適用於 claude-design-export 內部的視覺與 handoff 敘述</strong>。產品範圍與產品規則以 <strong style="color:#3B3B3D">docs/MVP.md</strong> 為準，技術決策與資料邊界以 <strong style="color:#3B3B3D">docs/ARCHITECTURE.md</strong> 為準；設計檔不得凌駕這兩份文件。</div>
     </div>
@@ -79,7 +77,7 @@
       <div data-w="{{ w }}" data-screen-label="{{ screenLabel }}" style="width:{{ frameWidth }};height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18);position:relative">
         <img src="assets/icons/status-bar.png" alt="" aria-hidden="true" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
 
-        <div ref="{{ scrollRef }}" data-pad="true" style="flex:1;min-height:0;overflow-y:auto;overflow-x:clip;overscroll-behavior:contain;scrollbar-width:none;padding:8px 20px 72px">
+        <div ref="{{ scrollRef }}" data-pad="true" style="flex:1;min-height:0;overflow-y:auto;overflow-x:clip;overscroll-behavior:contain;scrollbar-width:none;padding:8px 20px 32px">
 
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px">
             <x-import component-from-global-scope="PinTripDesignSystem_ab161c.IconButton" icon-src="./assets/icons/arrow-back.png" size="{{ 44 }}" variant="paper" label="返回" hint-size="44px,44px"></x-import>
@@ -299,8 +297,8 @@
         </sc-if>
 
         <sc-if value="{{ navVisible }}" hint-placeholder-val="{{ true }}">
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="imports" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="imports" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </sc-if>
       </div>
@@ -398,7 +396,7 @@
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:36px"><span style="font-weight:700;color:#4C76C2">DispositionRow（completed）</span><span style="color:#777">取代動作列的靜態處置標示，無按鈕；min-height 44 使卡高不變</span></div></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">BatchAddPanel</span><span style="color:#777"><strong>只存在於 review_required</strong>，數量由「已匹配且尚未處置」推導；全數處置完即 completed，改由 CompletedSummaryCard 承接</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">Button action</span><span style="color:#777">全頁唯一 commit；只在有「已匹配且尚未處置」項目時存在，completed 不出現，重試中原生 disabled</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">AppShell（共用）</span><span style="color:#777">BottomNav + FabButton，與 Home 同一元件</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">AppShell（共用）</span><span style="color:#777">BottomNav（兩格，無 FAB），與 Home 同一元件</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">SoftKeyboard</span><span style="color:#777">mockup-only，系統鍵盤佔位</span></div>
           </div>
           <div style="margin-top:2px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">mockup-only：狀態列（時間／訊號／Wi-Fi／電量／Dynamic Island）與軟鍵盤都不進產品程式。</div>
@@ -455,8 +453,8 @@
           <span style="color:#777">卡片 → Batch 面板</span><span style="font-weight:700">20px</span>
           <span style="color:#777">Batch 面板</span><span style="font-weight:700">padding 16/14 · 1.5px dashed · r20</span>
           <span style="color:#777">Batch → commit CTA</span><span style="font-weight:700">12px</span>
-          <span style="color:#777">內容底部留白</span><span style="font-weight:700">72px（+ safe-area inset）</span>
-          <span style="color:#777">BottomNav / FAB</span><span style="font-weight:700">72px / 60px, 上凸 14px</span>
+          <span style="color:#777">內容底部留白</span><span style="font-weight:700">32px（+ safe-area inset）</span>
+          <span style="color:#777">BottomNav</span><span style="font-weight:700">72px · 兩格 · 無 FAB</span>
         </div>
       </div>
 
@@ -464,7 +462,7 @@
         <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">RESPONSIVE RULES</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
           <span style="font-weight:700;color:#4C76C2">Breakpoint 變數</span><span style="color:#777">只有兩個：gutter（16/20/24）與照片欄（108/120/132）。其餘完全共用</span>
-          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">BottomNav 72、FAB 60 + 上凸 14、Back 44、Wordmark 40、信封 52、IG icon 24、clear 24、輸入框 52、CTA 50、Batch commit 50、目標收藏列高 64 與 pin 13、更換點擊區 44、所有裝飾</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">BottomNav 72（兩格，無 FAB）、Back 44、Wordmark 40、信封 52、IG icon 24、clear 24、輸入框 52、CTA 50、Batch commit 50、目標收藏列高 64 與 pin 13、更換點擊區 44、所有裝飾</span>
           <span style="font-weight:700;color:#4C76C2">Fluid</span><span style="color:#777">內容寬、LinkInput 寬、SourceRow 寬、兩顆 CTA 寬、卡片寬、文字欄寬、Batch 面板寬、失敗提示區寬、目標收藏列寬（名稱欄吸收寬度，單行 ellipsis；可用 230／252／284）</span>
           <span style="font-weight:700;color:#4C76C2">Photo ratio</span><span style="color:#777">固定 0.88（108/122 · 120/136 · 132/150），cover + center</span>
           <span style="font-weight:700;color:#4C76C2">Text : image</span><span style="color:#777">三個寬度都約 62:38（實測 184:108 · 194:120 · 214:132）；文字欄恆 ≥ 184px</span>
@@ -521,7 +519,8 @@
           <span style="font-weight:700;color:#4C76C2">兩欄</span><span style="color:#777">照片欄 flex-shrink:0；文字欄 flex:1 + min-width:0；gap 12</span>
           <span style="font-weight:700;color:#4C76C2">Photo</span><span style="color:#777">108/120/132 寬、ratio 0.88、最小 108×122；5px 白框 + r6 + sticker shadow</span>
           <span style="font-weight:700;color:#4C76C2">object-fit / position</span><span style="color:#777">cover + center；照片高度固定不隨卡片拉伸，因此不需 aspect-ratio</span>
-          <span style="font-weight:700;color:#4C76C2">Category badge</span><span style="color:#777">flex-shrink:0，永遠在名稱右側同列；長類別標籤時名稱先 ellipsis，badge 不換行</span>
+          <span style="font-weight:700;color:#4C76C2">Category badge</span><span style="color:#777">flex-shrink:0，永遠在名稱右側同列、不換行。<strong style="color:#3B3B3D">category 是 MVP 固定五分類的列舉值，不是自由文字</strong>：food／cafe／attraction／shopping／other，UI 一律顯示二字（美食／咖啡／景點／購物／其他），label 由 <code>CAT_LABEL</code> 推導、不逐筆手寫。<strong>因為固定二字，badge 實測 50px，地點名稱不需再為 badge 讓位</strong></span>
+          <span style="font-weight:700;color:#4C76C2">截斷順序｜契約</span><span style="color:#777">目前分類固定二字，名稱不因 badge 而截斷。<strong style="color:#B5745A">若未來要支援較長分類，規則是 badge 先截斷（給 badge max-width + ellipsis），不是名稱先 ellipsis</strong> — 地點名稱是主資訊，分類是次要標籤</span>
           <span style="font-weight:700;color:#4C76C2">Place name</span><span style="color:#777">18.5px Quicksand 700，單行 nowrap + ellipsis（不 clamp 兩行）</span>
           <span style="font-weight:700;color:#4C76C2">Description</span><span style="color:#777">13px KR / 1.6，line-clamp 2，右側留 16px 給邊緣小記號</span>
           <span style="font-weight:700;color:#4C76C2">Mark slot</span><span style="color:#777">卡片 relative 容器內 right:10 top:46（badge 下方 16px），20×20；三個 viewport、所有 state、任何文字長度都同一組數值，不遮 title／description／address／tags／actions</span>
@@ -580,13 +579,13 @@
         <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
           <span style="font-weight:700;color:#4C76C2">Top safe area</span><span style="color:#777">env(safe-area-inset-top)，內容再加 8px；不自繪狀態列</span>
           <span style="font-weight:700;color:#4C76C2">Bottom safe area</span><span style="color:#777">nav 高 = 72px + env(safe-area-inset-bottom)，內容 padding 同步加 inset</span>
-          <span style="font-weight:700;color:#4C76C2">BottomNav / FAB</span><span style="color:#777">與 Home 完全同一元件與數值：72px、上圓角 26、FAB 60、上凸 14、5px 米色環</span>
+          <span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">與 Home 完全同一元件與數值：72px、上圓角 26、兩格等寬、無 FAB、nav 上緣不再有任何凸出物</span>
           <span style="font-weight:700;color:#4C76C2">Scroll container</span><span style="color:#777">唯一捲動層：flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain</span>
-          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">狀態列區、BottomNav、FAB、（鍵盤開啟時）鍵盤；frame overflow:hidden</span>
-          <span style="font-weight:700;color:#4C76C2">Content bottom pad</span><span style="color:#777">72px + inset：最後一張卡、Batch 面板與 commit CTA 都能完整捲到 nav 與 FAB 之上</span>
-          <span style="font-weight:700;color:#4C76C2">遮擋驗證｜實測</span><span style="color:#777">捲到底後最後一個內容元素的下緣距 <strong>nav 上緣 72px</strong>、距 <strong>FAB 頂端 58px</strong>（FAB 60px，位於 nav 上方）。commit CTA 只存在於 review_required，因此以<strong>實際有 CTA 的 Success／Batch partial failure／Extreme</strong> × 360／390／430 共 9 組捲到底實測（scrollTop 已達底、餘量 0）：九組的 CTA 下緣間距皆為 nav 72px／FAB 58px，CTA 完整可見、未被 BottomNav 或 FAB 遮住。completed（All added／All processed／All rejected／Completed 回訪）沒有 commit CTA，量的是最後一張唯讀卡片。三個寬度、所有狀態的水平溢出量皆為 <strong>0px</strong>（捲動層與 frame 都是 scrollWidth − clientWidth = 0）</span>
-          <span style="font-weight:700;color:#4C76C2">需要捲動的狀態</span><span style="color:#777">可視高 736（鍵盤開啟時 601）。不需捲動：No collection／Idle／Filled／Reel URL／Invalid／received／analyzing／Empty／Error／End confirm／Resume 排隊中／五種 Keyboard（needs_input 資料不足在 360 為 756px，僅此一格需要微捲）。需要捲動：所有含結果列表的狀態與補充資料（實測 1250–1981）</span>
-          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">內容 0 · 膠帶 2 · nav 5 · FAB 6（nav 子層）· 鍵盤 7</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">狀態列區、BottomNav、（鍵盤開啟時）鍵盤；frame overflow:hidden</span>
+          <span style="font-weight:700;color:#4C76C2">Content bottom pad</span><span style="color:#777"><strong>32px + inset</strong>：原本的 72px 是為了讓 CTA 閃過上凸 14px 的 FAB（72 − 14 ＝ 距 FAB 頂端 58px）。FAB 移除後 nav 上緣沒有任何凸出物，留白只需負責 CTA 與 nav 之間的呼吸；取 2× 卡片間距 ＝ 32px，最後一張卡、Batch 面板與 commit CTA 都完整捲到 nav 之上</span>
+          <span style="font-weight:700;color:#4C76C2">遮擋驗證｜實測</span><span style="color:#777">捲到底後最後一個內容元素的下緣距 <strong>nav 上緣 32px</strong>（nav 上緣已無凸出物，不再有 FAB 淨空需求）。commit CTA 只存在於 review_required，因此以<strong>實際有 CTA 的 Success／Batch partial failure／Extreme</strong> × 360／390／430 共 9 組捲到底實測（scrollTop 已達底、餘量 0）：九組的 CTA 下緣距 nav 上緣皆為 32px，CTA 完整可見、未被 BottomNav 遮住。completed（All added／All processed／All rejected／Completed 回訪）沒有 commit CTA，量的是最後一張唯讀卡片。三個寬度、所有狀態的水平溢出量皆為 <strong>0px</strong>（捲動層與 frame 都是 scrollWidth − clientWidth = 0）</span>
+          <span style="font-weight:700;color:#4C76C2">需要捲動的狀態</span><span style="color:#777">可視高 736（鍵盤開啟時 601）。底部留白由 72 → 32px 後每個狀態的內容高各降 40px。不需捲動：No collection／Idle／Filled／Reel URL／Invalid／received／analyzing／Empty／needs_input 資料不足／Error／End confirm／Resume 排隊中／五種 Keyboard（needs_input 資料不足在 360 由 756 降為 736px，現在剛好不需捲動）。需要捲動：所有含結果列表的狀態與補充資料（重新實測約 1236–1967）</span>
+          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">內容 0 · 膠帶 2 · nav 5 · 鍵盤 7</span>
           <span style="font-weight:700;color:#4C76C2">Overscroll</span><span style="color:#777">contain；不做下拉裝飾，回彈交給系統</span>
           <span style="font-weight:700;color:#4C76C2">Horizontal</span><span style="color:#777">捲動層 overflow-x:clip、卡片 overflow:hidden、文字欄 min-width:0，三者同時具備</span>
         </div>
@@ -646,7 +645,6 @@
           <span style="font-weight:700;color:#4C76C2">completed 的唯讀邊界</span><span style="color:#777">completed 是處理終態：不可重新開啟、不可回到 processing、不可重新分析本筆、不可更換目標收藏、不可補充資料、不可重新搜尋、不可再次結束處理、不顯示 Batch CTA。ImportItem 只是唯讀處置紀錄，卡內不留任何無效控制。再次分析相同或不同 URL 都必須<strong>建立新的 Import</strong>（§5.5 · ARCH §6.1／§6.2）。已加入地點的正式內容修改對象是 <strong>TripPlace</strong>，其路由與畫面 <strong style="color:#B5745A">OUT OF SCOPE（尚未定案）</strong>，不得在本畫面自行發明 modal／sheet／新頁</span>
           <span style="font-weight:700;color:#4C76C2">Nav 旅行收藏</span><span style="color:#777">切到 Home；未選取圖示去飽和並降至 55%，不換 icon</span>
           <span style="font-weight:700;color:#4C76C2">Nav 匯入</span><span style="color:#777">目前頁；再次點擊回捲到頂端，不重新分析</span>
-          <span style="font-weight:700;color:#4C76C2">FAB</span><span style="color:#777">與 Home 完全一致的全域新增入口；spring cubic-bezier(.34,1.32,.52,1)</span>
           <span style="font-weight:700;color:#4C76C2">Disabled</span><span style="color:#777">原生 disabled（鍵盤與點擊皆不可觸發），opacity .45，顏色與尺寸不變</span>
           <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset，圓角跟隨元件</span>
         </div>
@@ -676,7 +674,7 @@
           <div><strong>Screenshot 上限｜FINAL</strong> — 每筆匯入最多<strong>選取</strong> 3 張；送出前移除不需確認（不構成破壞性動作，§5.4）。儲存供應商與保存期限見「技術事項」。</div>
           <div><strong>Responsive behavior｜FINAL</strong> — 單一捲動容器、單一份 markup、三個寬度只差 gutter 與照片欄；字級不因 360 縮小；實測結果見 UI STATE TABLE 與 MOBILE LAYOUT。</div>
           <div><strong>Accessibility｜FINAL</strong> — 見 ACCESSIBILITY 卡；completed 不保留任何無效控制。</div>
-          <div><strong>Design System 修改｜FINAL（本次已改）</strong> — Button 新增 ariaLabel／ariaDescribedby 透傳；PlaceResultCard 新增 readOnly + dispositionLabel（唯讀處置列）、failed + failureText + failureId + failureLabel（失敗提示區）、adding（重試 loading）、editAriaLabel／rejectAriaLabel／addAriaLabel、onRetry。<strong>這些屬於元件責任，不應留在本頁的覆寫層</strong>，需回寫 DS 元件原始碼。</div>
+          <div><strong>Design System 修改｜FINAL（本次已改）</strong> — Button 新增 ariaLabel／ariaDescribedby 透傳；PlaceResultCard 新增 readOnly + dispositionLabel（唯讀處置列）、failed + failureText + failureId + failureLabel（失敗提示區）、adding（重試 loading）、editAriaLabel／rejectAriaLabel／addAriaLabel、onRetry；CategoryBadge／PlaceResultCard 的 KINDS 與 TAG_TONE 對齊 MVP 固定五分類（shop → shopping、移除 stay、新增 other，底色 --ink-400 暖灰，不沿用任何既有 kind），原本 shopping 與 other 會靜默 fallback 成 cafe 的珊瑚色。<strong>這些屬於元件責任，不應留在本頁的覆寫層</strong>，需回寫 DS 元件原始碼。</div>
           <div><strong>技術事項｜OUT OF SCOPE（不得寫成已定案）</strong> — Instagram 公開內容取得服務、AI 模型或供應商、資料庫、背景任務方案、批次協調實作、併發控制、冪等策略、Authentication 套件、Places API 供應商與候選數量上限、截圖儲存供應商與保存期限、TripPlace 編輯路由與畫面、應用端 UI 元件庫。</div>
           <div><strong>Edit Place 的判定理由（上表 Edit｜FINAL 的依據）</strong> — 欄位取兩份來源的聯集：推薦品項有四處規範來源不能移除；決策紀錄的「Google Maps 地點／地址」對應 §5.7 既有的「選擇正確的實際地點」，不是新欄位；實際新增的只有標籤。呈現形式為全螢幕頁面而非 bottom sheet，因為多欄位加上手機鍵盤會擠壓 sheet；儲存或取消後返回 /imports/:importId/review 並保留分析結果與捲動位置。</div>
           <div><strong>結果卡不呈現的三個欄位｜FINAL</strong> — 推薦品項、城市或區域、辨識信心程度都<strong>不在 PlaceResultCard 呈現</strong>。§5.9「每張卡片至少顯示…推薦品項」指的是旅行收藏頁的卡片清單，不是 Import 的候選結果卡，兩者是不同的卡；§5.6 是 AI 辨識欄位清單、§5.8 是保存要求，都未要求在結果卡呈現。城市或區域：§5.9 寫的是「地址或區域」二擇一，且卡內候選清單本來就已顯示城市。辨識信心程度只有 §5.6 一處來源，未要求呈現。<strong>推薦品項仍須在 Edit Place（§5.7 可編輯）與旅行收藏頁卡片（§5.9）呈現，兩者都尚未設計 — 不在結果卡呈現不等於漏做。</strong></div>
@@ -743,14 +741,14 @@
         <div style="display:flex;flex-direction:column;gap:11px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#5A5A5C">
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">360px 窄螢幕</span><br>文字欄約 184px。照片欄必須降到 108px，否則名稱幾乎只剩 ellipsis、Tags 會擠成三行。字級一律不縮。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長 URL</span><br>input 本身水平捲動即可，不要 text-overflow（會讓使用者看不到自己在改哪一段）；欄位不長高、不換行，clear 按鈕永遠留在右內側。</div>
-          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長地點名稱</span><br>單行 nowrap + ellipsis。Category badge 是 flex-shrink:0，所以名稱先讓位、badge 永不換行、兩者不重疊。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長地點名稱</span><br>單行 nowrap + ellipsis，兩者不重疊。分類固定二字（badge 50px）後名稱不再為 badge 讓位：360px 的文字欄 184px 中名稱可用 126px（原本長分類時只剩 66px）。<strong style="color:#3B3B3D">Extreme 的 15 字名稱（需 278px）仍會 ellipsis，那是刻意的極端內容，不是 badge 造成</strong>。要支援較長分類時改成 badge 先截斷，不要回頭壓名稱。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">長地址</span><br>Google Maps 地址允許換到第二行後 clamp；pin 圖示 flex-shrink:0。地址在動作列上方，長地址只會讓卡片變高，不會壓縮按鈕。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Tags 換行與溢出</span><br>flex-wrap + gap 5，允許兩行以上；不要 nowrap 或橫向捲動，也不要縮小字級。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">卡片高度自適應</span><br>不要寫死高度。照片高度固定、文字欄決定卡片高度；下限 = 照片高 + 12 + 44（滿寬動作列）+ 24，實測 206–301px。動作列永遠貼卡片底部且滿寬，位置在所有狀態下不動。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">照片 object-fit / position</span><br>一律 cover + center。白框是 border 而非外層 padding，換算寬度時要含 10px 邊框。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">裝飾定位與溢出</span><br>膠帶在卡片外層、跨過上緣，所以外層不可 overflow:hidden；旋轉後可能超出右緣，靠捲動層 overflow-x:clip 收掉，不要用 overflow-x:hidden（會意外建立捲動容器）。</div>
-          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav / FAB 層級</span><br>FAB 是 nav 的子元素而非獨立 fixed 層，才能一起吃 safe-area inset。nav 之上不要再疊 scrim 或漸層。</div>
-          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">最後一顆 commit CTA 被 FAB 遮住</span><br>這是本頁最容易出錯的一點：FAB 上凸 14px + nav 72px，內容底部必須留 72px + inset，否則珊瑚色 CTA 會剛好卡在 FAB 底下。已在實際具有 commit CTA 的 Success、Batch partial failure 與 Extreme，分別以 360／390／430px 共 9 組驗證。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav 層級</span><br>nav 是 shell 的固定層並自己吃掉 safe-area inset，內容 padding 同步加 inset；nav 之上不要再疊 scrim 或漸層。兩格各佔 50%，中央不留缺口。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">最後一顆 commit CTA 的底部留白</span><br>這個數字曾經是 72px，因為要閃過上凸 14px 的 FAB。FAB 移除後改為 <strong style="color:#3B3B3D">32px + inset</strong>；別沿用舊值，也別歸零 — CTA 直接貼著 nav 上緣同樣不能接受。已在實際具有 commit CTA 的 Success、Batch partial failure 與 Extreme，分別以 360／390／430px 共 9 組捲到底重新驗證。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Layout shift</span><br>狀態列固定 24px、錯誤訊息只在 invalid 佔位；不要用 skeleton 取代整個結果區。<strong>例外只有兩處</strong>：composer → SourceRow 的來源區塊 −54px（Import 建立那一刻，使用者主動按下 Analyze 才發生），以及使用者主動觸發的卡內展開（拒絕確認、候選清單、失敗提示）。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">別把 UI variant 當資料狀態</span><br>Batch partial failure、All processed、Reel URL 這些名字都只是畫面變體，資料庫裡沒有這些狀態。lifecycle 只有六個值；失敗項目的「尚未處置」不是新狀態，就是原本的未處置。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">來源列不可退化成輸入框</span><br>最容易寫錯的一點：needs_input 與 failed 需要使用者做事，很容易順手把 LinkInput 放回去。規範是 Import 建立後<strong>一律</strong> SourceRow；「換一個連結」＝建立新的 Import，不是把目前這筆的 URL 改掉。</div>
@@ -773,6 +771,7 @@
           <span style="font-weight:700;color:#4C76C2">批次失敗播報</span><span style="color:#777">每張失敗卡的提示區是 <code>role="status" aria-live="polite"</code> 且有唯一 id；<strong>該卡「加入」鍵以 <code>aria-describedby</code> 指向它</strong>，失敗原因因此與對應卡片建立關聯，不是一則籠統的全頁訊息</span>
           <span style="font-weight:700;color:#4C76C2">Retry aria-label</span><span style="color:#777">失敗後改「重新加入旅行收藏：{地點}」；重試中原生 disabled，標籤與版位不變</span>
           <span style="font-weight:700;color:#4C76C2">completed 卡片</span><span style="color:#777"><strong>不保留任何看似可操作但無效的控制</strong>——Edit／Add／Reject／Retry 在 DOM 中不存在（不是 disabled 佔位），改為靜態處置文字</span>
+          <span style="font-weight:700;color:#4C76C2">Clear aria-label</span><span style="color:#777">DS 預設輸出英文 <code>aria-label="Clear"</code>；PinTrip 在頁面層顯式覆寫為<strong style="color:#3B3B3D">「清除連結」</strong>（所有有值的 composer 與鍵盤狀態實測通過：No collection、Filled、Invalid URL、Reel URL、Keyboard filled／long URL／long Reel URL／invalid 共八個。Idle 與 Keyboard empty 因欄位為空沒有這顆鍵；received 之後的唯讀狀態根本沒有 LinkInput）。收回元件時改為 LinkInput 的 <code>clearLabel</code> prop，不改 <code>_ds_bundle.js</code></span>
           <span style="font-weight:700;color:#4C76C2">點擊區</span><span style="color:#777">一律 ≥ 44 × 44：Back、開啟、更換、截圖 ✕、卡內所有按鈕（Button sm 已提高到 44）、候選列</span>
           <span style="font-weight:700;color:#4C76C2">裝飾</span><span style="color:#777">膠帶、mark、信封、箭頭、sparkles、狀態列與軟鍵盤全部 <code>aria-hidden</code> + <code>pointer-events:none</code>；不作為任何狀態的唯一訊號</span>
           <span style="font-weight:700;color:#4C76C2">prefers-reduced-motion</span><span style="color:#777">關閉 sparkle 脈動與所有非必要動畫；狀態切換改為即時，不改版位</span>
@@ -788,7 +787,7 @@
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">State presentation</span> — 分成兩層，不要混用：<strong>Import lifecycle</strong>（received / processing / needs_input / review_required / completed / failed，來自資料）與 <strong>畫面呈現變體</strong>（由 lifecycle + entry mode + 各 item 的處置狀態推導）。<strong>不要把 UI variant 存成新的資料狀態。</strong>來源呈現只看「Import 是否已建立」：未建立 → LinkInputSection，已建立 → SourceRow。每張卡片的 added / rejected / failed 是獨立的 item 狀態；Batch 數量由「已匹配且尚未處置」推導；completed 一律 readOnly。同一棵樹渲染所有狀態，不為狀態分岔版面。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">切版</span> — 只有一個捲動容器；gutter 與照片欄用兩個 breakpoint 變數（CSS 變數或 container query），其餘共用。裝飾 PNG 用一般 img + aria-hidden，不進 next/image；地點照片給 sizes（108/120/132）並保留 cover。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Accessibility</span> — 完整清單見 ACCESSIBILITY 卡，此處只補實作面：composer 欄位有視覺隱藏的 label（for="import-link-input"）與 inputmode="url"；Button 的 aria-label / aria-describedby 走 <code>ariaLabel</code> / <code>ariaDescribedby</code> prop（本次已加入 DS Button），不要在 wrapper 上補 aria；失敗提示區的 id 必須逐項唯一（<code>import-add-error-{itemId}</code>）。</div>
-          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Motion</span> — 狀態變化 200ms cubic-bezier(.32,.72,.28,1)，FAB 用 spring；一律淡入不滑入，尊重 prefers-reduced-motion 時關掉 sparkle 脈動。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Motion</span> — 狀態變化 200ms cubic-bezier(.32,.72,.28,1)；一律淡入不滑入，尊重 prefers-reduced-motion 時關掉 sparkle 脈動。</div>
         </div>
       </div>
 
@@ -900,6 +899,8 @@ const P = './assets/photos/', I = './assets/icons/', S = './assets/stickers/';
 // Decoration is derived from category, never from list index.
 // cafe → blue gingham tape + coral heart · food → butter tape + yellow star
 // attraction → lavender dotted tape + purple flower · everything else → butter tape, no mark
+// MVP 固定五分類；UI 一律二字。category 是列舉值，label 由此表推導，不是自由文字。
+const CAT_LABEL = { food: '美食', cafe: '咖啡', attraction: '景點', shopping: '購物', other: '其他' };
 const DECOR = {
   cafe:       { tape: 'A', mark: I + 'place-mark-heart.png' },
   food:       { tape: 'B', mark: I + 'place-mark-star.png' },
@@ -913,9 +914,9 @@ const TARGET = '濟州咖啡';
 const TARGET_LONG = '京都秋季賞楓與老喫茶店巡禮以及嵐山周邊散步路線';
 
 const BASE = [
-  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', categoryLabel: '咖啡', name: '春日咖啡', desc: '面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。', address: '濟州市涯月邑涯月路1街24', tags: ['#海景', '#風格咖啡', '#涯月咖啡'] },
-  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', categoryLabel: '美食', name: '溫谷鮭魚', desc: '鮭魚丼與生魚片都很新鮮，需要排隊但很值得。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼', '#濟州美食', '#蓮洞'] },
-  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', categoryLabel: '景點', name: '城山日出峰', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人。', address: '西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景'] }
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', name: '春日咖啡', desc: '面向蔚藍海景的濟州咖啡館，招牌紅蘿蔔蛋糕很受歡迎。', address: '濟州市涯月邑涯月路1街24', tags: ['#海景', '#風格咖啡', '#涯月咖啡'] },
+  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', name: '溫谷鮭魚', desc: '鮭魚丼與生魚片都很新鮮，需要排隊但很值得。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼', '#濟州美食', '#蓮洞'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', name: '城山日出峰', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人。', address: '西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景'] }
 ];
 
 // 3 筆為設計假設（Places API 未定），非已驗證規格。
@@ -926,11 +927,11 @@ const CANDIDATES = [
 ];
 
 const EXTREME = [
-  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', categoryLabel: '咖啡與甜點店', name: '涯月海岸線春日咖啡與甜點工作室', desc: '沿著涯月海岸線散步後最適合停下來的一站，二樓靠窗的位置可以看到整片海，招牌紅蘿蔔蛋糕與手沖咖啡都值得等。', address: '大韓民國 濟州特別自治道 濟州市涯月邑涯月路1街 24 號 2 樓', tags: ['#海景咖啡', '#風格咖啡', '#涯月咖啡', '#紅蘿蔔蛋糕', '#手沖咖啡', '#靠窗座位'], added: true },
-  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', categoryLabel: '美食', name: '溫谷鮭魚', desc: '短句。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼'] },
-  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', categoryLabel: '自然景觀與步道', name: '城山日出峰世界自然遺產步道', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人，登頂約需三十分鐘。', address: '大韓民國 濟州特別自治道 西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景', '#世界遺產', '#健行步道'], added: true },
-  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'shopping', categoryLabel: '選物店', name: '涯月小店', desc: '海邊的小型選物店，明信片與陶器都是當地作者作品。', address: '濟州市涯月邑涯月路 132', tags: ['#選物店', '#明信片'] },
-  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'other', categoryLabel: '住宿', name: '海邊民宿', desc: '走三分鐘就到海邊，早餐是自家做的濟州風味。', address: '西歸浦市城山邑城山里 88-2', tags: ['#海邊住宿', '#含早餐', '#安靜'] }
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'cafe', name: '涯月海岸線春日咖啡與甜點工作室', desc: '沿著涯月海岸線散步後最適合停下來的一站，二樓靠窗的位置可以看到整片海，招牌紅蘿蔔蛋糕與手沖咖啡都值得等。', address: '大韓民國 濟州特別自治道 濟州市涯月邑涯月路1街 24 號 2 樓', tags: ['#海景咖啡', '#風格咖啡', '#涯月咖啡', '#紅蘿蔔蛋糕', '#手沖咖啡', '#靠窗座位'], added: true },
+  { photo: P + 'place-food-jeju-clean-2x.jpg', category: 'food', name: '溫谷鮭魚', desc: '短句。', address: '濟州市蓮洞 261-27', tags: ['#鮭魚丼'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'attraction', name: '城山日出峰世界自然遺產步道', desc: '濟州最具代表性的自然景觀，趕上日出時分最動人，登頂約需三十分鐘。', address: '大韓民國 濟州特別自治道 西歸浦市城山邑城山里 1', tags: ['#日出景點', '#濟州必訪', '#自然風景', '#世界遺產', '#健行步道'], added: true },
+  { photo: P + 'place-cafe-jeju-clean-2x.jpg', category: 'shopping', name: '涯月小店', desc: '海邊的小型選物店，明信片與陶器都是當地作者作品。', address: '濟州市涯月邑涯月路 132', tags: ['#選物店', '#明信片'] },
+  { photo: P + 'place-nature-jeju-clean-2x.jpg', category: 'other', name: '海邊民宿', desc: '走三分鐘就到海邊，早餐是自家做的濟州風味。', address: '西歸浦市城山邑城山里 88-2', tags: ['#海邊住宿', '#含早餐', '#安靜'] }
 ];
 
 class Component extends DCLogic {
@@ -962,6 +963,11 @@ class Component extends DCLogic {
       input.removeAttribute('aria-invalid');
       input.removeAttribute('aria-describedby');
     }
+    /* Handoff override: LinkInput hard-codes aria-label="Clear"（英文）。
+       PinTrip 從頁面層顯式覆寫為繁中，不改 _ds_bundle.js。
+       → 收回元件時應改成 LinkInput 的 clearLabel prop。 */
+    const clear = [...this._field.querySelectorAll('button')].find(b => (b.getAttribute('aria-label') || '') === 'Clear');
+    if (clear) clear.setAttribute('aria-label', '清除連結');
   }
   get st() { return this.state.st || this.props.previewState || 'success'; }
   get wv() { return Number(this.state.w || this.props.previewWidth || 390); }
@@ -1073,6 +1079,7 @@ class Component extends DCLogic {
       addAria: r.added
         ? '已加入旅行收藏：' + r.name
         : (r.failed ? '重新加入旅行收藏：' : '加入旅行收藏：') + r.name,
+      categoryLabel: CAT_LABEL[r.category] || CAT_LABEL.other,
       mark: (DECOR[r.category] || DECOR_FALLBACK).mark,
       tapeA: showDecor && (DECOR[r.category] || DECOR_FALLBACK).tape === 'A',
       tapeB: showDecor && (DECOR[r.category] || DECOR_FALLBACK).tape === 'B',
@@ -1267,7 +1274,7 @@ class Component extends DCLogic {
         : isCompleted ? '無 Analyze／commit CTA（completed 唯讀）；「更換」原生 disabled'
         : anyAdding ? '珊瑚 commit CTA · disabled（重試中）'
         : (hasResults && pendingMatched > 0 ? '珊瑚 commit CTA「加入 ' + pendingMatched + ' 個地點」' : '無 Analyze CTA（來源唯讀）；此狀態不出現 commit CTA'),
-      specNav: kb ? '鍵盤開啟時隱藏，收起後 200ms 淡入' : '72px + inset · FAB 60 上凸 14（與 Home 相同）'
+      specNav: kb ? '鍵盤開啟時隱藏，收起後 200ms 淡入' : '72px + inset · 兩格 · 無 FAB（與 Home 相同）'
     };
   }
 }

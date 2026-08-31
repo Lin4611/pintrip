@@ -12,8 +12,12 @@
 <script src="./ds-base.js"></script>
 <style>body{margin:0;background:#EFE9DE}*{box-sizing:border-box}::-webkit-scrollbar{width:0}
 /* --- Handoff overrides. Each one should become a prop / rule inside the DS component. --- */
-/* BottomNav hard-codes the FAB at top:-26px; PinTrip Home lowers it to -14px (→ fabOffset prop) */
-[data-fab-lift] nav > span:last-of-type{top:-14px !important}
+/* TripCard's ••• renders 22×18; PinTrip needs a 44×44 hit area without moving the glyph
+   or stealing width from the title (→ TripCard menu hit-area, DS side) */
+[data-card="trip"] article button{position:relative}
+/* Focus ring is DS blue, not the UA default (→ MenuPopover / TripCard, DS side) */
+[data-card="trip"] article button:focus-visible,[data-trip-dropdown] button:focus-visible{outline:2px solid var(--blue-400);outline-offset:2px}
+[data-card="trip"] article button::before{content:'';position:absolute;top:-5px;right:-7px;width:44px;height:44px}
 /* TripCard photo column is width:172 flex-shrink:0; steps per breakpoint (→ photoWidth prop) */
 [data-w="360"] [data-card="trip"] article > div:last-of-type{width:148px !important}
 [data-w="430"] [data-card="trip"] article > div:last-of-type{width:196px !important}
@@ -72,7 +76,6 @@
             </div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 64 個地點</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -90,8 +93,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -113,7 +116,6 @@
             </div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 64 個地點</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -131,8 +133,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -154,7 +156,6 @@
             </div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 64 個地點</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -172,8 +173,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -190,8 +191,8 @@
           <span style="font-weight:700;color:#4C76C2">Photo</span><span style="color:#777">align-self:stretch，高度由卡片決定；比例 0.85–1.05，一律 cover + center</span>
           <span style="font-weight:700;color:#4C76C2">Card 高度</span><span style="color:#777">不設固定高；由文字欄內容決定，360 實測 183px、390 實測 196px、430 實測 218px，照片跟著拉伸裁切</span>
           <span style="font-weight:700;color:#4C76C2">Start New Trip</span><span style="color:#777">滿寬、104px、1.5px dashed；世界地圖 cut-out 靠右對齊，不隨寬度放大</span>
-          <span style="font-weight:700;color:#4C76C2">BottomNav / FAB</span><span style="color:#777">72px 高固定、FAB 60px 上凸 14px 水平置中；三者尺寸不隨寬度改變</span>
-          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">status bar、BottomNav、FAB、照片欄寬、所有裝飾與美術資源</span>
+          <span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">72px 高固定、兩格等寬（旅行收藏／匯入）、無 FAB；尺寸不隨寬度改變</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">status bar、BottomNav、照片欄寬、所有裝飾與美術資源</span>
           <span style="font-weight:700;color:#4C76C2">Fluid</span><span style="color:#777">gutter、TripCard 總寬、文字欄、Start New Trip 寬度、捲動高度</span>
         </div>
         <div style="background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">360 與 430 沒有任何獨立設計：同一份 markup，只有 gutter 與照片欄兩個 breakpoint 變數。360 是最窄安全值，文字欄若再變窄，28px 標題會被迫換兩行。</div>
@@ -214,7 +215,6 @@
         <div style="flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:12px 16px 72px">
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
             <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-            <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
           </div>
           <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前有 12 個旅行收藏 · 486 個地點</p>
           <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -232,8 +232,8 @@
             </div>
           </div>
         </div>
-        <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+        <div style="position:relative;z-index:5;flex-shrink:0">
+          <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
         </div>
       </div>
 
@@ -249,7 +249,7 @@
           <span style="font-weight:700;color:#4C76C2">Card 高度</span><span style="color:#777">自適應（實測 196 → 225px；360:183 · 390:196 · 430:218，長內容 225），照片欄 stretch 一起變高並重新 cover 裁切</span>
           <span style="font-weight:700;color:#4C76C2">Overflow</span><span style="color:#777">article overflow:hidden + 文字欄 min-width:0，任何長字串都不產生水平捲動</span>
         </div>
-        <div style="background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">左圖同時放入最長與最短內容：卡片高度各自不同、間距仍是 16px、操作區（•••、查看全部、FAB）全部未被遮擋。</div>
+        <div style="background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:16px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">左圖同時放入最長與最短內容：卡片高度各自不同、間距仍是 16px、操作區（•••、BottomNav）全部未被遮擋。</div>
       </div>
       </sc-if>
     </div>
@@ -259,7 +259,7 @@
     <div style="display:flex;align-items:baseline;gap:12px">
       <span style="font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">03</span>
       <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:24px;font-weight:500;color:#0B1B33">UI states</h2>
-      <span style="font-size:13px;font-weight:600;color:#A9A6A0">Empty · Loading · Error · Long list · 刪除確認</span>
+      <span style="font-size:13px;font-weight:600;color:#A9A6A0">Empty · Loading · Error · Long list · ••• 選單（下拉）· 刪除確認</span>
     </div>
 
     <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
@@ -278,7 +278,7 @@
             </div>
             <div style="margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">還沒有任何旅行收藏，從第一個地點開始吧。</p>
+              <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">還沒有任何旅行收藏。先建立一個，就能把 Instagram 貼文裡的地點收進來。</p>
             </div>
             <div style="position:relative;margin-top:14px">
               <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" style="position:absolute;top:-9px;left:50%;margin-left:-31px;width:62px;height:18px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-2deg);z-index:2;pointer-events:none"></div></sc-if>
@@ -288,8 +288,8 @@
               <img src="assets/stickers/note-paper.png" alt="Collect moments, not things." style="width:132px;display:block;transform:rotate(-3deg)">
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -311,7 +311,6 @@
             </div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2;opacity:0.45">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">正在整理你的旅行收藏…</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -341,8 +340,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -369,8 +368,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -382,29 +381,39 @@
           <div ref="{{ longListRef }}" style="flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:12px 20px 72px">
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">目前有 5 個旅行收藏 · 208 個地點</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
               <div data-card="trip" style="position:relative">
-                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
-                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
-              </div>
-              <div data-card="trip" style="position:relative">
                 <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="B" style="position:absolute;top:-7px;left:20px;width:50px;height:16px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-9deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-kyoto-decoration-wash.png" alt="" aria-hidden="true" style="position:absolute;bottom:-12px;right:26px;width:84px;height:38px;opacity:0.55;transform:rotate(-4deg);transform-origin:50% 50%;z-index:2;pointer-events:none"><img src="assets/stickers/trip-kyoto-decoration-lavender.png" alt="" aria-hidden="true" style="position:absolute;bottom:-8px;right:12px;width:74px;height:90px;transform:rotate(4deg);transform-origin:50% 100%;z-index:3;pointer-events:none"></sc-if>
-                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="京都" location="日本" note="慢慢散步，感受京都的四季與街景。" place-count="36" count-label="個地點" photo-src="./assets/photos/trip-kyoto-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
-              </div>
-              <div data-card="trip" style="position:relative">
-                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
-                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="52" count-label="個地點" photo-src="./assets/photos/place-nature-jeju.png" pin-src="./assets/icons/pin-coral.png" icons="{{ oneIcon }}" hint-size="100%,184px"></x-import>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="大阪" location="日本" note="吃完再走，走完再吃的兩天一夜。" place-count="48" count-label="個地點" photo-src="./assets/photos/place-food-jeju.png" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
               </div>
               <div data-card="trip" style="position:relative">
                 <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="D" style="position:absolute;top:-8px;left:26px;width:58px;height:17px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-6deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/sticker-envelope.png" alt="" aria-hidden="true" style="position:absolute;bottom:-7px;right:16px;width:44px;height:37px;transform:rotate(6deg);transform-origin:50% 100%;z-index:3;pointer-events:none"></sc-if>
                 <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="首爾" location="大韓民國" note="從益善洞到延南洞，逛咖啡館與老巷。" place-count="44" count-label="個地點" photo-src="./assets/photos/place-cafe-jeju.png" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
               </div>
               <div data-card="trip" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="52" count-label="個地點" photo-src="./assets/photos/place-nature-jeju.png" pin-src="./assets/icons/pin-coral.png" icons="{{ oneIcon }}" hint-size="100%,184px"></x-import>
+              </div>
+              <div data-card="trip" style="position:relative">
                 <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="B" style="position:absolute;top:-7px;left:20px;width:50px;height:16px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-9deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-kyoto-decoration-wash.png" alt="" aria-hidden="true" style="position:absolute;bottom:-12px;right:26px;width:84px;height:38px;opacity:0.55;transform:rotate(-4deg);transform-origin:50% 50%;z-index:2;pointer-events:none"><img src="assets/stickers/trip-kyoto-decoration-lavender.png" alt="" aria-hidden="true" style="position:absolute;bottom:-8px;right:12px;width:74px;height:90px;transform:rotate(4deg);transform-origin:50% 100%;z-index:3;pointer-events:none"></sc-if>
-                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="大阪" location="日本" note="吃完再走，走完再吃的兩天一夜。" place-count="48" count-label="個地點" photo-src="./assets/photos/place-food-jeju.png" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="京都" location="日本" note="慢慢散步，感受京都的四季與街景。" place-count="36" count-label="個地點" photo-src="./assets/photos/trip-kyoto-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
+              </div>
+              <div data-card="trip" data-trip-menu="C" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" on-menu="{{ onMenuC }}" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+              <sc-if value="{{ openC }}" hint-placeholder-val="{{ false }}">
+                <div data-trip-dropdown="true" role="menu" aria-label="「東京」的選項" style="position:absolute;z-index:4;width:172px;background:#FFFDFA;border:1px solid #E3D9C6;border-radius:14px;box-shadow:0 14px 32px rgba(60,45,25,0.24),0 2px 6px rgba(60,45,25,0.10);padding:6px;{{ posC }}">
+                  <button type="button" role="menuitem" data-menu-first="true" onClick="{{ onRenameC }}" aria-label="重新命名旅行收藏：東京" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">重新命名</span>
+                  </button>
+                  <div aria-hidden="true" style="height:0;border-top:1px solid #F2EADC;margin:3px 8px"></div>
+                  <button type="button" role="menuitem" onClick="{{ onDeleteC }}" aria-label="刪除旅行收藏：東京" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">刪除旅行收藏</span>
+                  </button>
+                </div>
+              </sc-if>
               </div>
               <div style="position:relative">
                 <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" style="position:absolute;top:-9px;left:50%;margin-left:-31px;width:62px;height:18px;background:#F3E3B8;opacity:0.92;border-radius:2px;transform:rotate(-2deg);z-index:2;pointer-events:none"></div></sc-if>
@@ -412,8 +421,63 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:8px;padding-left:4px"><span style="font-size:14px;font-weight:700">••• 卡片選單</span><span style="font-size:12.5px;font-weight:600;color:#4C76C2">錨定下拉 · 可實際操作</span></div>
+        <div data-w="390" data-screen-label="Home card menu" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18);position:relative">
+          <img src="assets/icons/status-bar.png" alt="" aria-hidden="true" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+          <div data-menu-scroll="true" style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:12px 20px 72px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+              <div>
+                <img src="assets/stickers/wordmark-serif.png" alt="PinTrip" style="height:58px;display:block">
+                <img src="assets/stickers/tagline-script.png" alt="Pin your best trips. Cherish every place." style="width:152px;display:block;margin-top:10px">
+              </div>
+              <img src="assets/photos/avatar-user.png" alt="" style="width:52px;height:52px;border-radius:999px;border:2.5px solid #FFFDFA;box-shadow:0 4px 14px rgba(122,96,58,0.07);display:block;margin-top:6px">
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
+              <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
+            </div>
+            <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 64 個地點</p>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
+              <div data-card="trip" data-trip-menu="A" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" on-menu="{{ onMenuA }}" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+              <sc-if value="{{ openA }}" hint-placeholder-val="{{ false }}">
+                <div data-trip-dropdown="true" role="menu" aria-label="「東京」的選項" style="position:absolute;z-index:4;width:172px;background:#FFFDFA;border:1px solid #E3D9C6;border-radius:14px;box-shadow:0 14px 32px rgba(60,45,25,0.24),0 2px 6px rgba(60,45,25,0.10);padding:6px;{{ posA }}">
+                  <button type="button" role="menuitem" data-menu-first="true" onClick="{{ onRenameA }}" aria-label="重新命名旅行收藏：東京" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">重新命名</span>
+                  </button>
+                  <div aria-hidden="true" style="height:0;border-top:1px solid #F2EADC;margin:3px 8px"></div>
+                  <button type="button" role="menuitem" onClick="{{ onDeleteA }}" aria-label="刪除旅行收藏：東京" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">刪除旅行收藏</span>
+                  </button>
+                </div>
+              </sc-if>
+              </div>
+              <div data-card="trip" data-trip-menu="B" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="B" style="position:absolute;top:-7px;left:20px;width:50px;height:16px;background:radial-gradient(circle,#D8CBEC 1.5px,transparent 1.6px) 0 0/8px 8px,#F1EDF7;opacity:0.92;border-radius:2px;transform:rotate(-9deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-kyoto-decoration-wash.png" alt="" aria-hidden="true" style="position:absolute;bottom:-12px;right:26px;width:84px;height:38px;opacity:0.55;transform:rotate(-4deg);transform-origin:50% 50%;z-index:2;pointer-events:none"><img src="assets/stickers/trip-kyoto-decoration-lavender.png" alt="" aria-hidden="true" style="position:absolute;bottom:-8px;right:12px;width:74px;height:90px;transform:rotate(4deg);transform-origin:50% 100%;z-index:3;pointer-events:none"></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" on-menu="{{ onMenuB }}" title="京都" location="日本" note="慢慢散步，感受京都的四季與街景。" place-count="36" count-label="個地點" photo-src="./assets/photos/trip-kyoto-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ kyotoIcons }}" hint-size="100%,184px"></x-import>
+              <sc-if value="{{ openB }}" hint-placeholder-val="{{ false }}">
+                <div data-trip-dropdown="true" role="menu" aria-label="「京都」的選項" style="position:absolute;z-index:4;width:172px;background:#FFFDFA;border:1px solid #E3D9C6;border-radius:14px;box-shadow:0 14px 32px rgba(60,45,25,0.24),0 2px 6px rgba(60,45,25,0.10);padding:6px;{{ posB }}">
+                  <button type="button" role="menuitem" data-menu-first="true" onClick="{{ onRenameB }}" aria-label="重新命名旅行收藏：京都" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">重新命名</span>
+                  </button>
+                  <div aria-hidden="true" style="height:0;border-top:1px solid #F2EADC;margin:3px 8px"></div>
+                  <button type="button" role="menuitem" onClick="{{ onDeleteB }}" aria-label="刪除旅行收藏：京都" style="display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;background:none;border:0;border-radius:11px;cursor:pointer;text-align:left">
+                    <span style="font-family:Quicksand,sans-serif;font-size:15px;font-weight:700;color:#3B3B3D;white-space:nowrap">刪除旅行收藏</span>
+                  </button>
+                </div>
+              </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
         </div>
       </div>
@@ -432,7 +496,6 @@
             </div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
               <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
-              <span style="font-family:Quicksand,sans-serif;font-size:14px;font-weight:600;color:#4C76C2">查看全部 ›</span>
             </div>
             <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 64 個地點</p>
             <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
@@ -446,8 +509,8 @@
               </div>
             </div>
           </div>
-          <div data-fab-lift="true" style="position:relative;z-index:5;flex-shrink:0">
-            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" hint-size="100%,72px"></x-import>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
           </div>
           <div aria-hidden="true" style="position:absolute;inset:0;background:rgba(43,32,18,0.24);z-index:8"></div>
           <div role="dialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body" style="position:absolute;left:0;right:0;bottom:0;z-index:9;background:#FFFDFA;border-radius:26px 26px 0 0;box-shadow:0 -8px 28px rgba(60,45,25,0.20);padding:24px 20px 30px">
@@ -479,9 +542,10 @@
           <span style="font-weight:700;color:#4C76C2">Loading</span><span style="color:#777">骨架沿用卡片外框、dashed 分隔線與 184px 高度，資料到位時無位移；色票為 #F2EADC / #F5EFE4 暖米色，不用灰</span>
           <span style="font-weight:700;color:#4C76C2">Loading 動態</span><span style="color:#777">opacity 1 → 0.55 → 1，1600ms ease-in-out，第二張延遲 200ms；不用掃光 shimmer</span>
           <span style="font-weight:700;color:#4C76C2">Error</span><span style="color:#777">單張 dashed 卡片，語氣溫和不指責；retry 為 outline 按鈕，位置固定於卡內左下</span>
-          <span style="font-weight:700;color:#4C76C2">Long list</span><span style="color:#777">卡片間距不變；Start New Trip 永遠排在列表最後，底部 72px 留白讓它完整露出於 nav 之上</span>
+          <span style="font-weight:700;color:#4C76C2">Long list</span><span style="color:#777">示範資料依<strong style="color:#3B3B3D">建立時間新到舊</strong>排列（最新建立在最上）；這只是預設順序，MVP 不提供排序或自訂排序入口。卡片間距不變；Start New Trip 永遠排在列表最後，底部 72px 留白讓它完整露出於 nav 之上</span>
+          <span style="font-weight:700;color:#4C76C2">••• 卡片選單</span><span style="color:#777"><strong>錨定在 ••• 的下拉選單</strong>（非 sheet、無 dim、無取消鍵）：兩列、點外部關閉、靠近 nav 時向上開啟。完整規格見 CARD MENU（錨定下拉）；選單本身<strong>不執行任何破壞性動作</strong></span>
           <span style="font-weight:700;color:#4C76C2">刪除確認</span><span style="color:#777">畫面層級 sheet（非卡內就地確認）：底部對齊、上圓角 26、padding 24 / 20 / 30（+ inset）、0 -8px 28px rgba(60,45,25,.20) 向上陰影。背後列表不捲動，BottomNav 不隱藏。完整規格見 DELETE TRIP CONFIRM</span>
-          <span style="font-weight:700;color:#4C76C2">共通</span><span style="color:#777">BottomNav 與 FAB 在四種狀態都存在且位置一致；狀態切換只換內容區，不換版面骨架</span>
+          <span style="font-weight:700;color:#4C76C2">共通</span><span style="color:#777">BottomNav 在四種狀態都存在且位置一致；狀態切換只換內容區，不換版面骨架</span>
         </div>
       </div>
       </sc-if>
@@ -504,7 +568,7 @@
           <div style="font-size:13.5px;font-weight:700">HomeScreen</div>
           <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;border-left:1px dashed #E6DFCF;font-size:12px">
             <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">BrandLockup</span><span style="color:#777">Wordmark · tagline · Avatar · NoteCard</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">SectionHeader</span><span style="color:#777">「我的旅行收藏」+ 查看全部 ›</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">SectionHeader</span><span style="color:#777">「我的旅行收藏」全部 ›</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">CollectionSummary</span><span style="color:#777">收藏數量行（狀態文案共用同一位置）</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">TripList</span><span style="color:#777">flex column gap 16</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">TripCardSlot ×n</span><span style="color:#777">裝飾 wrapper（relative）</span></div>
@@ -513,8 +577,7 @@
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">TripCardSkeleton</span><span style="color:#777">loading 專用，同尺寸</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">StartTripCard</span><span style="color:#777">列表最後一項</span></div>
             <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">ErrorCard</span><span style="color:#777">dashed 卡片 + Button outline</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">Trips（active）· Add · Imports</span></div>
-            <div style="display:flex;justify-content:space-between;gap:12px;padding-left:12px"><span style="font-weight:700;color:#4C76C2">FabButton</span><span style="color:#777">60px 圓形，top:-14px</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:700;color:#4C76C2">BottomNav</span><span style="color:#777">兩格：旅行收藏（active）· 匯入</span></div>
           </div>
           <div style="margin-top:2px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;line-height:1.6;color:#A9A6A0">mockup-only：status bar 圖（時間／訊號／電量／Dynamic Island）不進產品程式。</div>
         </div>
@@ -541,7 +604,6 @@
           <span style="color:#777">Start New Trip</span><span style="font-weight:700">104px · 1.5px dashed</span>
           <span style="color:#777">內容底部留白</span><span style="font-weight:700">72px</span>
           <span style="color:#777">BottomNav</span><span style="font-weight:700">72px · 上圓角 26px</span>
-          <span style="color:#777">FAB / lift</span><span style="font-weight:700">60px · 14px · 5px 米色環</span>
           <span style="color:#777">最小點擊區</span><span style="font-weight:700">44px</span>
         </div>
       </div>
@@ -553,9 +615,9 @@
           <span style="font-weight:700;color:#4C76C2">Bottom safe area</span><span style="color:#777">nav 高度 = 72px + env(safe-area-inset-bottom)，padding 同步加 inset</span>
           <span style="font-weight:700;color:#4C76C2">Home indicator</span><span style="color:#777">nav 標籤基線與 indicator 至少 8px；inset 由 nav 自己吃掉</span>
           <span style="font-weight:700;color:#4C76C2">Scroll container</span><span style="color:#777">唯一捲動層：flex:1; overflow-y:auto; overscroll-behavior:contain</span>
-          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">狀態列區、BottomNav、FAB；frame 本身 overflow:hidden</span>
+          <span style="font-weight:700;color:#4C76C2">Fixed</span><span style="color:#777">狀態列區、BottomNav；frame 本身 overflow:hidden</span>
           <span style="font-weight:700;color:#4C76C2">Content bottom pad</span><span style="color:#777">72px + inset：最後一張卡與 Start New Trip 都能完整捲出 nav 之上</span>
-          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">內容 0 · 裝飾 2（卡片內）· nav 5 · FAB 6（nav 子層）</span>
+          <span style="font-weight:700;color:#4C76C2">z-index</span><span style="color:#777">內容 0 · 裝飾 2（卡片內）· nav 5</span>
           <span style="font-weight:700;color:#4C76C2">Horizontal</span><span style="color:#777">內容區 overflow-x:clip；卡片 overflow:hidden；文字欄 min-width:0</span>
           <span style="font-weight:700;color:#4C76C2">Overscroll</span><span style="color:#777">contain，不做下拉彈跳裝飾；橡皮筋回彈交給系統</span>
         </div>
@@ -631,10 +693,32 @@
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">CARD MENU（錨定下拉）</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">形式</span><span style="color:#777"><strong>錨定在 ••• 上的下拉選單，不是 bottom sheet</strong>：沒有 dim、沒有標題列、沒有「取消」鍵，點外部即關閉。刪除確認才用 sheet（見 DELETE TRIP CONFIRM，該張不變）</span>
+          <span style="font-weight:700;color:#4C76C2">元件層級</span><span style="color:#777">DS 目前<strong>沒有 dropdown 元件</strong>。這裡的行為要收成 DS 的 <code>MenuPopover</code>（錨定、翻轉、單一開啟、focus trap、ESC）+ TripCard 的 menu slot；<strong>不做成 Home 專用的一次性版式</strong>，Import 之後若有卡片選單直接重用</span>
+          <span style="font-weight:700;color:#4C76C2">兩列｜只有兩個</span><span style="color:#777"><strong>單行、無副標</strong>：「重新命名」「刪除旅行收藏」。15px Quicksand 700 ink-700、<code>nowrap</code>、列高 44、兩列之間 1px dashed #EDE4D2。說明性文字留給表單與確認 sheet，選單只給動作名稱</span>
+          <span style="font-weight:700;color:#4C76C2">浮層層級</span><span style="color:#777"><strong>獨立浮層</strong>：<code>z-index:4</code> — 高於卡片內容與裝飾（膠帶／貼紙 2–3）、<strong>低於 BottomNav（5）</strong>。掛在卡片 wrapper（<code>position:relative</code> 且未 <code>overflow:hidden</code>）上，因此<strong>可以超出卡片下緣與左右緣</strong>而不被裁切；article 的 <code>overflow:hidden</code> 不影響它</span>
+          <span style="font-weight:700;color:#4C76C2">分隔線</span><span style="color:#777">選單自己的樣式：1px <strong>solid</strong> #F2EADC，左右內縮 8px。<strong>不沿用卡片內的 dashed cream 分隔線</strong> — 那是紙感卡片的語彙，浮層要讀起來像另一個表面</span>
+          <span style="font-weight:700;color:#4C76C2">錨定與翻轉</span><span style="color:#777"><strong>固定 172 × 109</strong>（<code>width:172px</code> — shift 夾制需要已知寬度，所以不用 <code>max-content</code>）· r14 · padding 6 · <strong>1px #E3D9C6 hairline</strong> + 雙層陰影 0 14px 32px rgba(60,45,25,.24) / 0 2px 6px rgba(60,45,25,.10)。卡片與選單同為 #FFFDFA，<strong>邊界靠 hairline 與陰影建立</strong>，不靠底色差異，<strong>右緣對齊 ••• 的右緣</strong>：inset 在開啟那一刻由「wrapper 右緣 − 觸發鍵右緣」量測（照片欄 148／172／196 隨寬度變，<strong>不可寫死</strong>，否則會變成對齊整張卡、右側多出約 187px）。選單<strong>不橫跨整張卡</strong>（172 / 350 ≈ 卡片一半），並向左略微超出卡片左緣，強化「浮在上面」而非「卡片的一部分」。<strong>但右緣對齊不能無條件成立</strong>：••• 位在文字欄右緣、距卡片右緣約 187px，選單靠右對齊時左緣可能越過螢幕 gutter 而被 frame 的 <code>overflow:hidden</code> 裁掉標籤。因此量測值只是<strong>偏好值</strong>，再夾住「左緣不得越過 frame 內緣 8px」（popper 的 shift）。<strong>夾制對 frame，不對卡片</strong>：對卡片夾會讓左緣正好貼齊卡片左緣，看起來就成了卡片的一部分；浮層本來就允許稍微超出卡片。垂直＝<strong>（觸發鍵下緣、標題文字下緣）較低者 + 8px</strong>。標題 28px 的行框比 18px 的 ••• 低約 13px，只錨定 ••• 會切到收藏名稱，因此實測上緣距標題 8px、距 ••• 19px；下方的目的地列會被浮層覆蓋 — 浮層本來就蓋住下方內容，這不是裁切；<strong>觸發鍵下緣 + 選單高 &gt; nav 上緣時改向上</strong>（改由觸發鍵上緣往上 8px 錨定），永不被 BottomNav 遮住。門檻＝<strong>觸發鍵下緣 + 132px（選單高 109 + 23px 呼吸）超過 nav 上緣</strong>，方向在開啟那一刻量測；把列表捲到某張卡貼近 nav 再開，就會向上開啟</span>
+          <span style="font-weight:700;color:#4C76C2">點擊區</span><span style="color:#777">每列最小高 44（實測 44）；••• 由 22 × 18 補到 <strong>44 × 44</strong>：覆蓋層自 glyph 右上角往左下展開（<code>top:-5;right:-7</code>），不放大 glyph、不從標題偷寬度、不造成 layout shift，也不會被卡片的 <code>overflow:hidden</code> 裁掉</span>
+          <span style="font-weight:700;color:#4C76C2">同時只開一個</span><span style="color:#777">開著 A 再點 B 的 ••• 時，<strong>A 收合、B 同一下就開啟</strong>：外部點擊的關閉邏輯必須先判斷 pointerdown 目標是否為另一顆 •••，是就跳過關閉，交給該鍵自己的 click 切換 — 否則會被吃掉一次、需要點兩次</span>
+          <span style="font-weight:700;color:#4C76C2">關閉條件</span><span style="color:#777">點同一顆 ••• 切換關閉 · 點外部 · ESC · <strong>列表捲動</strong>（捲動時關閉，不跟著卡片飄）· 選了任一列</span>
+          <span style="font-weight:700;color:#4C76C2">重新命名 →</span><span style="color:#777">導向 <code>/trips/new</code> 的<strong>同一個表單版式</strong>（<code>mode:'edit'</code>、帶入既有值），標題「編輯旅行收藏」、CTA「儲存變更」；不在選單內就地編輯</span>
+          <span style="font-weight:700;color:#4C76C2">刪除 →</span><span style="color:#777">關閉選單並開<strong>既有的刪除確認 sheet</strong>；影響範圍、不可復原與按鈕角色全部見 DELETE TRIP CONFIRM，本卡不重複定義。選單這一步<strong>不刪任何東西</strong></span>
+          <span style="font-weight:700;color:#4C76C2">破壞性不靠色相</span><span style="color:#777">「刪除旅行收藏」主標<strong>不用珊瑚色</strong>（小字對比不足 AA），語意由副標承擔；警告文案留在確認 sheet</span>
+          <span style="font-weight:700;color:#4C76C2">Focus ring</span><span style="color:#777">選單兩列與 ••• 都用 <strong>2px <code>var(--blue-400)</code> + 2px offset</strong>（與全站 focus-visible 同一條），不留瀏覽器預設的金褐色描邊</span>
+          <span style="font-weight:700;color:#4C76C2">a11y</span><span style="color:#777">觸發鍵 <code>aria-haspopup="menu"</code> + <code>aria-expanded</code> + <code>aria-label</code>「「東京」的更多選項」；選單 <code>role="menu"</code>、兩列 <code>role="menuitem"</code> 且 label 帶收藏名稱（「重新命名旅行收藏：東京」「刪除旅行收藏：東京」）。開啟時焦點移入第一列，ESC 關閉並把焦點歸還 •••</span>
+          <span style="font-weight:700;color:#4C76C2">Motion</span><span style="color:#777">140ms cubic-bezier(.32,.72,.28,1) 淡入 + 2px 位移（向上開啟時反向），不用 spring；<code>prefers-reduced-motion</code> 時即時顯示</span>
+          <span style="font-weight:700;color:#4C76C2">本稿可操作</span><span style="color:#777">「••• 卡片選單」frame 的兩張卡與 Long list 最後一張旅行收藏卡已接上真實行為：開啟、A→B 一次點擊切換、點同一顆關閉、點外部、ESC 歸還焦點、捲動關閉、靠近 nav 時自動向上，都可直接試</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
         <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">DELETE TRIP CONFIRM</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
           <span style="font-weight:700;color:#4C76C2">依據</span><span style="color:#777">MVP §5.2「刪除旅行收藏時，必須先清楚提示影響範圍」+ ARCHITECTURE §8「刪除 Trip 前必須取得使用者確認並驗證所有權」。實作 <strong>CLAUDE.md 破壞性動作確認四條規則</strong>，本卡不重複定義規則本身</span>
-          <span style="font-weight:700;color:#4C76C2">觸發路徑</span><span style="color:#777">TripCard ••• → bottom sheet（重新命名／刪除）→ 選「刪除」→ 本確認 sheet。<strong>••• 內的「刪除」不是執行鍵</strong>，只是開啟確認</span>
+          <span style="font-weight:700;color:#4C76C2">觸發路徑</span><span style="color:#777">TripCard ••• → 錨定下拉（重新命名／刪除旅行收藏）→ 選「刪除旅行收藏」→ 本確認 sheet。<strong>••• 內的「刪除旅行收藏」不是執行鍵</strong>，只是開啟確認</span>
           <span style="font-weight:700;color:#4C76C2">形式｜已定案</span><span style="color:#777"><strong>畫面層級 sheet，不用卡內就地確認</strong>（Import 拒絕候選用卡內列）：必須列出「N 個地點會一起刪除」與四類一併移除的資料，資訊量超過卡內一列</span>
           <span style="font-weight:700;color:#4C76C2">版面</span><span style="color:#777">底部對齊滿寬 · 上圓角 26 · #FFFDFA · padding 24 / 20 / 30（+ safe-area inset）· 陰影 0 -8px 28px rgba(60,45,25,.20)（向上，與 BottomNav 同一手法）· 高度由內容決定，不固定（390 實測 383px，佔 844 的 45%，上緣距 frame 頂 461px；取消 196 / 刪除收藏 146，皆高 48）</span>
           <span style="font-weight:700;color:#4C76C2">標題實測（樣本 20 字）</span><span style="color:#777">標題 19px 可換行，20 字樣本名稱在 360／390／430 一律 <strong>2 行 54px</strong>（單行 27px），sheet 高 383 → 410px，無截斷、無水平溢出。影響範圍句與按鈕列不受影響。<strong>20 字只是量測樣本，不是名稱上限</strong>；更長的名稱由 line-clamp 2 截斷，不溢出</span>
@@ -656,16 +740,33 @@
         <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">INTERACTION</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
           <span style="font-weight:700;color:#4C76C2">TripCard</span><span style="color:#777">整張可點 → 進入該旅行收藏頁（本次不設計）；press scale(.97) + brightness(.96) 120ms</span>
-          <span style="font-weight:700;color:#4C76C2">Card menu •••</span><span style="color:#777">stopPropagation，開 bottom sheet（重新命名／刪除）；44px 點擊區。<strong>選「刪除」不直接執行</strong>，接畫面層級刪除確認 sheet（見 DELETE TRIP CONFIRM）</span>
-          <span style="font-weight:700;color:#4C76C2">查看全部</span><span style="color:#777">導向收藏列表頁；press 只降不位移，text button 無底線</span>
-          <span style="font-weight:700;color:#4C76C2">Start New Trip</span><span style="color:#777">導向新增旅行收藏流程，與 FAB 同一目的地</span>
-          <span style="font-weight:700;color:#4C76C2">FAB</span><span style="color:#777">主要新增入口，開 bottom sheet；press 用 spring cubic-bezier(.34,1.32,.52,1)</span>
+          <span style="font-weight:700;color:#4C76C2">Card menu •••</span><span style="color:#777">stopPropagation，開錨定下拉選單（重新命名／刪除旅行收藏，見 CARD MENU）；44px 點擊區。<strong>選「刪除」不直接執行</strong>，接畫面層級刪除確認 sheet（見 DELETE TRIP CONFIRM）</span>
+          <span style="font-weight:700;color:#4C76C2">Start New Trip</span><span style="color:#777">導向 /trips/new 建立旅行收藏</span>
           <span style="font-weight:700;color:#4C76C2">Nav 旅行收藏</span><span style="color:#777">目前頁；再次點擊回捲到頂端，不重新載入</span>
           <span style="font-weight:700;color:#4C76C2">Nav 匯入</span><span style="color:#777">切到 Import 頁；未選取狀態去飽和並降至 55% 不換 icon</span>
           <span style="font-weight:700;color:#4C76C2">Retry</span><span style="color:#777">切回 loading 骨架後重試；重試中按鈕 disabled 45% 不變色</span>
           <span style="font-weight:700;color:#4C76C2">Disabled</span><span style="color:#777">opacity .45，顏色與尺寸不變</span>
           <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset，圓角跟隨元件</span>
           <span style="font-weight:700;color:#4C76C2">Hover</span><span style="color:#777">App 內不做 hover；web 版填色加深一階，尺寸不變</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">ACCESSIBILITY</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">語言</span><span style="color:#777">所有 <code>aria-label</code>、<code>aria-describedby</code> 目標文字一律<strong style="color:#3B3B3D">繁體中文</strong>；涉及特定收藏的動作必須帶收藏名稱，不可只寫「刪除」「更多」這類無主詞標籤</span>
+          <span style="font-weight:700;color:#4C76C2">點擊區｜契約</span><span style="color:#777"><strong style="color:#B5745A">所有互動元素一律 ≥ 44 × 44</strong>。不足時以透明 padding 或 <code>::before</code> 擴大命中區，<strong>不放大視覺尺寸</strong>；相鄰兩個命中區不重疊</span>
+          <span style="font-weight:700;color:#4C76C2">••• ｜已知不足</span><span style="color:#777">同一顆控制目前有<strong style="color:#B5745A">兩處未達契約，實作時都要補</strong>：<strong style="color:#B5745A">（1）命中區已補</strong>：glyph 仍是 22 × 18，命中區以居中的 44 × 44 覆蓋層擴大（不放大 glyph、不從標題偷寬度、無 layout shift）— 收回元件時由 TripCard 自己負責；（2）aria-label <strong style="color:#3B3B3D">已修正</strong>：DS 預設仍輸出 <code>aria-label="Trip options"</code>（英文、無收藏名稱），PinTrip 在頁面層顯式覆寫為<strong style="color:#3B3B3D">「「東京」的更多選項」</strong>格式（16 顆全數實測通過）；收回元件時改為 TripCard 的 <code>menuLabel</code> prop</span>
+          <span style="font-weight:700;color:#4C76C2">TripCard</span><span style="color:#777">整張是單一 <code>&lt;a&gt;</code>／<code>button</code>：<code>aria-label</code>「開啟旅行收藏：東京（28 個地點）」。•••<strong>不可</strong>嵌在這個可點區裡（巢狀互動元素），兩者為兄弟節點，••• 需 <code>stopPropagation</code>；卡內照片、膠帶、貼紙、類別貼紙全部 <code>aria-hidden</code></span>
+          <span style="font-weight:700;color:#4C76C2">•••｜語意</span><span style="color:#777"><code>aria-label</code>「「東京」的更多選項」+ <code>aria-haspopup="menu"</code> + <code>aria-expanded</code>；開啟的 sheet 內兩個項目為「重新命名旅行收藏：東京」「刪除旅行收藏：東京」。glyph 本身 <code>aria-hidden</code>，標籤不靠 ••• 字元傳達</span>
+          <span style="font-weight:700;color:#4C76C2">••• 選單 / 刪除確認</span><span style="color:#777">選單的 menu 語意與刪除 sheet 的 dialog 語意、焦點移入與回歸、ESC 關閉見 <strong>CARD MENU（錨定下拉）</strong> 與 <strong>DELETE TRIP CONFIRM</strong> 卡，此處不重複</span>
+          <span style="font-weight:700;color:#4C76C2">Start New Trip</span><span style="color:#777">整張卡是一個 <code>button</code>（不是 div + onClick），<code>aria-label</code>「建立旅行收藏」；標題與說明是可見文字，不需再重述，世界地圖 cut-out 與膠帶 <code>aria-hidden</code>。高 104px，天生達標</span>
+          <span style="font-weight:700;color:#4C76C2">BottomNav（兩格）</span><span style="color:#777"><code>&lt;nav aria-label="主要導覽"&gt;</code> 內兩個 <code>button</code>，各佔 50% 寬 × 高 ≥ 44；目前頁帶 <code>aria-current="page"</code>，未選取僅去飽和 55% <strong>不是唯一訊號</strong>；icon <code>aria-hidden</code>，label「旅行收藏」「匯入」即可讀名稱。<strong>已無中央 ＋</strong>，不留任何隱形命中區</span>
+          <span style="font-weight:700;color:#4C76C2">列表語意</span><span style="color:#777">TripList 為 <code>&lt;ul&gt;</code>／<code>&lt;li&gt;</code>，收藏數量行與清單以 <code>aria-describedby</code> 關聯；Loading 骨架 <code>aria-busy="true"</code>、Empty／Error 的說明是真文字而非圖片</span>
+          <span style="font-weight:700;color:#4C76C2">裝飾</span><span style="color:#777">膠帶、郵戳、lavender、信封、便條、tagline、狀態列圖一律 <code>aria-hidden</code> + <code>pointer-events:none</code>；任何狀態都不以裝飾作為唯一訊號</span>
+          <span style="font-weight:700;color:#4C76C2">prefers-reduced-motion</span><span style="color:#777">關閉 Loading 呼吸動畫與 sheet 滑入（改即時顯示）；press 縮放可保留但不放大位移</span>
+          <span style="font-weight:700;color:#4C76C2">目前 mock 未實作</span><span style="color:#777">本卡是<strong style="color:#3B3B3D">契約</strong>，不是這份 mock 的實測描述。已知落差（實作時一併補齊）：<code>nav</code> 缺 <code>aria-label</code>、active tab 缺 <code>aria-current</code>；TripCard 仍是 <code>article</code>（無 role／tabindex，<code>cursor:default</code>）；TripList 尚未是 <code>ul</code>／<code>li</code>；Start New Trip 仍是 <code>div</code> 且無 <code>aria-label</code>。<strong>18 顆 ••• 只有 3 顆（••• 選單 frame 兩張 + Long list 最後一張）接上真實選單</strong>，其餘 15 顆沒有 <code>aria-haspopup</code>／<code>aria-expanded</code>，產品實作時每一顆都要有。已達標的只有 nav 兩格命中區（實測 180–215 × 51）與 ••• 命中區 44 × 44</span>
+          <span style="font-weight:700;color:#4C76C2">Focus-visible</span><span style="color:#777">2px var(--blue-400) outline + 2px offset，圓角跟隨元件；TripCard 的 outline 不被卡片 <code>overflow:hidden</code> 裁掉</span>
         </div>
       </div>
 
@@ -702,7 +803,7 @@
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Card 高度自適應</span><br>不要寫死高度。390 定稿實測 196px、長內容可到 225px，這些是量測結果而不是規格；高度一律由文字欄決定。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Category stickers overflow</span><br>footer 列必須 flex-wrap:wrap；貼紙多時整排換行，數量文字保持 nowrap。不要縮小貼紙或裁切。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Decoration positioning</span><br>裝飾必須在卡片外層，且外層不可 overflow:hidden。若把膠帶放進卡片內，卡片就無法在其他頁面重用。</div>
-          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav 與 FAB 層級</span><br>FAB 是 nav 的子元素而非獨立 fixed 層，才能一起吃 safe-area inset。nav 之上不要再疊 scrim 或漸層。</div>
+          <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">BottomNav 層級</span><br>nav 是 shell 的固定層並自己吃掉 safe-area inset，內容 padding 同步加 inset；nav 之上不要再疊 scrim 或漸層。<strong style="color:#3B3B3D">兩格之間不留中央缺口</strong>，兩顆分頁各佔 50%。</div>
           <div><span style="font-family:Quicksand,sans-serif;font-weight:700;color:#3B3B3D">Horizontal overflow</span><br>長地名、長 hashtag、旋轉的膠帶都可能撐出水平捲動。捲動層 overflow-x:clip、卡片 overflow:hidden、文字欄 min-width:0 三者要同時具備。</div>
         </div>
       </div>
@@ -710,10 +811,10 @@
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">React / NEXT.JS</div>
         <div style="display:flex;flex-direction:column;gap:10px;background:#ECF2F6;border:1.5px dashed #C4D8EF;border-radius:20px;padding:18px 20px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;line-height:1.65;color:#5A5A5C">
-          <div>AppShell 放在 layout：狀態列安全區 + 捲動 slot + BottomNav。Home 與 Import 共用同一個 shell，切頁時 nav 與 FAB 不重繪、不跳動。</div>
+          <div>AppShell 放在 layout：狀態列安全區 + 捲動 slot + BottomNav。Home 與 Import 共用同一個 shell，切頁時 nav 不重繪、不跳動。</div>
           <div>Home 只有一個列表區塊會因狀態改變：normal / empty / loading / error 皆渲染在同一個容器內，外框與間距不動，避免 layout shift。</div>
           <div>TripCard 只接資料 props；裝飾由 TripCardSlot 依該收藏集<strong style="color:#3B3B3D">建立時已持久化的 decorPreset（A／B／C／D）</strong>渲染 — 不看 card index、不看 render order、render 時不重新隨機；缺欄位時 fallback C。兩者責任分離，卡片可在其他頁面直接重用。</div>
-          <div>兩個 DS 覆寫建議收回元件：BottomNav 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">fabOffset</span>（14px）與 TripCard 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">photoWidth</span> + line-clamp。目前以 CSS 覆寫呈現，僅為 handoff 示範。</div>
+          <div>DS 覆寫建議收回元件：TripCard 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">photoWidth</span> + line-clamp（目前以 CSS 覆寫呈現，僅為 handoff 示範），以及 ••• 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">menuLabel</span>（DS 預設寫死英文 <span style="font-family:Quicksand,sans-serif;font-weight:700">"Trip options"</span>，PinTrip 目前於頁面層以繁中 + 收藏名稱覆寫）。BottomNav 的 <span style="font-family:Quicksand,sans-serif;font-weight:700">fabOffset</span> 覆寫已隨 FAB 移除一併收回；改以 <span style="font-family:Quicksand,sans-serif;font-weight:700">showFab={false}</span> 傳入元件，FabButton 仍留在 DS 但 PinTrip 不再使用。</div>
           <div>間距全部走 4px 基準（6 / 10 / 12 / 14 / 16 / 20 / 26 / 72），色彩、圓角、陰影一律使用 design token CSS 變數，不寫死 hex。</div>
           <div>圖片用 next/image 時需給 sizes（照片欄 148/172/196），並保留 fill + object-cover；裝飾類 PNG 不進 next/image，直接 img + aria-hidden。</div>
         </div>
@@ -728,16 +829,112 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showSpec&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付&quot;}}">
 class Component extends DCLogic {
-  state = { tab: 'trips' };
+  state = { tab: 'trips', menu: null };
   componentDidMount(){
     const pin = () => { const el = this._longList; if (el) el.scrollTop = el.scrollHeight; };
     requestAnimationFrame(pin);
     window.addEventListener('load', pin);
     [400, 1200, 2400].forEach(t => setTimeout(pin, t));
+    this._labelMenus();
+  }
+  componentDidUpdate(){ this._labelMenus(); }
+  /* Handoff override: TripCard hard-codes aria-label="Trip options" (英文、無收藏名稱).
+     PinTrip 從頁面層顯式覆寫為繁中 + 收藏名稱，不改 _ds_bundle.js。
+     → 收回元件時應改成 TripCard 的 menuLabel prop。 */
+  /* Anchored card menu. One open at a time; a pointerdown on ANOTHER ••• must not be
+     swallowed by the outside-click close, so that trigger is skipped here and its own
+     click switches the open menu in a single tap. → DS: MenuPopover + TripCard menu slot. */
+  _bindMenu(){
+    if (this._menuBound) return;
+    this._menuBound = true;
+    document.addEventListener('pointerdown', e => {
+      if (!this.state.menu) return;
+      const t = e.target.closest && e.target.closest('button');
+      if (t && t.textContent.trim() === '•••') return;
+      if (e.target.closest && e.target.closest('[data-trip-dropdown]')) return;
+      this._closeMenu();
+    }, true);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && this.state.menu) { e.stopPropagation(); this._closeMenu(true); }
+    }, true);
+    document.addEventListener('scroll', () => { if (this.state.menu) this._closeMenu(); }, true);
+  }
+  _trigger(key){
+    const wrap = document.querySelector('[data-trip-menu="' + key + '"]');
+    return wrap ? [...wrap.querySelectorAll('button')].find(b => b.textContent.trim() === '•••') : null;
+  }
+  _toggleMenu(key){
+    if (this.state.menu && this.state.menu.key === key) { this._closeMenu(true); return; }
+    let up = false, right = 8, top = 44, bottom = 6;
+    const trig = this._trigger(key);
+    if (trig) {
+      const frame = trig.closest('[data-w]');
+      const wrap = trig.closest('[data-trip-menu]');
+      const nav = frame && frame.querySelector('nav');
+      const t = trig.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+      const limit = nav ? nav.getBoundingClientRect().top : t.bottom + 999;
+      // 浮層可超出卡片左右緣，只要不越過 frame 內緣 8px；夾制對 frame 而非卡片 gutter
+      const MENU_W = 172, MENU_H = 109, gutter = 8; // 選單實測 172 × 109
+      up = t.bottom + MENU_H + 23 > limit; // 109 + 23px 呼吸 = 132
+      // 錨定 •••：選單右緣對齊觸發鍵右緣（照片欄 148/172/196 隨寬度變，必須量測），
+      // 但左緣不得越過螢幕 gutter — 溢出時往右 shift，不裁切。
+      const fr = frame ? frame.getBoundingClientRect() : wr;
+      right = Math.min(
+        Math.round(wr.right - t.right),
+        Math.round(wr.right - (fr.left + gutter) - MENU_W)
+      );
+      if (right < 0) right = 0;
+      // 垂直：（觸發鍵下緣、標題文字下緣）較低者 + 8 — 8px 呼吸，且不切到收藏名稱
+      const h3 = wrap.querySelector('article h3');
+      const anchorBottom = h3 ? Math.max(t.bottom, h3.getBoundingClientRect().bottom) : t.bottom;
+      top = Math.round(anchorBottom - wr.top + 8);
+      bottom = Math.round(wr.bottom - t.top + 8);
+    }
+    this.setState({ menu: { key, up, right, top, bottom } });
+  }
+  _closeMenu(refocus){
+    const key = this.state.menu && this.state.menu.key;
+    this.setState({ menu: null });
+    if (refocus && key) { const t = this._trigger(key); if (t) t.focus(); }
+  }
+  _menuVals(){
+    const m = this.state.menu;
+    const out = {};
+    ['A', 'B', 'C'].forEach(k => {
+      const open = !!m && m.key === k;
+      out['open' + k] = open;
+      out['pos' + k] = m
+        ? 'right:' + m.right + 'px;' + (m.up ? 'bottom:' + m.bottom + 'px' : 'top:' + m.top + 'px')
+        : 'right:8px;top:44px';
+      out['onMenu' + k] = () => this._toggleMenu(k);
+      out['onRename' + k] = () => this._closeMenu(true);
+      out['onDelete' + k] = () => this._closeMenu(true);
+    });
+    return out;
+  }
+  _labelMenus(){
+    this._bindMenu();
+    const openKey = this.state.menu && this.state.menu.key;
+    ['A', 'B', 'C'].forEach(k => {
+      const t = this._trigger(k);
+      if (!t) return;
+      t.setAttribute('aria-haspopup', 'menu');
+      t.setAttribute('aria-expanded', String(openKey === k));
+    });
+    if (openKey) {
+      const first = document.querySelector('[data-trip-dropdown] [data-menu-first]');
+      if (first && document.activeElement !== first) first.focus();
+    }
+    document.querySelectorAll('[data-card="trip"] article').forEach(card => {
+      const title = card.querySelector('h3');
+      const btn = [...card.querySelectorAll('button')].find(b => b.textContent.trim() === '•••');
+      if (title && btn) btn.setAttribute('aria-label', '「' + title.textContent.trim() + '」的更多選項');
+    });
   }
   renderVals(){
     const S='./assets/stickers/', I='./assets/icons/';
     return {
+      ...this._menuVals(),
       showSpec: this.props.showSpec ?? true,
       showDecor: this.props.showDecor ?? true,
       activeTab: this.state.tab,

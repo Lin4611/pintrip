@@ -67,8 +67,8 @@
         "message": "<BottomNavItem> doesn't accept that prop. Declared props: id, label, iconSrc."
       },
       {
-        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|fullWidth|iconSrc|icon|disabled|onClick|children|style|key|ref|className|style|children)$/]",
-        "message": "<Button> doesn't accept that prop. Declared props: variant, size, fullWidth, iconSrc, icon, disabled, onClick, children, style."
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|fullWidth|iconSrc|icon|disabled|onClick|ariaLabel|ariaDescribedby|children|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, fullWidth, iconSrc, icon, disabled, onClick, ariaLabel, ariaDescribedby, children, style."
       },
       {
         "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|action|solid|outline|ghost)$/]",
@@ -83,8 +83,8 @@
         "message": "<CategoryBadge> doesn't accept that prop. Declared props: kind, label, tail, style."
       },
       {
-        "selector": "JSXOpeningElement[name.name='CategoryBadge'] > JSXAttribute[name.name='kind'] > Literal[value!=/^(?:cafe|food|attraction|stay|shop)$/]",
-        "message": "<CategoryBadge> kind must be one of 'cafe' | 'food' | 'attraction' | 'stay' | 'shop'."
+        "selector": "JSXOpeningElement[name.name='CategoryBadge'] > JSXAttribute[name.name='kind'] > Literal[value!=/^(?:cafe|food|attraction|shopping|other)$/]",
+        "message": "<CategoryBadge> kind must be one of 'cafe' | 'food' | 'attraction' | 'shopping' | 'other'."
       },
       {
         "selector": "JSXOpeningElement[name.name='CategoryIcon'] > JSXAttribute > JSXIdentifier[name!=/^(?:src|alt|size|style|key|ref|className|style|children)$/]",
@@ -119,12 +119,12 @@
         "message": "<NoteCard> doesn't accept that prop. Declared props: children, rotate, tapeColor, width, style."
       },
       {
-        "selector": "JSXOpeningElement[name.name='PlaceResultCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:photoSrc|category|categoryLabel|name|description|address|tags|pinSrc|editIconSrc|markSrc|onEdit|onAdd|added|editLabel|addLabel|addedLabel|tape|stamp|style|key|ref|className|style|children)$/]",
-        "message": "<PlaceResultCard> doesn't accept that prop. Declared props: photoSrc, category, categoryLabel, name, description, address, tags, pinSrc, editIconSrc, markSrc, onEdit, onAdd, added, editLabel, addLabel, addedLabel, tape, stamp, style."
+        "selector": "JSXOpeningElement[name.name='PlaceResultCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:photoSrc|category|categoryLabel|name|description|address|tags|pinSrc|editIconSrc|markSrc|onEdit|onAdd|added|editLabel|addLabel|addedLabel|showReject|rejected|onReject|rejectLabel|rejectedLabel|matchState|candidates|candidatesExpanded|onToggleCandidates|onPickCandidate|onResearch|chooseLabel|unmatchedLabel|researchLabel|confirming|onConfirmReject|onCancelReject|confirmLine1|confirmLine2|confirmCancelLabel|confirmRejectLabel|readOnly|dispositionLabel|failed|failureText|failureId|failureLabel|adding|editAriaLabel|rejectAriaLabel|addAriaLabel|onRetry|editIconOnly|tape|stamp|style|key|ref|className|style|children)$/]",
+        "message": "<PlaceResultCard> doesn't accept that prop. Declared props: photoSrc, category, categoryLabel, name, description, address, tags, pinSrc, editIconSrc, markSrc, onEdit, onAdd, added, editLabel, addLabel, addedLabel, showReject, rejected, onReject, rejectLabel, rejectedLabel, matchState, candidates, candidatesExpanded, onToggleCandidates, onPickCandidate, onResearch, chooseLabel, unmatchedLabel, researchLabel, confirming, onConfirmReject, onCancelReject, confirmLine1, confirmLine2, confirmCancelLabel, confirmRejectLabel, readOnly, dispositionLabel, failed, failureText, failureId, failureLabel, adding, editAriaLabel, rejectAriaLabel, addAriaLabel, onRetry, editIconOnly, tape, stamp, style."
       },
       {
-        "selector": "JSXOpeningElement[name.name='PlaceResultCard'] > JSXAttribute[name.name='category'] > Literal[value!=/^(?:cafe|food|attraction|stay|shop)$/]",
-        "message": "<PlaceResultCard> category must be one of 'cafe' | 'food' | 'attraction' | 'stay' | 'shop'."
+        "selector": "JSXOpeningElement[name.name='PlaceResultCard'] > JSXAttribute[name.name='category'] > Literal[value!=/^(?:cafe|food|attraction|shopping|other)$/]",
+        "message": "<PlaceResultCard> category must be one of 'cafe' | 'food' | 'attraction' | 'shopping' | 'other'."
       },
       {
         "selector": "JSXOpeningElement[name.name='ScreenTitle'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|subtitle|highlight|style|key|ref|className|style|children)$/]",
