@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored Claude Design export: compiled artifacts whose source is not in
+    // this repository (ARCHITECTURE 2.1). Linted by its own _adherence config.
+    "docs/design/**",
   ]),
 ]);
 
