@@ -45,10 +45,13 @@
 | Import 來源識別 | Import 建立後，其原始來源網址不因畫面輸入變更而改寫；不同網址建立另一筆 Import | 避免處理來源與顯示來源不一致 |
 | 批次確認失敗語意 | 允許部分成功；成功項目保留，失敗項目維持尚未處置並可重試，不回滾整批 | ImportItem 獨立處置與使用者體驗決定 |
 | 測試工具鏈 | Vitest + React Testing Library 負責單元與元件測試；Playwright 負責端對端測試 | 2026-09-01 Dependency Proposal 與 Reviewer 核准的工具鏈設定 |
+| UI 元件庫 | Tailwind CSS 搭配 Design System token 手刻視覺層；需要焦點管理、鍵盤模型或 ARIA 契約時才逐個引入 Radix primitive | 2026-09-01 Dependency Proposal |
 
 「Google 登入已決定」只代表使用者登入方式；具體 Auth 套件、Session 儲存與 OAuth 設定仍未決定。
 
 Vitest 使用 `jsdom`、`@testing-library/react`、`@testing-library/user-event` 與 `@testing-library/jest-dom` 驗證 Client Component 及純函式的公開可觀察行為。Playwright 目前只啟用 Pixel 7 裝置設定與 Chromium，驗證跨頁流程、Next.js 頁面組裝及需要真實瀏覽器的行為；Firefox、WebKit 與 production server E2E 尚未納入。每項功能仍須依 `docs/DEVELOPMENT_GUIDE.md` 事前確認 Test Seams、測試案例與通過標準，工具鏈 smoke test 不代表產品功能已有測試覆蓋。
+
+Radix primitive 不帶樣式，不對視覺做任何主張；外觀一律由 Design System token 決定。目前只安裝 `@radix-ui/react-dialog`（刪除確認 sheet）與 `@radix-ui/react-dropdown-menu`（TripCard 錨定下拉），不安裝整包 `radix-ui`；日後需要其他 primitive 時逐個提出 Dependency Proposal，不得預先引入。使用這些 primitive 的元件必須是 Client Component，符合 §4 的 Server 與 Client 邊界。不得引入自帶樣式主張的元件庫，以免與設計稿的視覺語彙衝突。
 
 設計交付使用的 Design System 以編譯後的 `docs/design/claude-design-export/_ds/<design-system>/_ds_bundle.js` 形式存在，原始 `components/` 未包含在本專案。目前該 bundle 帶有以下本地修改，屬元件責任而非頁面覆寫：
 
@@ -59,7 +62,7 @@ Vitest 使用 `jsdom`、`@testing-library/react`、`@testing-library/user-event`
 
 若日後改為由原始碼重新編譯 Design System，必須先確認這些修改不會遺失。設計交付端的對應紀錄見 `docs/design/claude-design-export/CLAUDE.md`。
 
-本段只描述設計交付所使用的 Design System，不構成應用端 UI 元件庫的決定；應用端 UI 元件庫仍列於 §2.2 尚未決定。
+本段只描述設計交付所使用的 Design System，不構成應用端的實作依據；應用端 UI 元件庫的決定見本節上方。
 
 ### 2.2 尚未決定
 
@@ -72,7 +75,6 @@ Vitest 使用 `jsdom`、`@testing-library/react`、`@testing-library/user-event`
 | AI 模型與供應商 | 不得自行選擇；輸出必須視為候選資料 |
 | 背景任務與重新嘗試機制 | 同步或非同步策略尚未決定 |
 | 截圖儲存與保存期限 | 必須支援隨 Trip 刪除，但供應商與期限未決 |
-| UI 元件庫 | 不得自行安裝或替換 |
 | Client 狀態管理 | 優先避免不必要的全域狀態；具體方案未決 |
 | 部署與環境配置 | 尚未指定 |
 | Instagram 公開內容取得方式 | 必須保留手動補充路徑，具體方法未決 |
