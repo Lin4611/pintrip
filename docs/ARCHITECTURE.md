@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 MVP 的系統邊界、元件責任、資料關係、處理流程與技術決策狀態
-- 最後更新：2026-08-28
+- 最後更新：2026-09-01
 
 本文件是架構與實作邊界的規範來源。產品目標、功能範圍與驗收條件以 `docs/MVP.md` 為準。
 
@@ -44,8 +44,11 @@
 | Instagram 匯入網址 | 支援單篇一般貼文（`/p/`）與 Reel（`/reel/`）網址 | MVP 匯入範圍 |
 | Import 來源識別 | Import 建立後，其原始來源網址不因畫面輸入變更而改寫；不同網址建立另一筆 Import | 避免處理來源與顯示來源不一致 |
 | 批次確認失敗語意 | 允許部分成功；成功項目保留，失敗項目維持尚未處置並可重試，不回滾整批 | ImportItem 獨立處置與使用者體驗決定 |
+| 測試工具鏈 | Vitest + React Testing Library 負責單元與元件測試；Playwright 負責端對端測試 | 2026-09-01 Dependency Proposal 與 Reviewer 核准的工具鏈設定 |
 
 「Google 登入已決定」只代表使用者登入方式；具體 Auth 套件、Session 儲存與 OAuth 設定仍未決定。
+
+Vitest 使用 `jsdom`、`@testing-library/react`、`@testing-library/user-event` 與 `@testing-library/jest-dom` 驗證 Client Component 及純函式的公開可觀察行為。Playwright 目前只啟用 Pixel 7 裝置設定與 Chromium，驗證跨頁流程、Next.js 頁面組裝及需要真實瀏覽器的行為；Firefox、WebKit 與 production server E2E 尚未納入。每項功能仍須依 `docs/DEVELOPMENT_GUIDE.md` 事前確認 Test Seams、測試案例與通過標準，工具鏈 smoke test 不代表產品功能已有測試覆蓋。
 
 設計交付使用的 Design System 以編譯後的 `docs/design/claude-design-export/_ds/<design-system>/_ds_bundle.js` 形式存在，原始 `components/` 未包含在本專案。目前該 bundle 帶有以下本地修改，屬元件責任而非頁面覆寫：
 
@@ -71,7 +74,6 @@
 | 截圖儲存與保存期限 | 必須支援隨 Trip 刪除，但供應商與期限未決 |
 | UI 元件庫 | 不得自行安裝或替換 |
 | Client 狀態管理 | 優先避免不必要的全域狀態；具體方案未決 |
-| 測試框架 | 依既有專案與後續決定，不得自行安裝 |
 | 部署與環境配置 | 尚未指定 |
 | Instagram 公開內容取得方式 | 必須保留手動補充路徑，具體方法未決 |
 
