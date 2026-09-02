@@ -1,0 +1,34 @@
+@theme {
+  /* Corner radii — elegant rounded, never pill except chips and CTAs */
+  --radius-xs: 8px;
+  --radius-sm: 12px; /* photo inside a card */
+  --radius-md: 14px; /* buttons */
+  --radius-lg: 20px; /* cards, panels */
+  --radius-xl: 26px; /* sheets */
+  --radius-pill: 999px;
+
+  /* Shadows — warm, low-contrast, never gray */
+  --shadow-card: 0 4px 14px rgba(122, 96, 58, 0.07);
+  --shadow-raised: 0 6px 20px rgba(122, 96, 58, 0.10);
+  --shadow-sticker: 0 2px 5px rgba(122, 96, 58, 0.16);
+  --shadow-fab: 0 6px 16px rgba(60, 95, 160, 0.28);
+  --shadow-cta: 0 6px 16px rgba(232, 96, 79, 0.26);
+  --shadow-nav: 0 -2px 14px rgba(122, 96, 58, 0.07);
+  --shadow-inset-field: inset 0 1px 2px rgba(122, 96, 58, 0.05);
+
+  /* Motion — gentle, slightly springy, never bouncy-cartoon */
+  --ease-soft: cubic-bezier(0.32, 0.72, 0.28, 1);
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.52, 1);
+}
+
+@utility dash-frame {
+  /* DS --border-dash */
+  border: 1.5px dashed var(--color-dash);
+}
+
+@utility divider-dash {
+  /* DS --divider-dash */
+  border-top: 1px dashed var(--color-cream-300);
+}
+
+/* Removed DS tokens: --border-1 → border border-hairline; --dur-fast → duration-120; --dur-base → duration-200; --dur-slow → duration-320; --press-scale → scale-97; --sticker-tilt → -rotate-4. */

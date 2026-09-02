@@ -1,0 +1,36 @@
+@utility px-gutter {
+  /* DS --screen-gutter */
+  padding-inline: 20px;
+}
+
+@utility p-card {
+  /* DS --card-pad */
+  padding: 16px;
+}
+
+@utility gap-card {
+  /* DS --card-gap */
+  gap: 16px;
+}
+
+@utility gap-stack {
+  /* DS --stack-gap */
+  gap: 12px;
+}
+
+@utility h-nav {
+  /* DS --nav-height */
+  height: 72px;
+}
+
+@utility pb-nav-safe {
+  /* DS --nav-safe-bottom */
+  padding-bottom: 24px;
+}
+
+@utility min-h-tap {
+  /* DS --tap-min */
+  min-height: 44px;
+}
+
+/* Removed DS tokens: --sp-1..10 → Tailwind spacing utilities (for example, p-5); --fab-size → no replacement (FAB removed); --frame-width and --frame-height → no replacement (design canvas only). */
