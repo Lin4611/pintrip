@@ -15,8 +15,16 @@ Screen-specific numbers live in [screens.md](screens.md).
 
 ## Design tokens
 
-Always reference the CSS custom properties in `_ds/pintrip-design-system-*/tokens/*.css` — don't
-hardcode the hex/px values below in new code. They're reproduced here so you know what exists.
+These are the design-side token names. They're reproduced here so you know what exists — never
+hardcode the hex/px values below.
+
+> **App-side code does not use these names.** The tokens were integrated into `src/styles/tokens/`
+> under Tailwind's namespaces, so implementation writes utility classes (`bg-cream-100`,
+> `rounded-lg`, `shadow-card`, `text-ui-sm`, `ease-soft`) rather than `var(--cream-100)`. Some
+> semantic names changed to avoid class-name collisions. **The DS-name to code-name mapping, the
+> rule for adding new design values, and the naming-collision rule all live in
+> `docs/ARCHITECTURE.md` §2.1 — read that section before writing any styling code.** The names
+> below remain canonical for reading design specs and the `.dc.html` files.
 
 ### Colors (`tokens/colors.css`)
 

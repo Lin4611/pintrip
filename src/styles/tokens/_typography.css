@@ -1,0 +1,40 @@
+@theme {
+  --font-display: var(--font-playfair), "Times New Roman", serif; /* wordmark, trip titles */
+  --font-ui: var(--font-quicksand), -apple-system, "Segoe UI", sans-serif; /* buttons, labels, titles */
+  --font-script: var(--font-caveat), cursive; /* taglines, margin notes */
+  --font-kr: var(--font-noto-kr), "Apple SD Gothic Neo", sans-serif; /* Korean copy */
+
+  /* Display (Playfair) */
+  --text-wordmark: 44px;
+  --text-display-lg: 30px; /* trip title: "Tokyo" */
+  --text-display-md: 22px; /* panel heading: "Start New Trip" */
+  --text-display-sm: 20px; /* section heading: "My Trip Collections" */
+
+  /* UI (Quicksand) */
+  --text-screen-title: 26px; /* "Import Link" */
+  --text-ui-lg: 19px; /* place name: "Bomnal Cafe" */
+  --text-ui-md: 16px; /* button label */
+  --text-ui-sm: 14px; /* meta, place count, nav label */
+  --text-ui-xs: 12px; /* tags, badge */
+
+  /* Body */
+  --text-body: 14px;
+  --text-body-sm: 13px;
+  --text-caption: 12px;
+  --text-script: 19px;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-body: 1.55;
+  --leading-kr: 1.6;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-caps: 0.08em;
+}

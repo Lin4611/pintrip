@@ -1,0 +1,65 @@
+@theme {
+  /* ---- Warm neutrals: paper, cream, ink. Sampled from the reference mockups. ---- */
+  --color-cream-50: #fdfbf6;
+  --color-cream-100: #f9f5ed; /* app background */
+  --color-cream-200: #f4efe4;
+  --color-cream-300: #eae5db; /* hairline borders on cream */
+  --color-paper: #fffdfa; /* card surface */
+  --color-paper-nav: #fcfbf7; /* bottom bar / elevated bar */
+
+  --color-ink-900: #0b1b33; /* serif display headings */
+  --color-ink-700: #3b3b3d; /* rounded-sans headings, place names */
+  --color-ink-500: #777777; /* body copy, descriptions */
+  --color-ink-400: #81817d; /* Korean secondary copy */
+  --color-ink-300: #a9a6a0; /* placeholder, disabled */
+
+  /* ---- Soft blue: the primary accent ---- */
+  --color-blue-700: #3c5fa0;
+  --color-blue-600: #4c76c2;
+  --color-blue-500: #5b87d0; /* primary button fill */
+  --color-blue-400: #7b9edc;
+  --color-blue-200: #b2c6dd; /* dashed borders */
+  --color-blue-100: #e9eef8; /* tag chip fill */
+  --color-blue-050: #ecf2f6; /* tinted panel fill */
+
+  /* ---- Small category accents ---- */
+  --color-coral-600: #e8604f;
+  --color-coral-500: #f0796c; /* batch CTA */
+  --color-coral-400: #f5726a; /* Cafe badge, map pins */
+  --color-coral-100: #fbeae6;
+
+  --color-butter-500: #e0b34e;
+  --color-butter-400: #f4ce6d; /* Food badge */
+  --color-butter-100: #faf3e0;
+  --color-butter-ink: #b79e68;
+
+  --color-lavender-500: #9e91c0;
+  --color-lavender-400: #b79ed9; /* Attraction badge */
+  --color-lavender-100: #f1edf7;
+  --color-lavender-ink: #9e91c0;
+
+  --color-tape-butter: #f3e3b8;
+  --color-tape-blush: #f7d9ce;
+  --color-tape-lavender: #d8cbec;
+  --color-tape-blue: #c4d8ef;
+
+  /* ---- Semantic aliases ---- */
+  --color-app: var(--color-cream-100);
+  --color-card: var(--color-paper);
+  --color-nav: var(--color-paper-nav);
+  --color-panel: var(--color-blue-050);
+  --color-title: var(--color-ink-900);
+  --color-heading: var(--color-ink-700);
+  --color-copy: var(--color-ink-500);
+  --color-copy-kr: var(--color-ink-400);
+  --color-muted: var(--color-ink-300);
+  --color-link: var(--color-blue-600);
+  --color-on-accent: #ffffff;
+  --color-accent: var(--color-blue-500);
+  --color-accent-strong: var(--color-blue-600);
+  --color-action: var(--color-coral-500);
+  --color-hairline: var(--color-cream-300);
+  --color-dash: var(--color-blue-200);
+  --color-field: var(--color-cream-300);
+  --color-focus: var(--color-blue-400);
+}

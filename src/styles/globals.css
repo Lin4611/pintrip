@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "./tokens/_colors.css";
+@import "./tokens/_typography.css";
+@import "./tokens/_effects.css";
+@import "./tokens/_spacing.css";
+
+@layer base {
+  body {
+    background: var(--color-app);
+    color: var(--color-copy);
+    font-family: var(--font-kr);
+  }
+}

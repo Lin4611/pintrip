@@ -62,7 +62,52 @@ Radix primitive 不帶樣式，不對視覺做任何主張；外觀一律由 Des
 
 若日後改為由原始碼重新編譯 Design System，必須先確認這些修改不會遺失。設計交付端的對應紀錄見 `docs/design/claude-design-export/CLAUDE.md`。
 
-本段只描述設計交付所使用的 Design System，不構成應用端的實作依據；應用端 UI 元件庫的決定見本節上方。
+以上關於 Design System bundle 的敘述只描述設計交付本身，不構成應用端的實作依據；應用端 UI 元件庫的決定見本節上方。
+
+**應用端 token 實作**
+
+本小標以下各段為應用端的規範性內容，實作時必須遵守。
+
+應用端字體透過 `next/font/google` 於建置時下載並自架，不採用 Design System `tokens/fonts.css` 的 Google CDN `@import`。字族與 fallback 順序仍以 Design System `tokens/typography.css` 為準；這項偏離只改變載入方式，不改變視覺。如此可避免瀏覽器直接向 Google Fonts 發出請求，也避免同一字體同時由自架資產與 CDN 重複載入。
+
+DS 的設計值在應用端一律以 Tailwind class 表達，切版時不得在 `className` 或 `style` 中寫 `var()`。token 定義於 `src/styles/tokens/`，由 `src/styles/globals.css` 單一入口匯入；每個值只有一個定義來源，不使用 `@theme inline` 與平行的 `:root` token 層。
+
+**新增設計值時的判斷順序**
+
+1. **Tailwind 內建 class 已能表達 → 不要定義 token。** `duration-*`、`scale-*`、`rotate-*`、`p-*`、`h-*` 是功能式 utility，接受任意數字，例如 200ms 直接寫 `duration-200`、0.97 倍寫 `scale-97`、-4deg 寫 `-rotate-4`。DS 的 `--sp-1` 至 `--sp-10` 與 Tailwind 預設 4px scale 完全重合，同樣不需定義。
+2. **落在 Tailwind namespace 內 → `@theme`。** namespace 清單以已安裝版本的 `node_modules/tailwindcss/theme.css` 為準。值不是數字（例如 `cubic-bezier`）時必須註冊才有 class。
+3. **不在 namespace 內但需要 class → `@utility`。** 可定義於被 `@import` 的檔案內。
+
+**命名必須同時避開兩類既有 utility**
+
+- Tailwind 內建 utility：例如 `--color-*` 若命名為 `dashed`，產生的 `border-dashed` 會覆蓋內建的 border-style。
+- `@theme` 自動產生的 utility：色票一旦定義 `--color-x`，`border-x`、`text-x`、`bg-x`、`ring-x` 即被佔用；`@utility` 不得再使用同名，否則編譯後同名規則互相覆蓋且無任何錯誤訊息。
+
+驗證方式：以 `@tailwindcss/postcss` 編譯後檢查產物，確認目標 class 存在且沒有任何 class 名稱被定義兩次。
+
+**DS 名稱與程式碼名稱的對應**
+
+設計稿與 `pintrip-design` Skill 使用 DS 原名，實作時依 Tailwind namespace 轉換：
+
+| DS | 程式碼 | 範例 class |
+| --- | --- | --- |
+| 色票 `--cream-100` 等 | 加 `--color-` 前綴 | `bg-cream-100` |
+| `--r-*` | `--radius-*` | `rounded-lg` |
+| `--shadow-*` | 同名 | `shadow-card` |
+| `--font-display/ui/script/kr` | 同名 | `font-display` |
+| `--type-*` | `--text-*` | `text-ui-sm` |
+| `--w-*` | `--font-weight-*` | `font-bold` |
+| `--lh-*` | `--leading-*` | `leading-tight` |
+| `--ls-*` | `--tracking-*` | `tracking-wide` |
+| `--ease-soft` / `--ease-spring` | 同名 | `ease-soft` |
+
+語意色去掉 DS 的方向前綴後套用 Tailwind namespace，其中部分為避開命名衝突而另行改名：`--bg-app` → `bg-app`、`--surface-card` → `bg-card`、`--surface-nav` → `bg-nav`、`--surface-panel` → `bg-panel`、`--text-display` → `text-title`、`--text-heading` → `text-heading`、`--text-body` → `text-copy`、`--text-body-kr` → `text-copy-kr`、`--text-muted` → `text-muted`、`--text-accent` → `text-link`、`--text-on-accent` → `text-on-accent`、`--accent` → `bg-accent`、`--accent-strong` → `bg-accent-strong`、`--accent-action` → `bg-action`、`--border-hairline` → `border-hairline`、`--border-dashed` → `border-dash`、`--border-field` → `border-field`、`--focus-ring` → `ring-focus`。
+
+`--text-body` 不可命名為 `--color-body`：會與字級 `--text-body` 產生同名 class。`--border-dashed` 不可命名為 `--color-dashed`：會覆蓋 Tailwind 內建的 `border-dashed`。
+
+具名間距與複合邊框以 `@utility` 提供：`px-gutter`（DS `--screen-gutter`）、`p-card`、`gap-card`、`gap-stack`、`h-nav`、`pb-nav-safe`、`min-h-tap`、`dash-frame`（DS `--border-dash`，1.5px）、`divider-dash`（DS `--divider-dash`，1px）。`dash-frame` 刻意不叫 `border-dash`，因該名稱已被 `--color-dash` 佔用。
+
+完整規劃與決策過程見 `docs/plans/design-system-tokens.md`。
 
 ### 2.2 尚未決定
 
