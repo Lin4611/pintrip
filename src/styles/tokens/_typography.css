@@ -3,6 +3,7 @@
   --font-ui: var(--font-quicksand), -apple-system, "Segoe UI", sans-serif; /* buttons, labels, titles */
   --font-script: var(--font-caveat), cursive; /* taglines, margin notes */
   --font-kr: var(--font-noto-kr), "Apple SD Gothic Neo", sans-serif; /* Korean copy */
+  --font-tc: var(--font-noto-tc), "PingFang TC", "Microsoft JhengHei", sans-serif; /* 繁體中文內文（DS 只為韓文指定 --font-kr，未涵蓋繁中） */
 
   /* Display (Playfair) */
   --text-wordmark: 44px;

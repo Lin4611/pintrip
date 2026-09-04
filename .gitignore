@@ -50,3 +50,7 @@ next-env.d.ts
 
 # Other local-only files
 *.local.md
+
+# Local tooling (not part of the product)
+/.claude/
+/.vscode/

@@ -1,0 +1,8 @@
+@theme {
+  /* 設計稿只有兩個變數隨寬度改變：gutter 與照片欄寬，斷點為 390 與 430
+     （references/screens.md · HomeScreen.dc.html）。Tailwind 預設的 sm/md/lg
+     全都在 640px 以上，對這三個手機寬度不會觸發，因此另外命名，
+     不覆寫預設斷點——本應用仍須支援桌面瀏覽器（ARCHITECTURE.md §2.1）。 */
+  --breakpoint-w390: 390px;
+  --breakpoint-w430: 430px;
+}
