@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 Branch、Commit、Push、Pull Request 與 Merge 流程
-- 最後更新：2026-07-31
+- 最後更新：2026-09-05
 
 本文件只規範 Git 協作流程。
 
@@ -281,32 +281,22 @@ Pull Request 由使用者在 GitHub 建立。Agent 可以依 Final Report 與實
 
 ### 9.2 PR 內容
 
-PR 說明至少包含：
+PR 說明使用條列清單，描述這支分支實際完成的內容。
 
 ```md
-## Summary
-- 完成內容
-
-## Files Changed
-- 主要修改檔案
-
-## Validation
-- 執行的指令與結果
-
-## Manual Verification
-- 實際確認項目
-
-## Known Limitations
-- 已知限制
-
-## Risks
-- 已知風險
-
-## Reviewer Result
-- APPROVED
+- 完成的功能或修改
+- 重要的實作決定與理由
+- 已知限制或尚未實作的部分
 ```
 
-不得在 Reviewer 尚未通過時填寫 `APPROVED`。
+撰寫原則：
+
+- 一項一則，描述做了什麼，必要時附上為什麼這樣做。
+- 涉及套件、架構或流程的決定，寫出理由，不只寫結果。
+- 已知限制與未實作範圍要寫出來，不得只描述完成的部分。
+- 不重複已經記錄在其他地方的內容。驗證結果、Reviewer 結論、量測數據等，以 Developer Report 與 `docs/plans/` 的實際檔案為準；PR 說明不再抄寫一份。
+
+Reviewer 結果不寫入 PR 說明。是否通過審查由 §9.1 的前提條件把關，證據是 Developer Report 的實際內容。
 
 ### 9.3 `dev` 到 `main`
 
@@ -338,13 +328,16 @@ Merge 前必須確認：
 - 沒有未解決的阻擋問題。
 - 使用者已確認合併。
 
-Merge 方法目前為「未指定」。
+Merge 方法為 **Merge Commit**（2026-09-05 決定）。
 
-在正式決定前，不得把以下任何方法寫成 PinTrip 的既定規則：
+理由是工作分支內的 Commit 依 §7 已按類別拆分，Merge Commit 會完整保留這個拆分；
+Squash and Merge 會把整支分支壓成單一 Commit，使拆分失去意義。
 
-- Merge Commit
-- Squash and Merge
-- Rebase and Merge
+Merge 後的分支處理（2026-09-05 決定）：
+
+- **由使用者刪除遠端分支。** 工作分支的內容合併後已存在於 `dev`，保留遠端分支只會讓分支清單
+  持續累積無效項目；需要追溯時以 Merge Commit 與 PR 記錄為準。
+- 本地分支自行決定是否保留，不強制。本地分支不影響協作，是否清理由使用者自行判斷。
 
 ---
 
@@ -432,8 +425,6 @@ git status --short 的實際輸出
 
 以下項目目前為「未指定」：
 
-- Merge 方法。
-- Branch 是否在 Merge 後刪除。
 - Hotfix 完整流程。
 - Release Tag 規則。
 - Versioning 規則。
