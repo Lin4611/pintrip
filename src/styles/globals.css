@@ -3,11 +3,12 @@
 @import "./tokens/_typography.css";
 @import "./tokens/_effects.css";
 @import "./tokens/_spacing.css";
+@import "./tokens/_layout.css";
 
 @layer base {
   body {
     background: var(--color-app);
     color: var(--color-copy);
-    font-family: var(--font-kr);
+    font-family: var(--font-tc);
   }
 }

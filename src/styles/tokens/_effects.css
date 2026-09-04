@@ -32,3 +32,50 @@
 }
 
 /* Removed DS tokens: --border-1 → border border-hairline; --dur-fast → duration-120; --dur-base → duration-200; --dur-slow → duration-320; --press-scale → scale-97; --sticker-tilt → -rotate-4. */
+
+/* ---- Motion：選單 140ms 淡入 + 2px 位移（向上開啟時反向）；
+       sheet 320ms 上滑、關閉同長反向，dim 同步淡入淡出。
+       數值來自 HomeScreen.dc.html CARD MENU §Motion 與 DELETE TRIP CONFIRM §Motion。
+       時長寫成字面值而非 token：`--dur-*` 不在 Tailwind 的 namespace 內，放進 `@theme`
+       不會產生任何 utility，只是掛在 `:root` 的 CSS 變數；上面那行也已記載
+       `--dur-fast/base/slow` 是刻意移除、改用 `duration-*`。`--ease-soft` 有 namespace，保留。 ---- */
+@keyframes menu-in-down { from { opacity: 0; transform: translateY(-2px); } }
+@keyframes menu-in-up { from { opacity: 0; transform: translateY(2px); } }
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+@keyframes dim-in { from { opacity: 0; } }
+@keyframes dim-out { to { opacity: 0; } }
+
+@utility menu-motion {
+  animation: menu-in-down 140ms var(--ease-soft);
+  &[data-side='top'] {
+    animation-name: menu-in-up;
+  }
+}
+
+@utility sheet-motion {
+  &[data-state='open'] {
+    animation: sheet-in 320ms var(--ease-soft);
+  }
+  &[data-state='closed'] {
+    animation: sheet-out 320ms var(--ease-soft);
+  }
+}
+
+@utility dim-motion {
+  &[data-state='open'] {
+    animation: dim-in 320ms var(--ease-soft);
+  }
+  &[data-state='closed'] {
+    animation: dim-out 320ms var(--ease-soft);
+  }
+}
+
+/* 非必要動畫一律關閉；狀態切換改為即時，且不得因此位移版面。 */
+@media (prefers-reduced-motion: reduce) {
+  .menu-motion,
+  .sheet-motion,
+  .dim-motion {
+    animation: none !important;
+  }
+}
