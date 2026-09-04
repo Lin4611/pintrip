@@ -219,6 +219,29 @@ MVP 不需要一般關鍵字搜尋。
 
 實作任何 Next.js API、檔案慣例或快取行為前，必須依 `AGENTS.md` 查閱已安裝版本的相關文件。
 
+### 4.1 專案資料夾結構
+
+資料夾配置同時決定了 Server 與 Client 元件的落點：`app/` 內的頁面預設為 Server Component，需要瀏覽器互動的元件放在 `components/` 並自行標註 `use client`。
+
+```text
+src/
+├─ app/            App Router：頁面、layout、Route Handlers
+├─ components/     跨畫面共用的 UI 元件
+├─ lib/            共用工具與資料存取
+│  └─ mock/        開發期間的假資料；接上真實資料存取後整包移除
+├─ types/          跨模組共用型別
+└─ styles/         globals.css 單一入口 + tokens/
+```
+
+規則：
+
+- **檔名採 kebab-case，元件名採 PascalCase**，與 `src/app/layout.tsx` 的既有慣例一致。
+- **單元測試與被測檔案 colocate**（`*.test.tsx` 放在同一層）；E2E 集中於頂層 `e2e/`（`*.spec.ts`）。此分工由 `vitest.config.mts` 的 `include` 與 `playwright.config.ts` 的 `testDir` 強制。
+- **元件不得相依 `lib/mock/`**。共用型別放 `types/`，讓元件與假資料解耦，之後替換資料來源不需要改元件。
+- **目錄依實際需要建立，不預先開空目錄。** 需要跨功能領域的分區時（例如 `modules/`）另行提出並更新本節。
+
+`src/app/` 內的路由對應 §10 的規劃路由。`/` 以 `redirect()` 導向 `/trips`；登入狀態的判斷待 Auth 方案定案後再加入。
+
 ---
 
 ## 5. 資料模型與所有權
