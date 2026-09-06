@@ -39,8 +39,17 @@ export function BottomNav() {
       className="z-[5] flex h-[calc(72px+env(safe-area-inset-bottom))] shrink-0 items-start rounded-t-xl bg-nav pt-3 pb-[env(safe-area-inset-bottom)] shadow-nav"
     >
       {CELLS.map((cell) => {
-        // 精確比對：`/trips/new` 不該讓「旅行收藏」也高亮。
-        const active = pathname === cell.href
+        // 明確列出屬於「旅行收藏」的路由，不用 `startsWith`（會誤命中 `/tripsomething`）。
+        // `/trips/new` 與 `/trips/:id/edit` 要高亮，依據是 `NewTripScreen.dc.html` 的
+        // BottomNav 明載 `active-id="trips"`。**這推翻了上一支的判斷**——
+        // `trip-collection-list-visual.md` 第 10 列把「`/trips/new` 會一起高亮」當成缺陷、
+        // 標為「實作決定：改精確比對」，但那不是缺陷，是設計要求；來源明載優先於實作決定。
+        // 未涵蓋：`/trips/:tripId` 與 `/trips/:tripId/map`（無設計稿，active 狀態未定義）。
+        const active = pathname === cell.href || (
+          cell.href === '/trips' && (
+            pathname === '/trips/new' || /^\/trips\/[^/]+\/edit$/.test(pathname)
+          )
+        )
 
         return (
           <Link
