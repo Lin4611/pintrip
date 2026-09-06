@@ -14,13 +14,16 @@ import { BottomNav } from './bottom-nav'
  * 上緣為 `env(safe-area-inset-top)` + 12px；內容底部留白 72px，
  * 讓最後一張卡完全避開 nav（nav 自身另含 bottom inset）。
  */
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, bottomPad = 'nav' }: {
+  children: ReactNode
+  bottomPad?: 'nav' | 'compact'
+}) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-app">
       <div className="mx-auto flex w-full max-w-[430px] min-h-0 flex-1 flex-col">
         <div
           data-scroll-container
-          className="min-h-0 flex-1 overflow-x-clip overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-[72px] w390:px-5 w430:px-6"
+          className={`min-h-0 flex-1 overflow-x-clip overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+12px)] w390:px-5 w430:px-6 ${bottomPad === 'compact' ? 'pb-[calc(32px+env(safe-area-inset-bottom))]' : 'pb-[72px]'}`}
         >
           {children}
         </div>
