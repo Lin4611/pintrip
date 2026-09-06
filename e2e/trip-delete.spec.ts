@@ -10,8 +10,11 @@ test('removes a collection after the deletion is confirmed', async ({ page }) =>
   await expect(
     page.getByRole('button', { name: '「東京」的更多選項' }),
   ).toHaveCount(0)
+  // 不比對名稱：`trip-edit.spec.ts` 案例 13 會在 server mock 上把「京都」改名再還原，
+  // 與本檔平行執行時可能落在改名視窗內。這裡要斷言的是「另一個收藏還在」，
+  // 與它叫什麼無關，所以改數卡片數量。
   await expect(
-    page.getByRole('button', { name: '「京都」的更多選項' }),
+    page.getByRole('button', { name: /的更多選項$/ }),
   ).toHaveCount(1)
 })
 
