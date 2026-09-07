@@ -90,7 +90,7 @@ export function TripCard({ trip, onRename, onConfirmDelete }: TripCardProps) {
             <strong className="font-bold text-link">{trip.placeCount}</strong>{' '}
             個地點
           </span>
-          <span className="flex gap-1">
+          <span className="flex min-h-[27px] gap-1">
             {trip.icons.map((icon) => (
               <Image
                 key={icon.src}
@@ -106,15 +106,44 @@ export function TripCard({ trip, onRename, onConfirmDelete }: TripCardProps) {
         </div>
       </div>
 
-      <div className="relative min-h-[161px] w-[148px] shrink-0 self-stretch overflow-hidden rounded-md w390:w-[172px] w430:w-[196px]">
-        <Image
-          src={trip.photoSrc}
-          alt=""
-          fill
-          sizes="(max-width: 389px) 148px, (max-width: 429px) 172px, 196px"
-          className="object-cover object-center"
-        />
-      </div>
+      {trip.placeCount === 0 ? (
+        <div
+          data-placeholder="empty-trip-photo"
+          className="relative min-h-[161px] w-[148px] shrink-0 self-stretch rounded-md w390:w-[172px] w430:w-[196px]"
+          style={{
+            background:
+              'radial-gradient(circle, var(--color-grid-dot) 1.3px, transparent 1.4px) 0 0/9px 9px, var(--color-cream-200)',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/design-assets/stickers/trip-decoration-paperclip-generic.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-2 right-8 h-auto w-[17px] drop-shadow-[0_2px_4px_rgba(122,96,58,0.16)] [transform:rotate(4deg)]"
+          />
+          <div className="absolute right-[11px] bottom-[14px] left-[13px] flex flex-col gap-[1px] text-left">
+            <span className="text-[12px] leading-[1.5] font-semibold text-heading [text-wrap:balance]">
+              還沒有地點
+            </span>
+            <span className="text-[11.5px] leading-[1.5] font-normal text-copy [text-wrap:balance]">
+              從貼文匯入後會出現在這裡
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="relative min-h-[161px] w-[148px] shrink-0 self-stretch overflow-hidden rounded-md w390:w-[172px] w430:w-[196px]">
+          {trip.photoSrc && (
+            <Image
+              src={trip.photoSrc}
+              alt=""
+              fill
+              sizes="(max-width: 389px) 148px, (max-width: 429px) 172px, 196px"
+              className="object-cover object-center"
+            />
+          )}
+        </div>
+      )}
 
       <DeleteTripDialog
         open={confirmingDelete}
