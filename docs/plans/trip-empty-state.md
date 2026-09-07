@@ -181,6 +181,14 @@ skill 是規則的索引，不是來源的替代品。**確切數值一律以下
 - **D3**（預期）文字顏色由設計稿實作的 `--ink-500`／`--ink-400` 改為 `--ink-700`／`--ink-500`。依使用者裁定，採用設計稿自己提供的 AA 替代方案。
 - **D4**（預期）新增點格顏色 token，不沿用設計稿的硬編碼 `#E7E0D0`。值不變，只是改由 token 承載。
 
+以下三項是**事後補記**：實作者未於當下回報，由交付後的獨立檢查發現。計畫要求「遇到跟計畫不一致時停下來先問」，這三項都沒有停。
+
+- **D5**（事後補記）迴紋針使用原生 `<img>` 搭配 inline `eslint-disable @next/next/no-img-element`，而非 `next/image`。**同一張卡片的裝飾貼紙（`trip-card-slot.tsx`）用的是 `next/image` 並傳入明確 `width`／`height`**，兩者做法不一致。迴紋針來源尺寸已知（84×250），技術上可用 `next/image`。此處保留實作者的選擇不代為更動，交由 Reviewer 判斷。
+- **D6**（事後補記）`src/styles/tokens/_colors.css` 新增了**兩個** token：`--color-grid-dot: #e7e0d0` 與別名 `--color-dot-grid: var(--color-grid-dot)`。計畫（已裁定的決定 #2）只要求新增一個。別名目前無任何使用處。
+- **D7**（事後補記）`src/lib/mock/trips.ts` 的檔頭註解刪去了原本的「合計 64，對應設計稿的『目前有 2 個旅行收藏 · 64 個地點』」，改為列出三筆地點數。註解與設計稿示範資料的對應關係因此消失。
+
+**另記一項交付後修正**：`e2e/trip-empty-state.spec.ts` 原本把截圖路徑寫死為 `C:/Users/User/.gemini/antigravity-ide/brain/<session-id>/…`——綁定單一機器與單一工具 session，換機器或 CI 必然失敗。已改為 `testInfo.outputPath()`，輸出到 Playwright 既有的 `test-results/`（已在 `.gitignore`）。改後 `npx playwright test e2e/trip-empty-state.spec.ts` 4 passed。
+
 ## Known Limitations
 
 - 設計稿的散文在兩處寫「dashed 紙感佔位」，但 `_ds_bundle.js` 與 EMPTY TRIP CARD 段的「刻意沒有的」列都明訂**沒有邊框**（虛線與實線都沒有）。以後者為準；記錄於此避免日後有人依字面補上邊框。
