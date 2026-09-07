@@ -25,12 +25,13 @@
 
 ## Design System 本地修改（需回寫 DS 元件原始碼）
 
-`_ds/…/_ds_bundle.js` 目前帶有四處本地修改，屬元件責任而非頁面覆寫：
+`_ds/…/_ds_bundle.js` 目前帶有五處本地修改，屬元件責任而非頁面覆寫：
 
 - `Button` — 新增 `ariaLabel` / `ariaDescribedby` 透傳。
 - `BottomNav` — 新增 `showFab`（預設 `true`，PinTrip 三張稿傳 `false`）。
 - `PlaceResultCard` — 新增 `readOnly` + `dispositionLabel`（completed 的唯讀處置列）、`failed` + `failureText` + `failureId` + `failureLabel`（批次失敗提示區）、`adding`（重試 loading）、`editAriaLabel` / `rejectAriaLabel` / `addAriaLabel`、`onRetry`。
 - `CategoryBadge` / `PlaceResultCard` — `KINDS` 與 `TAG_TONE` 對齊 MVP 固定五分類：`shop` → `shopping`、移除 `stay`、新增 `other`（底色 `--ink-400` 暖灰，不沿用任何既有 kind）。原本 `shopping` 與 `other` 會靜默 fallback 成 `cafe` 的珊瑚色。
+- `TripCard` — 新增 `empty` / `emptyHint` / `emptyStickerSrc`（0 個地點時，照片欄改為 dashed 紙感佔位 + 貼紙 + 引導文字；不放按鈕、不新增第二個可點目標）；分類貼紙那排補 `min-height:27px`，讓計數列在有無貼紙時佔同一個高度槽位（計數文字不上移）。**這不等於所有卡片同高**：計數列 `flex-wrap:wrap`，三枚貼紙在 148px 文字欄會換行 → 卡片 195.6px；0–1 枚不換行 → 183px。0 個地點的卡片為 183px，與一枚貼紙的卡片同高。不改 `flex-wrap` 去強制齊高。
 
 ## Home Screen 素材（2026-08-26 確認，2026-08-27 校正敘述）
 
@@ -61,7 +62,7 @@
 - **不得依 card index、render order 或每次 render 隨機**；排序、刪除、reload、重開 App、切換 viewport 後都必須不變。
 - 舊資料沒有 preset 欄位時 **fallback C（Grid Scrapbook）**，不重抽、不變成無裝飾。
 - 不依目的地挑 preset；MVP 不提供使用者挑選／更換／關閉裝飾的入口。
-- `trip-tokyo-decoration-paperclip.png`、`trip-tokyo-decoration-stamp.png`：素材保留不刪除，但**目前不屬於任何 preset，也不進分配池**（paperclip 與 paper tape 重複表達「固定照片」；stamp 是 destination-specific 參考素材）。
+- `trip-tokyo-decoration-paperclip.png`：舊檔保留不刪除；已裁到墨跡（84×250）並以通用名稱 `trip-decoration-paperclip-generic.png` 重出，由「保留未使用」改為 **0 個地點佔位專用**。仍**不屬於任何 preset、不進分配池** —— 它與 paper tape 重複表達「固定照片」，而空照片欄要說的就是「這裡要夾一張照片」。`trip-tokyo-decoration-stamp.png` 仍為 destination-specific 參考素材，保留但不使用。
 - lavender 貼紙為手繪近似，已接受並繼續使用。
 
 **視覺身份一致性**
@@ -137,6 +138,19 @@
 **確認介面的形式依資訊量選擇，不強制統一：**
 - Import 的拒絕候選地點 — 卡內就地確認列（規格見 `ImportScreen.dc.html`）。
 - Home 的 TripCard「•••」→ 刪除旅行收藏 — 同樣適用上述四條，但因必須列出「N 個地點會一起刪除」，資訊量超過卡內一列，**採畫面層級 sheet 而非卡內就地確認**。實際設計另案處理，本次未設計。
+
+## 圖示修正（2026-09-06）
+
+- `assets/icons/arrow-back.png` 重出：畫布仍 **30×28**、glyph 尺寸與造型不變（`IconButton` 以 `size × 0.45` 換算，改動 glyph 會連動所有使用處），但**背景改為透明**（原本 alpha 全 255、四角 #FFFFFF）、**箭頭在畫布內置中**（原本左偏 4.5px、上偏 2.5px）。
+- `assets/icons/flower.png`（28×28）與 `assets/icons/pin-coral.png`（25×29）同樣重出：畫布尺寸與 glyph 造型不變，背景改為透明（白底 alpha key，低於 20 的殘留 halo 歸零）、glyph 在畫布內置中。
+- **`status-bar` 本次未修**（使用者指定）：它是狀態列整條截圖，置中會移動列内時間與電量的位置。仍為不透明 PNG、偏移 (0, −4.5)。另外 `heart-outline`／`pencil`／`pin-blue`／`note-paper`／`sticker-envelope`／`sticker-sparkles`／`worldmap` 仍為不透明 PNG，未測偏移。要修需另案指示。
+
+## TripCard 0 個地點狀態（2026-09-06 確認）
+
+- 引導文案 **FINAL**：「還沒有地點／從貼文匯入後會出現在這裡」（`white-space:pre-line`，**最多兩行** —— 148px 窄欄內容寬約 123px，第二行會折行）。文案一律指「地點」，不得用「收藏」指涉地點。
+- 佔位**只有三個元素**：① 點格紙底（`radial-gradient(circle,#E7E0D0 1.3px,transparent 1.4px) 0 0/9px 9px` 疊 `--cream-200`，點色暖 cream 且壓淡，以免讀成 lavender preset）② `trip-decoration-paperclip-generic.png` 寬 17px 夾在佔位上緣（`top:-8` `right:32`、`rotate(4deg)`、淡 drop-shadow）——「這裡要夾一張照片」；橫向不放在角上，因為 `TripCard` 根是 `overflow:hidden` + r20（preset 能真正出界是因為畫在卡片外層 wrapper）③ 左下兩行文字（絕對定位錨在左下 `left:13`／`right:11`／`bottom:14`，左對齊；第一行 12px `--w-semibold` `--ink-500`，第二行 11.5px 400 `--ink-400`，lh 1.5）。**沒有邊框、沒有第二張貼紙、沒有膠帶**（每張卡只有一條 tape，由 preset 提供）。中間的留白是設計的一部分。148 欄第二行會折成兩行（整體三行），屬預期：不撐破卡片、不蓋到迴紋針。
+- 佔位**不加 `aspect-ratio`**：照片欄本來是寬度固定（148／172／196 随断點）、高度 `align-self:stretch` 跟卡片、`min-height:161`，不是固定比例。加 `1/1` 會在 360 與 `min-height` 衝突（148 < 161），在 430 讓空卡片（196）反而比有内容的高。
+- 提示只是文字：不放按鈕、不做匯入入口（匯入是主導覽列分頁），卡片維持單一可點區。
 
 ## 圖片格式
 - Design Handoff 只維護 1x／2x／3x JPG + 透明 decoration PNG。

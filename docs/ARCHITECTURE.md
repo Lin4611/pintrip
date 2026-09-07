@@ -4,7 +4,7 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 MVP 的系統邊界、元件責任、資料關係、處理流程與技術決策狀態
-- 最後更新：2026-09-01
+- 最後更新：2026-09-05
 
 本文件是架構與實作邊界的規範來源。產品目標、功能範圍與驗收條件以 `docs/MVP.md` 為準。
 
@@ -377,6 +377,7 @@ Place 代表外部實際地點，可能被其他 Trip 參照，不隨單一 Trip
 /trips
 /trips/new
 /trips/:tripId
+/trips/:tripId/edit
 /trips/:tripId/map
 /imports
 /imports/:importId/review
@@ -385,6 +386,8 @@ Place 代表外部實際地點，可能被其他 Trip 參照，不隨單一 Trip
 ```
 
 路由可以在實作規劃時調整，但不得刪除對應的登入、旅行收藏、匯入、確認、卡片、地圖與分享能力。
+
+`/trips/:tripId/edit` 是編輯既有旅行收藏的名稱、目的地名稱與收藏說明（`MVP.md` §5.2）。它與 `/trips/new` 共用同一份表單元件，只差畫面標題、CTA 文案與初始值；**刪除收藏不在此路由**，其入口為旅行收藏列表的卡片選單與畫面層級確認（§8）。
 
 `/imports/:importId/items/:itemId/edit` 只服務尚在 `review_required` 的候選編輯。Import 進入 `completed` 後不得再進入此路由；已加入地點的後續修改必須使用 TripPlace 的正式收藏編輯邊界，其路由與畫面不在本次 Import Screen 設計範圍，尚未於本文件定案。
 

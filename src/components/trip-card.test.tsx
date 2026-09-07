@@ -69,3 +69,105 @@ test('hides the photo, the pin and the category stickers from assistive technolo
   expect(screen.queryAllByRole('img')).toHaveLength(0)
   expect(screen.queryByText('神社')).not.toBeInTheDocument()
 })
+
+const emptyTrip: Trip = {
+  id: 'jeju',
+  name: '濟州',
+  destination: '大韓民國',
+  note: '海岸線、咖啡館與日出峰，慢慢走完一整圈。',
+  placeCount: 0,
+  createdAt: '2026-08-15T09:00:00.000Z',
+  decorationPreset: 'C',
+  icons: [],
+}
+
+// 測試 1：0 地點顯示提示文字
+test('1. 0 地點顯示提示文字', () => {
+  render(<TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />)
+
+  expect(screen.getByText('還沒有地點')).toBeInTheDocument()
+  expect(screen.getByText('從貼文匯入後會出現在這裡')).toBeInTheDocument()
+})
+
+// 測試 2：0 地點不 render 照片
+test('2. 0 地點不 render 照片', () => {
+  const { container } = render(
+    <TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />,
+  )
+
+  expect(container.querySelector('img[src*="photos"]')).toBeNull()
+})
+
+// 測試 3：有地點時仍 render 照片（回歸）
+test('3. 有地點時仍 render 照片（回歸）', () => {
+  const { container } = render(
+    <TripCard trip={tokyo} onRename={() => {}} onConfirmDelete={() => {}} />,
+  )
+
+  expect(container.querySelector('img[src*="photos"]')).toBeInTheDocument()
+  expect(screen.queryByText('還沒有地點')).not.toBeInTheDocument()
+  expect(screen.queryByText('從貼文匯入後會出現在這裡')).not.toBeInTheDocument()
+})
+
+// 測試 4：迴紋針是純裝飾
+test('4. 迴紋針是純裝飾', () => {
+  render(<TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />)
+
+  expect(screen.queryAllByRole('img')).toHaveLength(0)
+})
+
+// 測試 5：計數行不特例
+test('5. 計數行不特例', () => {
+  render(<TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />)
+
+  const countNode = screen.getByText('0')
+  expect(countNode.tagName).toBe('STRONG')
+  expect(countNode.parentElement).toHaveTextContent('0 個地點')
+})
+
+// 測試 6：0 分類時貼紙列仍佔位
+test('6. 0 分類時貼紙列仍佔位', () => {
+  const { container } = render(
+    <TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />,
+  )
+
+  const stickerContainer = container.querySelector('.min-h-\\[27px\\]')
+  expect(stickerContainer).toBeInTheDocument()
+})
+
+// 測試 7：佔位不可點
+test('7. 佔位不可點', () => {
+  const { unmount } = render(
+    <TripCard trip={tokyo} onRename={() => {}} onConfirmDelete={() => {}} />,
+  )
+  const normalLinks = screen.getAllByRole('link').length
+  const normalButtons = screen.getAllByRole('button').length
+  unmount()
+
+  render(<TripCard trip={emptyTrip} onRename={() => {}} onConfirmDelete={() => {}} />)
+  expect(screen.getAllByRole('link')).toHaveLength(normalLinks)
+  expect(screen.getAllByRole('button')).toHaveLength(normalButtons)
+})
+
+// 測試 8：photoSrc 選填
+test('8. photoSrc 選填', () => {
+  const tripWithoutPhoto: Trip = {
+    id: 'jeju-no-photo',
+    name: '濟州',
+    destination: '大韓民國',
+    placeCount: 0,
+    createdAt: '2026-08-15T09:00:00.000Z',
+    decorationPreset: 'C',
+    icons: [],
+  }
+
+  expect(() =>
+    render(
+      <TripCard
+        trip={tripWithoutPhoto}
+        onRename={() => {}}
+        onConfirmDelete={() => {}}
+      />,
+    ),
+  ).not.toThrow()
+})

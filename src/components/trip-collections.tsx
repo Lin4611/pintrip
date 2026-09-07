@@ -87,7 +87,7 @@ export function TripCollections({
           trips={visible}
           error={error}
           describedBy={error ? undefined : SUMMARY_ID}
-          onRename={() => router.push('/trips/new')}
+          onRename={(tripId) => router.push(`/trips/${encodeURIComponent(tripId)}/edit`)}
           onConfirmDelete={(tripId) =>
             setVisible((current) => current.filter((trip) => trip.id !== tripId))
           }

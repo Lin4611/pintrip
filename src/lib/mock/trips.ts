@@ -5,9 +5,23 @@ import type { Trip } from '@/types/trip'
  * 接上真實資料存取時整個 `src/lib/mock/` 移除。
  *
  * 數值取自 HomeScreen.dc.html 的示範資料：東京 28 個地點、京都 36 個，
- * 合計 64，對應設計稿的「目前有 2 個旅行收藏 · 64 個地點」。
+ * 合計 64，對應設計稿的「目前有 2 個旅行收藏 · 64 個地點」；濟州為 0 個地點。
  */
-const TRIPS: Trip[] = [
+// Next.js dev 將路由編成各自的 server chunk，模組陣列不一定共用。
+// 只在可整包移除的 mock 層使用 process 共用單例，讓編輯與 Home 讀到同份資料。
+// 伺服器重啟後還原；熱重載可能保留。不得複製此模式到正式資料存取。
+const mockGlobal = globalThis as typeof globalThis & { pintripMockTrips?: Trip[] }
+const TRIPS: Trip[] = mockGlobal.pintripMockTrips ??= [
+  {
+    id: 'jeju',
+    name: '濟州',
+    destination: '大韓民國',
+    note: '海岸線、咖啡館與日出峰，慢慢走完一整圈。',
+    placeCount: 0,
+    createdAt: '2026-08-15T09:00:00.000Z',
+    decorationPreset: 'C',
+    icons: [],
+  },
   {
     id: 'tokyo',
     name: '東京',
@@ -42,4 +56,14 @@ const TRIPS: Trip[] = [
 
 export function listTrips(): Trip[] {
   return TRIPS
+}
+
+export function getTrip(id: string): Trip | undefined {
+  return TRIPS.find((trip) => trip.id === id)
+}
+
+export function updateTrip(id: string, input: Pick<Trip, 'name' | 'destination' | 'note'>): void {
+  const index = TRIPS.findIndex((trip) => trip.id === id)
+  if (index < 0) throw new Error('找不到旅行收藏。')
+  TRIPS[index] = { ...TRIPS[index], name: input.name, destination: input.destination, note: input.note }
 }

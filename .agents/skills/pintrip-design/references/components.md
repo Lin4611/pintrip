@@ -203,6 +203,13 @@ page-level overrides:
   to match and re-crops with `cover` (ratio drifts 0.85–1.05). Footer row (category stickers +
   place count) is `flex-wrap: wrap` with `row-gap: 6` so stickers never squeeze the count, and the
   count is `white-space:nowrap`.
+  The footer row also carries **`min-height: 27px`** (= one `CategoryIcon`) so the count sits in the
+  same vertical slot whether or not stickers are present — it does **not** equalise card heights
+  (three stickers wrap at the 148px text column → 195.6px card; 0–1 sticker → 183px). Do not change
+  `flex-wrap` to force equal heights; that would alter every existing card.
+  For the 0-places state the component takes **`empty`, `emptyHint`, `emptyStickerSrc`** and renders
+  a placeholder instead of the photo (`photoSrc` is not passed in that state) — see the 0 places row
+  in [screens.md](screens.md). This is the same component, not a new one.
 - **`PlaceResultCard`** — two-column: fixed/breakpoint photo column left (in the 5px white frame),
   text right, `gap 12`, text column `flex:1; min-width:0`. Place name is single-line `nowrap` +
   ellipsis (not clamped). Description and address are each `line-clamp: 2`. One shared decorative
@@ -262,10 +269,17 @@ Assignment rules (do not deviate):
   disable decoration.
 - When several collections are created in a row, *try* to avoid repeating the immediately previous
   preset — best-effort only; it must never block creation.
-- `trip-tokyo-decoration-paperclip.png` and `trip-tokyo-decoration-stamp.png` are kept in the repo
-  but are **not** in any preset and **not** in the assignment pool (the paperclip duplicates what
-  tape already signals; the stamp is destination-specific reference art) — do not wire them up
-  without a product decision.
+- `trip-decoration-paperclip-generic.png` (the old `trip-tokyo-decoration-paperclip.png` cropped to
+  its ink, 84×250, re-exported under a generic name; the old file is kept, not deleted) is **still not
+  in any preset and still not in the assignment pool** — but it is no longer unused. As of 2026-09-06
+  it is the **0-places placeholder sticker**, and that is its only sanctioned use. The reason it was
+  excluded from the presets is exactly why it fits there: it duplicates what paper tape signals
+  ("holds a photo"), and an empty photo column is precisely "a photo gets clipped in here". Because it
+  lives outside the pool it structurally cannot collide with a preset, and it does not violate the
+  one-tape-per-card rule.
+- `trip-tokyo-decoration-stamp.png` is kept in the repo but is **not** in any preset, **not** in the
+  assignment pool, and still unused (destination-specific reference art) — do not wire it up without
+  a product decision.
 - The Start New Trip card's centered butter tape is a fixed brand element, outside the preset pool
   and outside the randomization.
 - The `data-decor-preset="A|B|C|D"` attribute on the first node of each decoration group exists only

@@ -19,8 +19,8 @@ export type Trip = {
   createdAt: string
   /** 建立時等機率抽出並持久化，之後不再變更 */
   decorationPreset: TripDecorationPreset
-  /** 佔位：實際應由收藏內的地點推導 */
-  photoSrc: string
+  /** 佔位：實際應由收藏內的地點推導；0 地點時不提供 */
+  photoSrc?: string
   /** 佔位：footer 的分類貼紙，實際應由收藏內的地點分類推導 */
   icons: { src: string; alt: string }[]
 }

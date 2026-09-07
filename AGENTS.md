@@ -15,6 +15,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 程式修改與驗證：`docs/DEVELOPMENT_GUIDE.md`
 - Branch、Commit 或 PR：`docs/GIT_WORKFLOW.md`
 - 程式或文件修改的 Reviewer 審查：`docs/CODE_REVIEW.md`
+- UI 實作、修改或審查：`.agents/skills/pintrip-design/`
+
+`pintrip-design` 的 `SKILL.md` 是索引，依任務讀對應的 `references/*.md`，不需全部讀完；確切數值仍以 `docs/design/claude-design-export/` 的來源檔為準。無法自動載入 Skill 的工具，直接以路徑讀檔即可，效果相同，不得因此略過。Claude Code 另讀 `.claude/skills/pintrip-design/`（被 `.gitignore`），兩份內容必須同步，改一份就要改另一份。
 
 不得為了取得一般背景而主動擴大閱讀範圍。使用者若明確限制可讀檔案，以該限制為準；確實需要擴大時，先說明原因並取得同意。
 
