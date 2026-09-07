@@ -78,6 +78,17 @@
 
 ## Files to Inspect
 
+**設計規則（先讀）**
+
+- `.agents/skills/pintrip-design/SKILL.md` —— 來源優先順序（依問題類型決定，不是單一清單）、design-to-code 規則、最後的 Visual QA checklist
+- `.agents/skills/pintrip-design/references/components.md` —— `TripCard` 的 props（含 `empty` / `emptyHint` / `emptyStickerSrc`）、footer 的 `min-height: 27px`、decoration preset 系統與迴紋針素材的定位
+- `.agents/skills/pintrip-design/references/screens.md` —— Home 的版面數值、響應式規則、UI states（含「0 places」列，明寫它不是 Empty）
+- 需要 token、字級或無障礙細節時再讀 `references/design-system.md`、`references/accessibility.md`；不必全部讀完
+
+skill 是規則的索引，不是來源的替代品。**確切數值一律以下列來源檔為準。**
+
+**設計來源**
+
 - `docs/design/claude-design-export/HomeScreen.dc.html`（EMPTY TRIP CARD 段）
 - `docs/design/claude-design-export/_ds/pintrip-design-system-*/_ds_bundle.js`（`TripCard`）
 - `docs/design/claude-design-export/CLAUDE.md`（圖示修正、TripCard 0 個地點狀態）
@@ -104,15 +115,25 @@
 - `public/design-assets/icons/arrow-back.png`、`flower.png`、`pin-coral.png` — 以匯出版本覆蓋。
 - `public/design-assets/stickers/trip-decoration-paperclip-generic.png` — 新增。
 
-**Skill 修正**（使用者已於 2026-09-06 明確授權；`.claude/` 被 `.gitignore` 第 55 行忽略，
-因此依 `docs/DEVELOPMENT_GUIDE.md` §3 於修改前將原檔複製到 Repository 外作為基準，
-以 `git diff --no-index` 產生替代 diff，Developer Report 標示 `Diff Source: NON_GIT_BASELINE`）：
+**流程規範修正**（使用者已於 2026-09-07 明確授權；見「已裁定的決定」#5）
 
-- `.claude/skills/pintrip-design/references/components.md` —
+- `AGENTS.md` — Required Reading 新增一行「UI 實作、修改或審查：`.agents/skills/pintrip-design/`」，並補一段說明：`SKILL.md` 是索引不需全讀、確切數值仍以設計來源檔為準、無法自動載入 Skill 的工具改為直接讀檔且不得因此略過、`.claude/` 另有一份被 `.gitignore` 的副本兩份必須同步。
+  **此檔不在本計畫原定範圍內**，屬使用者授權的範圍擴充，於此明列以供審查。
+
+**Skill 修正**（使用者已於 2026-09-07 明確授權）
+
+這個 skill 在專案裡有**兩份副本**，改前內容一致（已以 md5 驗證）：
+
+- `.agents/skills/pintrip-design/` — **有進 Git 版控**，Codex 與 Gemini 從這裡讀取。**這份是正規來源**，diff 用一般 `git diff` 即可。
+- `.claude/skills/pintrip-design/` — 被 `.gitignore` 第 55 行忽略，Claude Code 從這裡讀取。
+
+兩份都要套用相同修改，否則不同工具會讀到不同規則。修改內容：
+
+- `references/components.md` —
   (a) `TripCard` 補上 `empty` / `emptyHint` / `emptyStickerSrc` 與 footer 的 `min-height: 27px`（含「這不是讓卡片同高」的說明）；
   (b) 迴紋針那條原本寫「未經產品決定不得接上」，現在已有決定且已指定用途，改為「仍不屬於任何 preset、不進分配池，但已是 0 地點佔位專用」，並把 stamp 拆成獨立一條維持原狀。
-- `.claude/skills/pintrip-design/references/screens.md` — Home 的 UI states 表新增「0 places」一列，並明寫**它不是 Empty**（Empty 指一個收藏都沒有）。
-- `.claude/skills/pintrip-design/SKILL.md` — **不修改**。「不得用來發明 design 沒定義的狀態」依然成立，該狀態現在有定義。
+- `references/screens.md` — Home 的 UI states 表新增「0 places」一列，並明寫**它不是 Empty**（Empty 指一個收藏都沒有）。
+- `SKILL.md` — **不修改**。「不得用來發明 design 沒定義的狀態」依然成立，該狀態現在有定義。
 
 `src/components/app-header.tsx`、`src/app/trips/new/page.tsx`、`src/app/trips/[tripId]/edit/page.tsx` **不需修改**：返回鍵的 CSS 與設計系統 `IconButton` 逐項一致（`size=44`、`width: size*0.45`、`justify-content:center`），偏移的成因在圖檔，換檔即修好。
 
@@ -148,6 +169,8 @@
 3. **提示文字採用 `text-wrap: balance`。** 使用者裁定「符合通用開發方式就做」。它是為短文字區塊避免末行孤字而設計的標準屬性，Chrome／Safari／Firefox 自 2023–2024 起支援，不支援的瀏覽器照常斷行（漸進增強）。**不改文案、不改字級**，設計稿禁止的兩件事都沒碰，只影響斷行位置。仍記入偏離（見 D2）。
 
 4. **mock 新增 0 地點收藏。** 沿用設計稿示範資料。連動修改 `e2e/trip-delete.spec.ts` 的剩餘卡片數斷言（1 → 2）；那是資料筆數變動的必然結果，非行為變更。
+
+5. **把「UI 任務必須讀 design skill」寫進 `AGENTS.md`。** 查證後確認這條先前**不存在於任何文件**——`AGENTS.md` 只有一處提到 Skill，講的是「使用 Skill 時誰優先」，不是「必須先用」。實際運作一直依賴使用者手動載入：Codex 那次它明確回報「工具清單沒有可呼叫的 Skill 載入工具，我也沒有用檔案讀取替代」，是使用者打 `/pintrip-design` 注入才解決的。工具看得到 skill 不等於 agent 有義務使用它，兩者是不同問題；前者已解決（三個工具都從 `.agents/` 讀得到），後者到此才寫下來。
 
 ## 偏離與計畫外的修改
 
