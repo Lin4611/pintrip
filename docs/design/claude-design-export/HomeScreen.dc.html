@@ -259,7 +259,7 @@
     <div style="display:flex;align-items:baseline;gap:12px">
       <span style="font-size:13px;font-weight:700;color:#A9A6A0;letter-spacing:0.08em">03</span>
       <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:24px;font-weight:500;color:#0B1B33">UI states</h2>
-      <span style="font-size:13px;font-weight:600;color:#A9A6A0">Empty · Loading · Error · Long list · ••• 選單（下拉）· 刪除確認</span>
+      <span style="font-size:13px;font-weight:600;color:#A9A6A0">Empty · 0 個地點 · Loading · Error · Long list · ••• 選單（下拉）· 刪除確認</span>
     </div>
 
     <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
@@ -290,6 +290,66 @@
           </div>
           <div style="position:relative;z-index:5;flex-shrink:0">
             <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:8px;padding-left:4px"><span style="font-size:14px;font-weight:700">0 個地點</span><span style="font-size:12.5px;font-weight:600;color:#A9A6A0">剛建立的收藏</span></div>
+        <div data-w="390" data-screen-label="Home zero places" style="width:390px;height:844px;background:#F9F5ED;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(60,45,25,0.18)">
+          <img src="assets/icons/status-bar.png" alt="" aria-hidden="true" style="width:100%;height:28px;object-fit:cover;flex-shrink:0;margin-top:8px">
+          <div style="flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:12px 20px 72px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+              <div>
+                <img src="assets/stickers/wordmark-serif.png" alt="PinTrip" style="height:58px;display:block">
+                <img src="assets/stickers/tagline-script.png" alt="Pin your best trips. Cherish every place." style="width:152px;display:block;margin-top:10px">
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;padding-top:6px">
+                <img src="assets/photos/avatar-user.png" alt="" style="width:52px;height:52px;border-radius:999px;border:2.5px solid #FFFDFA;box-shadow:0 4px 14px rgba(122,96,58,0.07);display:block">
+                <img src="assets/stickers/note-paper.png" alt="Collect moments, not things." style="width:100px;display:block;transform:rotate(-3deg)">
+              </div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px">
+              <h2 style="margin:0;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#0B1B33;letter-spacing:-0.01em">我的旅行收藏</h2>
+            </div>
+            <p style="margin:6px 0 0;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:400;line-height:1.6;color:#81817D">目前有 2 個旅行收藏 · 28 個地點</p>
+            <div style="display:flex;flex-direction:column;gap:16px;margin-top:14px">
+              <div data-card="trip" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="C" style="position:absolute;bottom:-6px;right:22px;width:54px;height:16px;background:repeating-linear-gradient(90deg,#D8CBEC 0 3px,transparent 3px 7px),#EFE4FA;opacity:0.92;border-radius:2px;transform:rotate(7deg);z-index:2;pointer-events:none"></div></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="0" count-label="個地點" empty="{{ true }}" empty-hint="{{ emptyHintA }}" empty-sticker-src="./assets/stickers/trip-decoration-paperclip-generic.png" pin-src="./assets/icons/pin-coral.png" hint-size="100%,184px"></x-import>
+              </div>
+              <div data-card="trip" style="position:relative">
+                <sc-if value="{{ showDecor }}" hint-placeholder-val="{{ true }}"><div aria-hidden="true" data-decor-preset="A" style="position:absolute;top:-6px;left:18px;width:46px;height:15px;background:#F7D9CE;opacity:0.92;border-radius:2px;transform:rotate(-14deg);z-index:2;pointer-events:none"></div><img src="assets/stickers/trip-decoration-postmark-generic.png" alt="" aria-hidden="true" style="position:absolute;top:15px;right:15px;width:60px;height:60px;opacity:0.88;mix-blend-mode:multiply;transform:rotate(-7deg);transform-origin:50% 50%;z-index:2;pointer-events:none"></sc-if>
+                <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="東京" location="日本" note="東京的老派風景與新的日常交會。" place-count="28" count-label="個地點" photo-src="./assets/photos/trip-tokyo-clean-2x.jpg" pin-src="./assets/icons/pin-coral.png" icons="{{ tokyoIcons }}" hint-size="100%,184px"></x-import>
+              </div>
+            </div>
+          </div>
+          <div style="position:relative;z-index:5;flex-shrink:0">
+            <x-import component-from-global-scope="PinTripDesignSystem_ab161c.BottomNav" items="{{ navItems }}" active-id="{{ activeTab }}" on-select="{{ onSelect }}" show-fab="{{ false }}" hint-size="100%,72px"></x-import>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:baseline;gap:8px;padding-left:4px"><span style="font-size:14px;font-weight:700">0 個地點 · 照片欄三個寬度</span><span style="font-size:12.5px;font-weight:600;color:#A9A6A0">148 / 172 / 196</span></div>
+        <div style="display:flex;align-items:flex-start;gap:18px;background:#F9F5ED;border-radius:24px;padding:20px">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;color:#A9A6A0">148 · 360 frame</div>
+            <div data-w="360" style="width:320px"><div data-card="trip" data-screen-label="Zero places 148" style="position:relative">
+              <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="0" count-label="個地點" empty="{{ true }}" empty-hint="{{ emptyHintA }}" empty-sticker-src="./assets/stickers/trip-decoration-paperclip-generic.png" pin-src="./assets/icons/pin-coral.png" hint-size="320px,184px"></x-import>
+            </div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;color:#A9A6A0">172 · 390 frame</div>
+            <div data-w="390" style="width:350px"><div data-card="trip" data-screen-label="Zero places 172" style="position:relative">
+              <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="0" count-label="個地點" empty="{{ true }}" empty-hint="{{ emptyHintA }}" empty-sticker-src="./assets/stickers/trip-decoration-paperclip-generic.png" pin-src="./assets/icons/pin-coral.png" hint-size="350px,184px"></x-import>
+            </div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;color:#A9A6A0">196 · 430 frame</div>
+            <div data-w="430" style="width:390px"><div data-card="trip" data-screen-label="Zero places 196" style="position:relative">
+              <x-import component-from-global-scope="PinTripDesignSystem_ab161c.TripCard" title="濟州" location="大韓民國" note="海岸線、咖啡館與日出峰，慢慢走完一整圈。" place-count="0" count-label="個地點" empty="{{ true }}" empty-hint="{{ emptyHintA }}" empty-sticker-src="./assets/stickers/trip-decoration-paperclip-generic.png" pin-src="./assets/icons/pin-coral.png" hint-size="390px,184px"></x-import>
+            </div></div>
           </div>
         </div>
       </div>
@@ -539,6 +599,7 @@
         <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0">STATE RULES</div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
           <span style="font-weight:700;color:#4C76C2">Empty</span><span style="color:#777">品牌區保留，摘要行換成一句說明，只留 Start New Trip 一個出口；便條貼紙移到下方置中，不加大型插圖</span>
+          <span style="font-weight:700;color:#4C76C2">0 個地點</span><span style="color:#777">收藏存在但還沒有地點（剛建立即為此狀態）。<strong>不是 Empty</strong>——Empty 是「連一個收藏都沒有」。卡片照片欄換成 dashed 紙感佔位，其餘（標題、目的地列、說明、dashed 分隔、計數行）與 normal 完全一致，版面不位移。完整規格見 EMPTY TRIP CARD</span>
           <span style="font-weight:700;color:#4C76C2">Loading</span><span style="color:#777">骨架沿用卡片外框、dashed 分隔線與 184px 高度，資料到位時無位移；色票為 #F2EADC / #F5EFE4 暖米色，不用灰</span>
           <span style="font-weight:700;color:#4C76C2">Loading 動態</span><span style="color:#777">opacity 1 → 0.55 → 1，1600ms ease-in-out，第二張延遲 200ms；不用掃光 shimmer</span>
           <span style="font-weight:700;color:#4C76C2">Error</span><span style="color:#777">單張 dashed 卡片，語氣溫和不指責；retry 為 outline 按鈕，位置固定於卡內左下</span>
@@ -546,6 +607,24 @@
           <span style="font-weight:700;color:#4C76C2">••• 卡片選單</span><span style="color:#777"><strong>錨定在 ••• 的下拉選單</strong>（非 sheet、無 dim、無取消鍵）：兩列、點外部關閉、靠近 nav 時向上開啟。完整規格見 CARD MENU（錨定下拉）；選單本身<strong>不執行任何破壞性動作</strong></span>
           <span style="font-weight:700;color:#4C76C2">刪除確認</span><span style="color:#777">畫面層級 sheet（非卡內就地確認）：底部對齊、上圓角 26、padding 24 / 20 / 30（+ inset）、0 -8px 28px rgba(60,45,25,.20) 向上陰影。背後列表不捲動，BottomNav 不隱藏。完整規格見 DELETE TRIP CONFIRM</span>
           <span style="font-weight:700;color:#4C76C2">共通</span><span style="color:#777">BottomNav 在四種狀態都存在且位置一致；狀態切換只換內容區，不換版面骨架</span>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;color:#A9A6A0;margin-top:6px">EMPTY TRIP CARD（0 個地點）</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 14px;background:#FFFDFA;border-radius:20px;box-shadow:0 4px 14px rgba(122,96,58,0.07);padding:18px 20px;font-size:12px">
+          <span style="font-weight:700;color:#4C76C2">依據</span><span style="color:#777">MVP §5.2：卡片必須能呈現收藏內沒有地點的狀態，並以文字說明尚未有地點、之後可從貼文匯入。<strong>此狀態必然出現</strong>——建立收藏的當下就是 0 個地點</span>
+          <span style="font-weight:700;color:#4C76C2">佔位版面</span><span style="color:#777">照片欄尺寸與位置<strong>完全不變</strong>（width 172 · <code>align-self:stretch</code> · minHeight 161 · r <code>--r-md</code>，<strong>不加 <code>aspect-ratio</code></strong>），只把 <code>img</code> 換成佔位。<strong>只有三個元素</strong>：點格紙底、右上角一張貼紙、左下兩行文字。<code>position:relative</code> · <code>justify-content:flex-end</code> · <code>align-items:flex-start</code> · padding 14/13/15 · <code>box-sizing:border-box</code></span>
+          <span style="font-weight:700;color:#4C76C2">① 底：點格紙</span><span style="color:#777"><code>radial-gradient(circle,#E7E0D0 1.3px,transparent 1.4px) 0 0/9px 9px</code> 疊在 <code>--cream-200</code> 上 —— 沿用 preset B 膠帶的點點做法，但<strong>點色是暖 cream 且壓得更淡</strong>（#E7E0D0，非 preset 的 #D8CBEC 淡紫）：紋樣要沉在真實照片卡之下，也不能讓佔位讀成 lavender preset 的一部分</span>
+          <span style="font-weight:700;color:#4C76C2">② 迴紋針</span><span style="color:#777"><code>trip-decoration-paperclip-generic.png</code> 寬 17px（高自動 ≈ 50px），<code>absolute</code> <strong>夾在佔位上緣</strong>（<code>top:−8</code> · <code>right:32</code>，上段跨出邊界、下段壓在紙上）· <code>rotate(4deg)</code> · <code>drop-shadow(0 2px 4px rgba(122,96,58,.16))</code> ——「這裡要夾一張照片」。<code>alt=""</code> + <code>aria-hidden</code> + <code>pointer-events:none</code>，純裝飾。<strong>橫向刻意不放在角上</strong>：<code>TripCard</code> 根是 <code>overflow:hidden</code> + r20，圓角帶只在四角，夾在上緣中段才不會被弧線切平（四組 preset 能真正出界，是因為它們畫在卡片<strong>外層 wrapper</strong> <code>div[data-card="trip"]</code>） · <code>drop-shadow(0 2px 4px rgba(122,96,58,.14))</code> ——「貼上去」而非置中平放。<code>alt=""</code> + <code>aria-hidden</code> + <code>pointer-events:none</code>，純裝飾</span>
+          <span style="font-weight:700;color:#4C76C2">③ 文字</span><span style="color:#777">見下一列。<strong>絕對定位錨在左下</strong>（<code>left:13</code> · <code>right:11</code> · <code>bottom:14</code>）—— 固定內距，不隨內容高度浮動。上方大片留白<strong>是設計的一部分</strong>，不要填滿</span>
+          <span style="font-weight:700;color:#4C76C2">刻意沒有的</span><span style="color:#777"><strong>沒有邊框</strong>（不要虛線框也不要實線細框）、<strong>沒有第二張貼紙</strong>、沒有膠帶、沒有 <code>worldmap.png</code>。膠帶尤其不行 —— 規格明訂每張卡有且只有一條，由四組 preset 提供，佔位再加會變兩條</span>
+          <span style="font-weight:700;color:#4C76C2">引導文字｜FINAL</span><span style="color:#777"><code>--font-kr</code>、<strong>左對齊</strong>、兩行<strong>分層</strong>（依 <code>\n</code> 切成兩個 <code>span</code>，<code>gap:1</code>）：第一行「還沒有地點」<strong>12px / <code>--w-semibold</code> / <code>--ink-500</code></strong> #777；第二行「從貼文匯入後會出現在這裡」<strong>11.5px / 400 / <code>--ink-400</code></strong> #81817D，兩行 <code>line-height:1.5</code>。<strong>不設 <code>max-width</code></strong>，文字用滿內容寬。<strong>對比實測</strong>：#777 對佔位底 #F4EFE4 為 3.9:1、#81817D 為 3.4:1 —— 低於 AA 4.5:1，是<strong>依指示採用的層次</strong>（比照 DS 既有 note 用 <code>--ink-400</code> 的作法）；若要補足對比，往上各推一階（<code>--ink-700</code> / <code>--ink-500</code>）即可，版面不動：<strong>「還沒有地點／從貼文匯入後會出現在這裡」</strong>（第一行講現況、第二行講之後會怎樣，符合 MVP §5.2）。用 <code>--ink-700</code> 而非 <code>--ink-500</code>：#777 對 #F4EFE4 只有 3.9:1，12px 不足 AA；#3B3B3D 為 9.7:1</span>
+          <span style="font-weight:700;color:#4C76C2">三個寬度</span><span style="color:#777">照片欄 148 / 172 / 196 都已排實稿對照（見「0 個地點 · 照片欄三個寬度」）。172 與 196 為兩行；<strong>148 時第二行折成兩行、整體三行</strong>，屬預期 —— 文字錨在下緣、迴紋針在上緣，中間留白吸收增高，<strong>不撐破卡片也不蓋到迴紋針</strong>（文字塊上緣與迴紋針下緣仍有距離）。<strong>不改文案</strong>（已定案 A），也不需要縮字級</span>
+          <span style="font-weight:700;color:#4C76C2">用語</span><span style="color:#777">文案一律指「<strong>地點</strong>」。<strong>不得用「收藏」指涉地點</strong> — 「收藏」在產品用語裡是旅行收藏本身，混用會被讀成這張卡片不存在</span>
+          <span style="font-weight:700;color:#4C76C2">不放入口</span><span style="color:#777">提示<strong>只是文字</strong>：不放按鈕、不做匯入入口。匯入是主導覽列的固定分頁（兩格等寬：旅行收藏／匯入），不在卡片內重複。卡片維持<strong>單一可點區</strong>（整張卡打開收藏，••• 不巢狀），此狀態<strong>不新增第二個可點目標</strong></span>
+          <span style="font-weight:700;color:#4C76C2">計數行</span><span style="color:#777">維持「<strong>0</strong> 個地點」，數字仍為 <code>--blue-600</code> 加粗，<strong>不做特例文案</strong>（不寫「尚無地點」）</span>
+          <span style="font-weight:700;color:#4C76C2">分類貼紙</span><span style="color:#777">0 個地點 ＝ 0 個分類，該排<strong>空著即可</strong>，不放佔位；計數行仍靠左、右側留空。但<strong>空排必須保留 <code>min-height:27px</code></strong>（＝ CategoryIcon 尺寸，bundle 內 <code>TripCard</code> 一併補上），讓計數列在有無貼紙時<strong>佔同一個高度槽位</strong>，計數文字不因為沒有貼紙而上移。<strong>這不是讓所有卡片同高</strong>：卡片高度本來就隨貼紙數量變動 —— 計數列是 <code>flex-wrap:wrap</code>，在 148px 文字欄裡「計數 54.9 + gap 6 + 三枚貼紙 89 ＝ 149.9 &gt; 148」會換行，該列變 52px、卡片 <strong>195.6px</strong>；0–1 枚貼紙不換行，該列 27px、卡片 <strong>183px</strong>（由佔位的 <code>minHeight:161</code> 觸底）。0 個地點的卡片落在 183px，與一枚貼紙的卡片同高，<strong>比三枚貼紙的卡片矮 12.6px 是既有行為</strong>，非本狀態新增。不為此改 <code>flex-wrap</code>：那會改動所有既有 normal 卡片的版面</span>
+          <span style="font-weight:700;color:#4C76C2">裝飾 preset</span><span style="color:#777">照 decoration preset 規則照常抽（建立當下抽、之後永久沿用）。示範用 <strong>C — Grid Scrapbook</strong>（只有膠帶、無大型貼紙），避免 preset 貼紙壓在佔位貼紙上；但<strong>其他 preset 也合法</strong>，preset 與 0 個地點狀態互不干涉</span>
+          <span style="font-weight:700;color:#4C76C2">元件邊界</span><span style="color:#777"><code>TripCard</code> 新增 <code>empty</code> / <code>emptyHint</code> / <code>emptyStickerSrc</code>（bundle 第五處本地修改）。<strong>不是新元件</strong>、不是 Home 頁面覆寫；<code>photoSrc</code> 在此狀態不傳</span>
         </div>
       </div>
       </sc-if>
@@ -781,7 +860,7 @@
           <span style="font-weight:700;color:#4C76C2">trip-*-decoration-*.png</span><span style="color:#777">獨立透明裝飾層，不進 next/image；目前使用 postmark-generic（A）、lavender + wash（B）</span>
           <span style="font-weight:700;color:#4C76C2">…-postmark-generic</span><span style="color:#777">通用旅行郵戳 240×240（顯示 60×60）· PINTRIP／BON VOYAGE／空白日期線，無城市或國家字樣</span>
           <span style="font-weight:700;color:#4C76C2">…-tokyo-decoration-stamp</span><span style="color:#777">destination-specific 參考素材，保留不刪除；不進隨機池，MVP 不做目的地判斷或特例</span>
-          <span style="font-weight:700;color:#4C76C2">…-paperclip.png</span><span style="color:#777">目前四組 Preset 都不使用 — 與 paper tape 重複表達「固定照片」；素材保留不刪除，但不屬於任何 Preset，也不進分配池</span>
+          <span style="font-weight:700;color:#4C76C2">…-paperclip-generic</span><span style="color:#777"><strong>0 個地點佔位專用</strong>（原 <code>trip-tokyo-decoration-paperclip.png</code> 140×340，裁到墨跡 84×250 後改為通用名稱重出；舊檔保留不刪除）。仍<strong>不屬於任何 Preset、不進分配池</strong> — 當初被排除的理由正是它與 paper tape 重複表達「固定照片」，而空照片欄要說的就是「這裡要夾一張照片」，所以結構上不會與 preset 撞位，也不違反「每張卡有且只有一條 paper tape」
           <span style="font-weight:700;color:#4C76C2">sticker-envelope</span><span style="color:#777">Preset D 的主要貼紙，沿用既有素材，44×37</span>
           <span style="font-weight:700;color:#4C76C2">pin-coral</span><span style="color:#777">旅行收藏的國家（Home 專用；街道層級用 pin-blue）</span>
           <span style="font-weight:700;color:#4C76C2">icon-* 類別貼紙</span><span style="color:#777">27px 模切貼紙，只用於卡片 footer 暗示收藏內容</span>
@@ -940,6 +1019,7 @@ class Component extends DCLogic {
       activeTab: this.state.tab,
       onSelect: (id) => this.setState({ tab: id }),
       longListRef: (el) => { this._longList = el; },
+      emptyHintA:'還沒有地點\n從貼文匯入後會出現在這裡',
       tokyoIcons:[{src:S+'icon-torii.png',alt:'Shrines'},{src:S+'icon-food.png',alt:'Food'},{src:S+'icon-train.png',alt:'Rail'}],
       kyotoIcons:[{src:S+'icon-pagoda.png',alt:'Temples'},{src:S+'icon-maple.png',alt:'Autumn'},{src:S+'icon-matcha.png',alt:'Tea'}],
       oneIcon:[{src:S+'icon-matcha.png',alt:'Tea'}],

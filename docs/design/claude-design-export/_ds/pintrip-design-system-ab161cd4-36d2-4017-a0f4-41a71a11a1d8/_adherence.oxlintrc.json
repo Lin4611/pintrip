@@ -159,8 +159,8 @@
         "message": "<Tag> tone must be one of 'blue' | 'butter' | 'lavender'."
       },
       {
-        "selector": "JSXOpeningElement[name.name='TripCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|location|note|placeCount|countLabel|photoSrc|pinSrc|icons|onMenu|onClick|sticker|style|key|ref|className|style|children)$/]",
-        "message": "<TripCard> doesn't accept that prop. Declared props: title, location, note, placeCount, countLabel, photoSrc, pinSrc, icons, onMenu, onClick, sticker, style."
+        "selector": "JSXOpeningElement[name.name='TripCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|location|note|placeCount|countLabel|photoSrc|pinSrc|icons|onMenu|onClick|sticker|empty|emptyHint|emptyStickerSrc|style|key|ref|className|style|children)$/]",
+        "message": "<TripCard> doesn't accept that prop. Declared props: title, location, note, placeCount, countLabel, photoSrc, pinSrc, icons, onMenu, onClick, sticker, empty, emptyHint, emptyStickerSrc, style."
       },
       {
         "selector": "JSXOpeningElement[name.name='Wordmark'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|src|size|style|key|ref|className|style|children)$/]",

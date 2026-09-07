@@ -695,6 +695,9 @@ function TripCard({
   onMenu,
   onClick,
   sticker,
+  empty = false,
+  emptyHint,
+  emptyStickerSrc,
   style
 }) {
   return /*#__PURE__*/React.createElement("article", {
@@ -799,7 +802,8 @@ function TripCard({
   }, placeCount), " ", countLabel), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      gap: 4
+      gap: 4,
+      minHeight: 27
     }
   }, icons.map((ic, i) => /*#__PURE__*/React.createElement(__ds_scope.CategoryIcon, {
     key: i,
@@ -813,7 +817,56 @@ function TripCard({
       flexShrink: 0,
       alignSelf: 'stretch'
     }
-  }, /*#__PURE__*/React.createElement("img", {
+  }, empty ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      minHeight: 161,
+      boxSizing: 'border-box',
+      borderRadius: 'var(--r-md)',
+      background: "radial-gradient(circle, #E7E0D0 1.3px, transparent 1.4px) 0 0/9px 9px, var(--cream-200)"
+    }
+  }, emptyStickerSrc && /*#__PURE__*/React.createElement("img", {
+    src: emptyStickerSrc,
+    alt: "",
+    "aria-hidden": "true",
+    style: {
+      position: 'absolute',
+      top: -8,
+      right: 32,
+      width: 17,
+      display: 'block',
+      transform: 'rotate(4deg)',
+      filter: 'drop-shadow(0 2px 4px rgba(122,96,58,0.16))',
+      pointerEvents: 'none'
+    }
+  }), emptyHint && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      left: 13,
+      right: 11,
+      bottom: 14,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1,
+      fontFamily: 'var(--font-kr)',
+      textAlign: 'left'
+    }
+  }, String(emptyHint).split('\n').map((ln, li) => /*#__PURE__*/React.createElement("span", {
+    key: li,
+    style: li === 0 ? {
+      fontSize: 12,
+      fontWeight: 'var(--w-semibold)',
+      color: 'var(--ink-500)',
+      lineHeight: 1.5
+    } : {
+      fontSize: 11.5,
+      fontWeight: 'var(--w-regular)',
+      color: 'var(--ink-400)',
+      lineHeight: 1.5
+    }
+  }, ln)))) : /*#__PURE__*/React.createElement("img", {
     src: photoSrc,
     alt: title,
     style: {
