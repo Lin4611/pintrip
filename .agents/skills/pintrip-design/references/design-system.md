@@ -193,8 +193,9 @@ fighting an adaptive card height. The decoration-free `*-clean*.jpg` plates at 1
 specify photo treatment; the older `*.png` files have decoration composited into the pixels and
 serve as before/after reference and demo-frame fixtures inside the export — they are not runtime
 assets. These plates define *how a photo is treated*, not where a production photo comes from —
-**the production source for place and trip photos is `OUT OF SCOPE / UNDECIDED`** (neither
-`docs/MVP.md` nor `docs/ARCHITECTURE.md` settles it), so don't commit to one in implementation.
+**the production source is settled in `docs/ARCHITECTURE.md` §3.8** (2026-09-15): Google Places
+photo → category placeholder, never Instagram. Google photos are fetched at display time and may
+not be cached, so treatment rules here apply to an image whose URL changes between renders.
 
 **Buttons and states.** Sizes are `sm` 44px / `md` 48px / `lg` 54px — **`sm` was raised from 40 to
 44** so every in-card control meets the 44px tap minimum. `sm` is used by **`PlaceResultCard` and by
