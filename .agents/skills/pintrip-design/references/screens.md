@@ -248,14 +248,14 @@ photo sits in the card is incidental. So there is nothing here to "fix":
   stay in the design export and be used for local visual comparison.
 - **Don't ship them.** They are not runtime assets and not fixed product content; don't copy these
   references into app code or bundle the files as product imagery.
-- **Where production trip and place photos come from is `OUT OF SCOPE / UNDECIDED`** — neither
-  `docs/MVP.md` nor `docs/ARCHITECTURE.md` settles it. Don't write any source into implementation as
-  settled: not a named vendor, not "the Places provider", and not these repo assets.
+- **Where production trip and place photos come from is settled in `docs/ARCHITECTURE.md` §3.8**
+  (2026-09-15): Google Places photo → category placeholder. Instagram images are ruled out by Meta's
+  terms. These repo assets are still never production photos.
 - **Nothing needs adding for 濟州, 首爾 or 大阪 to work with the current design files.** The asset
   set has clean covers only for Tokyo and Kyoto; that gap doesn't affect layout work or visual
   comparison against these frames, which is all these fixtures serve. That is a statement about the
-  design files only — **it says nothing about runtime**, where the photo source is undecided; don't
-  read it as a guarantee that no asset will ever be needed. For now: don't request, generate, or
+  design files only — **it says nothing about runtime**, where photos come from Google Places per
+  §3.8 and the category placeholder is still `PENDING CLAUDE DESIGN`. For now: don't request, generate, or
   substitute one, and don't repurpose an Import place plate (132×150) as a square Home cover.
 
 ### React / Next.js boundary
@@ -505,8 +505,8 @@ displayed 34px) on the Batch panel, `nav-trips.png` / `nav-imports.png`.
 The older `place-*.png` files have decoration baked in. They are not runtime assets and shouldn't be
 shipped, but they stay valid inside the export for the PREVIOUS / CLEAN / RECOMPOSED comparison —
 which documents the change and is not a switchable product state. As on Home, these files are
-reference and fixture material; **where production photos come from is `OUT OF SCOPE / UNDECIDED`**
-and must not be written into implementation as settled. Washi tape is CSS, not a file.
+reference and fixture material; **production photos come from Google Places per
+`docs/ARCHITECTURE.md` §3.8**, with the category placeholder as the fallback. Washi tape is CSS, not a file.
 `status-bar.png` and the soft keyboard are mockup-only.
 
 > The earlier conflict in this file — an ASSETS summary line describing the heart/star/flower marks

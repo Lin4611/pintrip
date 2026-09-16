@@ -109,8 +109,8 @@ cannot by itself satisfy §5.5's two exits.
 - **Removing a not-yet-submitted screenshot needs no confirmation** — per §5.4 it does not
   constitute a destructive action, so the confirmation rule's premise never applies. This is not an
   exemption. Removing screenshots after submission is out of MVP scope.
-- Storage provider, file size limits and retention are **OUT OF SCOPE** — do not write them into the
-  design as settled.
+- The storage provider is Supabase Storage (2026-09-13). File size limits and retention are still
+  **OUT OF SCOPE** — do not write them into the design as settled.
 
 ## Ending an import (結束處理)
 
@@ -221,8 +221,8 @@ Boundaries: `onToggleCandidates(placeId)`, `onPickCandidate(placeId, candidate)`
   stay undispositioned, must never render as added, and can be retried individually; the Import
   stays `review_required`. Do not implement whole-batch rollback or a full re-run.
 - **Internal transactions, batch coordination, concurrency control and idempotency are explicitly
-  not decided** (ARCH §6.2, pending the database and background-job decisions). The design must not
-  be written up as though they were.
+  not decided** (ARCH §6.2 — the database is settled, the background-job approach is not). The
+  design must not be written up as though they were.
 - The failure notice is a **single-responsibility block inside the card** — not another card variant,
   not an overlay. It sits below Tags and above the action row, never compresses the action row, and
   never overlaps the next card. **Retry is the same 加入 button** — no fourth button, because the
@@ -295,9 +295,9 @@ Every item carries exactly one marker, consistent across the whole handoff.
   be verified, and redirecting to an unchanged collection page after an all-rejected import makes no
   sense.
 - **Places candidate count** — the 3 candidates in the preview are design test data, not a product
-  or API limit. `MVP.md` and `ARCHITECTURE.md` don't specify a count, and ARCH §2.2 forbids assuming
-  a maps/Places provider. The UI for more than 3 (scroll, paging, map preview, promotion to a sheet)
-  is undefined. **Unrelated to the 3-screenshot cap, which is FINAL.**
+  or API limit. The provider is settled (Google Places API (New), ARCH §2.1), but neither `MVP.md`
+  nor `ARCHITECTURE.md` specifies a candidate count. The UI for more than 3 (scroll, paging, map
+  preview, promotion to a sheet) is undefined. **Unrelated to the 3-screenshot cap, which is FINAL.**
 - **Delete-in-progress / delete-failure feedback** on Home's delete-collection flow.
 
 ### PENDING DESIGN
@@ -312,7 +312,15 @@ Every item carries exactly one marker, consistent across the whole handoff.
 ### OUT OF SCOPE
 
 - `TripPlace` editing (route and screen) for already-added places.
-- Technical choices that must not be written up as settled: the Instagram public-content fetching
-  service, AI model/provider, database, background-job approach, batch coordination, concurrency
-  control, idempotency strategy, authentication library, Places API provider and candidate cap,
-  screenshot storage provider and retention, and the application-side UI component library.
+- Technical choices that must not be written up as settled: the AI model/provider, background-job
+  approach, batch coordination, concurrency control, idempotency strategy, candidate cap, screenshot
+  retention period, and which of the *permitted* Instagram retrieval methods is used (automated
+  scraping is ruled out, not undecided — `docs/MVP.md` §8).
+
+### ALREADY DECIDED — do not treat these as open
+
+Settled in `docs/ARCHITECTURE.md` §2.1; do not re-open them here or write them up as pending:
+database, auth and file storage (Supabase), data access layer (Drizzle), place and map provider
+(Google Places API (New) + Google Maps), place photo source (§3.8), screenshot storage provider
+(Supabase Storage), and the application-side UI component library (Tailwind + Design System tokens,
+Radix primitives added one at a time).

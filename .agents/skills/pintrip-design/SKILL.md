@@ -130,8 +130,8 @@ Avoid (visual drift to catch in review):
   create/edit collection form, and Import.
 - **[references/import-lifecycle.md](references/import-lifecycle.md)** — the Import data lifecycle
   vs. UI variants, entry modes, the source-read-only rule, completed read-only, batch partial
-  failure, place matching, supplement flow, and the FINAL / OPEN / PENDING DESIGN / OUT OF SCOPE
-  decision ledger.
+  failure, place matching, supplement flow, and the FINAL / OPEN / PENDING DESIGN / OUT OF SCOPE /
+  ALREADY DECIDED decision ledger.
 - **[references/accessibility.md](references/accessibility.md)** — the documented a11y contract:
   aria wiring, live regions, native `disabled`, focus, tap targets, reduced motion.
 
@@ -179,7 +179,9 @@ Read the reference file(s) relevant to your task; you rarely need all of them at
   [references/import-lifecycle.md](references/import-lifecycle.md); as of this handoff it includes
   the change-target picker UI, the re-search flow (explicitly *required before frontend
   implementation*), the Edit Place page layout, post-add navigation, the Places candidate count,
-  TripPlace editing, and delete-in-progress/failure feedback.
+  TripPlace editing, and delete-in-progress/failure feedback. That same ledger has an
+  `ALREADY DECIDED` section — settled infrastructure and provider choices that must not be written
+  up as open or re-opened here.
 - Do not treat a navigation description found anywhere in the handoff as a decided destination.
 - Do not create a second design system or duplicate the token source — always reference
   `_ds/pintrip-design-system-*/tokens/*.css`.
@@ -204,8 +206,9 @@ Run this after implementing or changing PinTrip UI:
       breakpoint, button heights — `Button sm` is **44px**, not 40 — tap targets ≥ 44px)
 - [ ] **Assets** — only existing assets, by their documented filenames, referenced from code as
       `/design-assets/...` (never a `docs/...` path, never straight from `uploads/`); no decorated
-      `*.png` plate shipped as a runtime asset — those are export fixtures; the production photo
-      source is `OUT OF SCOPE / UNDECIDED`, so don't commit to one
+      `*.png` plate shipped as a runtime asset — those are export fixtures. The production photo
+      source is settled in `docs/ARCHITECTURE.md` §3.8: Google Places photo → category placeholder,
+      never Instagram. The category placeholder itself is `PENDING CLAUDE DESIGN` — don't improvise it
 - [ ] **Bottom Navigation** — 72px nav with 26px top corners, exactly two equal cells
       (旅行收藏 / 匯入). No FAB: `BottomNav` is passed `showFab={false}`
 - [ ] **Safe area** — top/bottom safe-area insets respected; content bottom padding is 72px + inset

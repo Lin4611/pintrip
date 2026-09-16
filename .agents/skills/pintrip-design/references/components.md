@@ -351,11 +351,18 @@ and don't reach into `uploads/` to fill the gap.
   **within the design export** — as before/after reference, and as mock fixtures in demo frames —
   but they are **not runtime assets**: don't ship them, and don't treat them as fixed product
   content.
-- **Where production place and trip photos come from is `OUT OF SCOPE / UNDECIDED`.** Neither
-  `docs/MVP.md` nor `docs/ARCHITECTURE.md` settles it. Do not write any source into implementation
-  as settled — not a named vendor, not "the Places provider", and not the repo's own clean plates.
-  What the plates here *do* specify is **treatment**: crop, ratio, radius, framing, `cover` /
-  `center`. Treat the source as an open question to raise, not one to answer.
+- **Where production place and trip photos come from is decided in `docs/ARCHITECTURE.md` §3.8**
+  (2026-09-15): Google Places photo → category placeholder. **Instagram images are not an option**
+  (Meta Developer Policies §6, Instagram ToU §4.2). Trip covers reuse the earliest-added place that
+  has a Google photo, and shift when that place is removed or Google changes the photo — Google
+  photos may not be cached. The lines above are a pointer, not the rule: read §3.8 before
+  implementing, and never ship the repo's own clean plates as production photos. What the plates here *do* specify is **treatment**: crop,
+  ratio, radius, framing, `cover` / `center`.
+- **Not yet designed — `PENDING CLAUDE DESIGN`:** the category placeholder for the
+  `PlaceResultCard` photo column and the `TripCard` cover column, and the Google photo author
+  attribution / Google Maps mark. None of these exist in the handoff. Don't improvise them from the
+  0-places placeholder, `CategoryIcon`, or any other asset — stop and report until Claude Design
+  delivers them.
 - The originals in `uploads/` are never overwritten, and never referenced by the App — they exist to
   regenerate outputs from. Photo work is limited to crop / resize / object-position — no color
   grading, no filters, no generative fill, no upscaling a low-res asset to fake a high-res one.

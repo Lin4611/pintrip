@@ -4,11 +4,11 @@
 
 - 專案名稱：PinTrip
 - 文件用途：定義 MVP 的系統邊界、元件責任、資料關係、處理流程與技術決策狀態
-- 最後更新：2026-09-05
+- 最後更新：2026-09-16
 
 本文件是架構與實作邊界的規範來源。產品目標、功能範圍與驗收條件以 `docs/MVP.md` 為準。
 
-本次架構內容只根據 `docs/MVP.md`、本文件原始內容與 `AGENTS.md` 整理，尚未對照現有程式碼、套件或部署環境。未驗證的實作狀態不得標示為已完成。
+本文件早期內容只根據 `docs/MVP.md`、本文件原始內容與 `AGENTS.md` 整理，未對照現有程式碼、套件或部署環境。2026-09-13 起補記的 §2.1 各列（部署、資料庫、資料存取層、資料隔離、截圖儲存）與 2026-09-15 補記的地點、地圖與照片來源，則已對照實際環境或外部服務條款查證；其中「部署＝Vercel」是依網站既有的實際部署狀態補記。除此之外，未驗證的實作狀態仍不得標示為已完成。
 
 ---
 
@@ -24,7 +24,7 @@
 6. 在使用者確認後建立正式收藏，並避免同一旅行收藏出現重複地點。
 7. 讓卡片清單與地圖共用相同的分類篩選結果。
 
-架構不得假設能直接同步 Instagram 私人珍藏，也不得依賴不穩定爬蟲作為唯一匯入路徑。
+架構不得假設能直接同步 Instagram 私人珍藏。**自動化抓取（爬蟲）已排除，不是可選路徑**（Instagram ToU §4.2，見 `docs/MVP.md` §8）；匯入只能依賴允許範圍內的來源：Share Target 傳入的文字、使用者手動貼上與補充、官方 oEmbed 的允許用途。
 
 ---
 
@@ -46,8 +46,18 @@
 | 批次確認失敗語意 | 允許部分成功；成功項目保留，失敗項目維持尚未處置並可重試，不回滾整批 | ImportItem 獨立處置與使用者體驗決定 |
 | 測試工具鏈 | Vitest + React Testing Library 負責單元與元件測試；Playwright 負責端對端測試 | 2026-09-01 Dependency Proposal 與 Reviewer 核准的工具鏈設定 |
 | UI 元件庫 | Tailwind CSS 搭配 Design System token 手刻視覺層；需要焦點管理、鍵盤模型或 ARIA 契約時才逐個引入 Radix primitive | 2026-09-01 Dependency Proposal |
+| 地點服務 | Google Places API (New)；Google Place ID 作為外部地點識別碼 | 2026-09-15 使用者確認 |
+| 地圖服務 | Google Maps；Places API 內容不得顯示於非 Google 地圖 | Google Maps Platform Service Specific Terms §14.2，2026-09-15 使用者確認 |
+| 地點與旅行收藏照片來源 | Google Places 照片優先；沒有可用照片時使用分類預設圖。不使用 Instagram 圖片。規則見 §3.8 | 2026-09-15 使用者確認 |
+| 部署與環境配置 | Vercel | 2026-09-13 使用者確認；網站先前已在 Vercel 運行，文件補記 |
+| 資料庫、Auth 與檔案儲存 | Supabase（Postgres／Auth／Storage） | 2026-09-13 使用者確認；四個候選中唯一同時涵蓋三者並支援資料庫層授權 |
+| 資料存取層 | Drizzle ORM | 2026-09-13 使用者確認；主要理由為型別保護，且 RLS 有官方 helper |
+| 資料隔離 | 資料庫層 Row Level Security ＋ 應用層查詢條件 | 2026-09-13 使用者確認；防禦縱深，兩層都要有 |
+| 截圖儲存 | Supabase Storage | 2026-09-13 使用者確認；保存期限仍未決定 |
 
-「Google 登入已決定」只代表使用者登入方式；具體 Auth 套件、Session 儲存與 OAuth 設定仍未決定。
+「Google 登入已決定」只代表使用者登入方式。Auth 服務已決定使用 Supabase Auth；實際套件版本、Session 儲存寫法與 Google Cloud OAuth 憑證設定仍待實作時以 Dependency Proposal 確認。
+
+「Google Places 與 Google Maps 已決定」只代表地點與地圖供應商；前端地圖套件、API Key 管理與地點資料快取更新機制仍未決定。
 
 Vitest 使用 `jsdom`、`@testing-library/react`、`@testing-library/user-event` 與 `@testing-library/jest-dom` 驗證 Client Component 及純函式的公開可觀察行為。Playwright 目前只啟用 Pixel 7 裝置設定與 Chromium，驗證跨頁流程、Next.js 頁面組裝及需要真實瀏覽器的行為；Firefox、WebKit 與 production server E2E 尚未納入。每項功能仍須依 `docs/DEVELOPMENT_GUIDE.md` 事前確認 Test Seams、測試案例與通過標準，工具鏈 smoke test 不代表產品功能已有測試覆蓋。
 
@@ -114,15 +124,14 @@ DS 的設計值在應用端一律以 Tailwind class 表達，切版時不得在 
 | 項目 | 決定前的限制 |
 | --- | --- |
 | Next.js 實際版本與路由慣例 | 實作前依 `AGENTS.md` 閱讀已安裝版本的官方指南，不依訓練資料猜測 |
-| Authentication 套件或服務 | 不得自行安裝；必須支援 Google 登入與安全 Session |
-| 資料庫與資料存取方案 | 不得自行選擇或更換 |
-| 地圖服務與 Places API | 不得把任何供應商寫成既定方案 |
+| Supabase 與 Drizzle 的實際套件與版本 | 不得自行安裝；安裝前須提出 Dependency Proposal 並取得確認 |
+| Google Maps 前端套件與 API Key 管理 | 不得自行安裝套件；API Key 不得寫入程式碼 |
+| Google 地點資料快取與更新機制 | 必須符合 §3.5 的保存限制 |
 | AI 模型與供應商 | 不得自行選擇；輸出必須視為候選資料 |
 | 背景任務與重新嘗試機制 | 同步或非同步策略尚未決定 |
-| 截圖儲存與保存期限 | 必須支援隨 Trip 刪除，但供應商與期限未決 |
+| 截圖保存期限 | 供應商已定為 Supabase Storage，但保存期限未決；必須支援隨 Trip 刪除 |
 | Client 狀態管理 | 優先避免不必要的全域狀態；具體方案未決 |
-| 部署與環境配置 | 尚未指定 |
-| Instagram 公開內容取得方式 | 必須保留手動補充路徑，具體方法未決 |
+| Instagram 公開內容取得方式 | **自動化抓取已排除**（Instagram ToU §4.2 禁止自動化取得，且明載未登入一樣適用）。未決的只是允許範圍內的方式：Share Target 傳入的文字、使用者手動貼上與補充、官方 oEmbed 的允許用途。必須保留手動補充路徑 |
 
 未決項目只能記錄需求、限制與候選方案；未經使用者確認，不得被 Agent 選定、安裝或實作為唯一方案。
 
@@ -186,6 +195,14 @@ UI 隱藏不是授權控制。任何讀取、修改、重新處理或刪除動�
 
 無法匹配外部 Place 時，ImportItem 不能建立 TripPlace。
 
+Google Places 資料的保存必須符合 Google Maps Platform 條款：
+
+- Google Place ID 可以永久保存（Service Specific Terms §3 Google ID Caching）；建議每 12 個月重新整理一次。
+- 經緯度最多暫存 30 個日曆天，逾期必須刪除或重新查詢（§14.3）。
+- 名稱、地址、評分等其他 Places 內容**沒有快取許可**：ToS §3.2.3(b) 規定除非 Service Specific Terms 明文允許否則不得快取，而 Places 段只允許經緯度。
+- Google 照片不得下載保存，**連 photo name 都不得快取**（Place Photos 文件明載 "You cannot cache a photo name"）；必須在顯示時向 Google 取得，並顯示攝影者署名與 Google Maps 標示。
+- Places 內容不得顯示於非 Google 地圖（Service Specific Terms §14.2）。
+
 ### 3.6 人工確認與正式收藏
 
 負責：
@@ -206,6 +223,25 @@ Import 進入 `completed` 後，ImportItem 只作為唯讀處置紀錄。後續�
 - 只把已確認的 TripPlace 顯示在正式地圖。
 
 MVP 不需要一般關鍵字搜尋。
+
+### 3.8 照片來源
+
+TripPlace 的照片依序嘗試：
+
+1. **Google Places 照片**：Place 有 Google 照片時使用，依 §3.5 在顯示時向 Google 取得；照片與 photo name 都不保存。
+2. **分類預設圖**：沒有 Google 照片時，依 TripPlace 的分類顯示預設圖。
+
+**不使用 Instagram 貼文圖片。** Meta Developer Policies §6 禁止第三方應用單純顯示他人 User Content；Instagram Terms of Use §4.2 禁止自動化抓取，且明載未登入一樣適用；oEmbed 條款另禁止 extracting 或 persisting 其內容與中繼資料，且 `thumbnail_url` 已於 2025-11-03 移除。因此下載、轉存或熱連 Instagram 圖片都不在可選範圍內。
+
+Trip 封面規則：
+
+- 0 個地點時使用既有的 0 個地點佔位圖。
+- 有地點時，使用最早加入且擁有 Google 照片的 TripPlace 照片。
+- 所有地點都沒有 Google 照片時，使用最早加入 TripPlace 的分類預設圖。
+- 作為封面的 TripPlace 被移除後，改用下一個符合條件的 TripPlace。
+- Google 照片不可保存，因此封面會隨 Google 端的照片異動而改變。這是條款造成的必然結果，不是缺陷，也不得以快取規避。
+
+分類預設圖、Google 攝影者署名與 Google Maps 標示目前沒有設計交付，實作前必須先由 Claude Design 產出 `PlaceResultCard` 照片欄與 `TripCard` 封面欄的設計。署名設計必須包含「可開啟完整署名大圖」的路徑——那是縮圖可省略作者署名的前提。
 
 ---
 
@@ -240,7 +276,7 @@ src/
 - **元件不得相依 `lib/mock/`**。共用型別放 `types/`，讓元件與假資料解耦，之後替換資料來源不需要改元件。
 - **目錄依實際需要建立，不預先開空目錄。** 需要跨功能領域的分區時（例如 `modules/`）另行提出並更新本節。
 
-`src/app/` 內的路由對應 §10 的規劃路由。`/` 以 `redirect()` 導向 `/trips`；登入狀態的判斷待 Auth 方案定案後再加入。
+`src/app/` 內的路由對應 §10 的規劃路由。`/` 以 `redirect()` 導向 `/trips`；登入狀態的判斷待 Supabase Auth 實作接上後再加入（服務已定，見 §2.1；Session 寫法與 OAuth 憑證設定仍待實作時確認）。
 
 ---
 
@@ -265,7 +301,7 @@ Import 1 ── * TripPlaceSource
 - `Trip`：使用者擁有的旅行收藏容器，保存建立時指派、之後不再變更的視覺樣式標記。
 - `Import`：一次單篇來源匯入及其整體處理狀態。
 - `ImportItem`：單一候選地點及其確認結果。
-- `Place`：外部地點服務中的實際地點；不直接表示收藏所有權。
+- `Place`：Google Places 中的實際地點；只永久保存 Google Place ID，經緯度最多暫存 30 天，其他 Places 內容不得快取（見 §3.5）；不直接表示收藏所有權。
 - `TripPlace`：某 Trip 對某 Place 的正式收藏與旅行收藏專屬內容。
 - `TripPlaceSource`：TripPlace 與來源 Import 的關聯。
 
@@ -278,7 +314,7 @@ Import 1 ── * TripPlaceSource
 - TripPlaceSource 只能連結同一 Trip 範圍內的 TripPlace 與 Import。
 - 未確認或未匹配 Place 的 ImportItem 不得產生 TripPlace。
 
-實際欄位、主鍵、索引、約束語法與資料庫層授權方式，需在資料庫方案決定後補充。
+實際欄位、主鍵、索引與約束語法需在實作時補充。資料庫層授權方式已決定：以 PostgreSQL Row Level Security 實施，應用層查詢仍須自行帶上擁有者條件，兩層並存（防禦縱深）。
 
 ---
 
@@ -318,7 +354,7 @@ needs_input ──使用者結束零候選匯入──▶ completed
 - 重新處理不得未經使用者同意覆蓋已確認的正式收藏內容。
 - Import 進入 `completed` 後，不得再修改、重新匹配、確認、拒絕或重新處理其 ImportItem。已確認項目的正式收藏內容只能透過 TripPlace 的編輯邊界修改；該修改不改變原 ImportItem 的處置紀錄。
 
-具體狀態欄位、單一 ImportItem 的原子寫入邊界、批次協調方式、併發控制與重試冪等策略仍待資料庫及背景任務方案決定；無論採用何種實作，都必須維持上述部分成功的對外語意。
+具體狀態欄位、單一 ImportItem 的原子寫入邊界、批次協調方式、併發控制與重試冪等策略仍待補：資料庫已定為 Supabase Postgres（見 §2.1），待決的是欄位設計與背景任務策略。無論採用何種實作，都必須維持上述部分成功的對外語意。
 
 ---
 
@@ -330,7 +366,7 @@ needs_input ──使用者結束零候選匯入──▶ completed
 4. 若已存在，只新增尚未存在的 TripPlaceSource。
 5. 新解析資料只能作為更新候選；使用者明確選擇後才能改寫既有內容。
 
-資料庫方案決定後，必須以唯一約束或等效的原子機制保證 `(Trip, Place)` 與來源關聯不重複，不能只依賴 UI 檢查。
+必須以 PostgreSQL 的唯一約束或等效的原子機制保證 `(Trip, Place)` 與來源關聯不重複，不能只依賴 UI 檢查。實際約束語法於 schema 實作時補上。
 
 ---
 
